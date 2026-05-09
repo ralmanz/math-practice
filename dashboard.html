@@ -411,7 +411,7 @@
       if (!genRes.ok) throw new Error('generate failed');
       const variant = await genRes.json();
       if (!variant || variant.error) throw new Error('generate failed');
-      const baseUrl = window.location.href.split('?')[0].replace(/dashboard\.html$/, 'index.html');
+      const baseUrl = window.location.href.split('?')[0].replace(/dashboard\.html$/, 'app.html');
       const saveRes = await fetch(WORKER + '/save-variant', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
