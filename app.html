@@ -620,11 +620,120 @@
     .problem-card { padding: 20px; }
     .problem-text { font-size: 1rem; }
   }
+
+  /* ── Trial banner ── */
+  #trial-banner {
+    display: none;
+    width: 100%;
+    background: #FFF8E7;
+    border-bottom: 1.5px solid #F5D06A;
+    color: #7A5C00;
+    font-size: 0.82rem;
+    font-weight: 500;
+    text-align: center;
+    padding: 9px 16px;
+  }
+
+  #trial-banner a {
+    color: #7A5C00;
+    font-weight: 700;
+    text-decoration: underline;
+  }
+
+  /* ── Trial expired overlay ── */
+  #trial-expired {
+    display: none;
+    max-width: 540px;
+    width: 100%;
+    margin-top: 60px;
+    text-align: center;
+    padding: 0 8px;
+  }
+
+  #trial-expired .expired-logo {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 28px;
+    letter-spacing: -0.02em;
+  }
+
+  #trial-expired h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    letter-spacing: -0.02em;
+  }
+
+  #trial-expired p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.55;
+    margin-bottom: 28px;
+  }
+
+  .expired-btn-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+  }
+
+  .expired-btn {
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-family: var(--sans);
+    font-size: 0.92rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1.5px solid var(--accent);
+    transition: opacity 0.15s;
+  }
+
+  .expired-btn:hover { opacity: 0.85; }
+
+  .expired-btn-primary {
+    background: var(--accent);
+    color: white;
+  }
+
+  .expired-btn-outline {
+    background: transparent;
+    color: var(--accent);
+  }
+
+  .expired-note {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .expired-note a {
+    color: var(--text-secondary);
+    text-decoration: underline;
+  }
 </style>
 <script src="calculator.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/algebrite@1.4.0/dist/algebrite.bundle-for-browser.js"></script>
 </head>
 <body>
+
+<!-- ── Trial banner (shown when trial is active) ── -->
+<div id="trial-banner"></div>
+
+<!-- ── Trial expired overlay (replaces all content when trial has ended) ── -->
+<div id="trial-expired">
+  <div class="expired-logo">Nuvo Math</div>
+  <h2>Your free trial has ended</h2>
+  <p>You're one step away from full access. Choose a plan to keep practicing.</p>
+  <div class="expired-btn-row">
+    <a id="expired-practice-btn" href="#" class="expired-btn expired-btn-outline">Practice &mdash; $29/month</a>
+    <a href="https://wa.me/5076014-1676" target="_blank" class="expired-btn expired-btn-primary">Practice + Tutoring &mdash; $99/month</a>
+  </div>
+  <p class="expired-note">Questions? Email <a href="mailto:tutor@nuvostudio.club">tutor@nuvostudio.club</a> or WhatsApp 6014-1676.</p>
+</div>
 
 <!-- ════════ SETUP / TEACHER MODE ════════ -->
 <div id="setup-screen">
@@ -1700,8 +1809,52 @@
     });
   }());
 
+  // ── Trial status check ──
+  async function checkTrialStatus() {
+    if (!STUDENT_ID) return;
+    try {
+      const res = await fetch(`${PROXY_URL}/student/${encodeURIComponent(STUDENT_ID)}`);
+      if (!res.ok) return;
+      const student = await res.json();
+      if (!student.trialExpiry) return;
+
+      // Compare as YYYY-MM-DD strings to avoid timezone issues
+      const today = new Date();
+      const todayStr = today.getFullYear() + '-' +
+        String(today.getMonth() + 1).padStart(2, '0') + '-' +
+        String(today.getDate()).padStart(2, '0');
+
+      if (todayStr > student.trialExpiry) {
+        // Expired — hide all screens, show overlay
+        ['setup-screen', 'link-screen', 'practice-screen', 'done-screen'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.style.display = 'none';
+        });
+        // Pre-fill mailto with student name
+        const sName = encodeURIComponent(student.name || STUDENT_ID);
+        const subject = encodeURIComponent('Subscribe: Practice Plan');
+        const body = encodeURIComponent(`Hi, I'd like to subscribe to the Practice plan for ${student.name || STUDENT_ID}.`);
+        document.getElementById('expired-practice-btn').href =
+          `mailto:tutor@nuvostudio.club?subject=${subject}&body=${body}`;
+        document.getElementById('trial-expired').style.display = 'block';
+      } else {
+        // Active — compute days remaining and show banner
+        const expiry = new Date(student.trialExpiry + 'T00:00:00');
+        const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const daysLeft = Math.round((expiry - todayMidnight) / (1000 * 60 * 60 * 24));
+        const dayWord = daysLeft === 1 ? 'day' : 'days';
+        const banner = document.getElementById('trial-banner');
+        banner.innerHTML = `Free trial &middot; <strong>${daysLeft} ${dayWord} remaining</strong> &mdash; <a href="https://nuvostudio.club/#pricing">Choose a plan</a>`;
+        banner.style.display = 'block';
+      }
+    } catch {
+      // Silently ignore — never block the practice tool
+    }
+  }
+
   // ── Boot ──
   init();
+  checkTrialStatus();
 </script>
 
 </body>

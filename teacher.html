@@ -296,7 +296,9 @@
   .student-selector-row:hover { border-color: var(--accent); background: var(--accent-bg); }
   .student-selector-row.active { border-color: var(--accent); background: var(--accent-bg); }
 
-  .student-selector-row .s-name { flex: 1; font-size: 0.92rem; font-weight: 600; }
+  .student-selector-row .s-name { flex: 1; font-size: 0.92rem; font-weight: 600; display: flex; flex-direction: column; gap: 2px; }
+  .student-selector-row .s-meta { font-size: 0.7rem; font-weight: 500; color: var(--accent); opacity: 0.85; }
+  .student-selector-row.active .s-meta { color: white; }
 
   .s-progress {
     display: flex;
@@ -419,6 +421,7 @@
         <div>
           <div id="compact-name" style="font-size:0.95rem;font-weight:600;"></div>
           <div id="compact-id" style="font-size:0.75rem;color:var(--text-secondary);font-family:var(--mono);margin-top:2px;"></div>
+          <div id="compact-meta" style="font-size:0.75rem;color:var(--accent);margin-top:3px;"></div>
         </div>
         <button class="btn btn-secondary btn-sm" onclick="showEditForm()">Edit ✏️</button>
       </div>
@@ -433,6 +436,30 @@
       <div class="field">
         <label>Student Name</label>
         <input type="text" id="student-name" placeholder="e.g. Sofia" autocomplete="off" autocorrect="off" spellcheck="false">
+      </div>
+      <div class="field">
+        <label>Curriculum</label>
+        <select id="student-curriculum">
+          <option value="" disabled selected>Select curriculum...</option>
+          <option value="cambridge">Cambridge Lower Secondary</option>
+          <option value="common-core">Common Core (US)</option>
+          <option value="ib-myp">IB MYP</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Grade / Stage</label>
+        <select id="student-grade">
+          <option value="" disabled selected>Select grade...</option>
+          <option value="6">Grade 6 / Stage 7 / MYP 1</option>
+          <option value="7">Grade 7 / Stage 8 / MYP 2</option>
+          <option value="8">Grade 8 / Stage 9 / MYP 3</option>
+          <option value="9">Grade 9 / MYP 4</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Trial expiry date <span style="font-weight:400;color:var(--text-secondary);">(optional — leave blank for full access)</span></label>
+        <input type="date" id="trial-expiry">
       </div>
       <div class="btn-row">
         <button class="btn btn-primary" onclick="saveProfile()" id="save-profile-btn">Save Student</button>
@@ -543,6 +570,8 @@
   let currentProblems = []; // local working copy
   let selectedStudentId = null;
   let selectedStudentName = '';
+  let selectedCurriculum = '';
+  let selectedGrade = '';
   let pidCounter = 1;
 
   // ── Auth ──────────────────────────────────────────────────────
@@ -596,7 +625,7 @@
           const data = await r.json();
           const problems = data.problems || [];
           const done = problems.filter(p => p.completed).length;
-          return { ...s, done, total: problems.length };
+          return { ...s, done, total: problems.length, curriculum: data.curriculum || '', grade: data.grade || '' };
         } catch {
           return { ...s, done: 0, total: 0 };
         }
@@ -617,7 +646,7 @@
       <div class="student-selector-row${selectedStudentId === s.id ? ' active' : ''}"
            id="srow-${escHtml(s.id)}"
            onclick="selectStudent('${escHtml(s.id)}', '${escHtml(s.name)}')">
-        <span class="s-name">${escHtml(s.name)}</span>
+        <span class="s-name">${escHtml(s.name)}${s.curriculum && s.grade ? `<span class="s-meta">${escHtml(formatMeta(s.curriculum, s.grade))}</span>` : ''}</span>
         <span class="s-progress">
           <span class="s-progress-track">
             <span class="s-progress-fill" style="width:${pct}%"></span>
@@ -640,9 +669,24 @@
     document.getElementById('student-form').style.display = 'none';
   }
 
+  function formatMeta(curriculum, grade) {
+    if (!curriculum || !grade) return '';
+    const stageMap = {
+      cambridge:    { '6': 'Stage 7', '7': 'Stage 8', '8': 'Stage 9', '9': 'Stage 9' },
+      'common-core': { '6': 'Grade 6', '7': 'Grade 7', '8': 'Grade 8', '9': 'Grade 9' },
+      'ib-myp':     { '6': 'MYP 1',   '7': 'MYP 2',   '8': 'MYP 3',  '9': 'MYP 4'   },
+      other:        { '6': 'Grade 6', '7': 'Grade 7', '8': 'Grade 8', '9': 'Grade 9' }
+    };
+    const nameMap = { cambridge: 'Cambridge', 'common-core': 'Common Core', 'ib-myp': 'IB MYP', other: 'Other' };
+    const stage = (stageMap[curriculum] || {})[grade] || `Grade ${grade}`;
+    const name  = nameMap[curriculum] || curriculum;
+    return `${name} · ${stage}`;
+  }
+
   function showStudentCompact() {
     document.getElementById('compact-name').textContent = selectedStudentName || selectedStudentId;
     document.getElementById('compact-id').textContent = selectedStudentId;
+    document.getElementById('compact-meta').textContent = formatMeta(selectedCurriculum, selectedGrade);
     document.getElementById('student-placeholder').style.display = 'none';
     document.getElementById('student-compact').style.display = 'block';
     document.getElementById('student-form').style.display = 'none';
@@ -663,6 +707,8 @@
     if (selectedStudentId) {
       document.getElementById('student-id').value = selectedStudentId;
       document.getElementById('student-name').value = selectedStudentName;
+      document.getElementById('student-curriculum').value = selectedCurriculum;
+      document.getElementById('student-grade').value = selectedGrade;
       showStudentCompact();
     } else {
       showStudentPlaceholder();
@@ -696,6 +742,11 @@
     selectedStudentName = '';
     document.getElementById('student-id').value = '';
     document.getElementById('student-name').value = '';
+    document.getElementById('student-curriculum').value = '';
+    document.getElementById('student-grade').value = '';
+    document.getElementById('trial-expiry').value = '';
+    selectedCurriculum = '';
+    selectedGrade = '';
     currentProblems = [];
     pidCounter = 1;
     updatePidField();
@@ -726,7 +777,12 @@
       if (!res.ok) throw new Error('Server error');
       const student = await res.json();
       selectedStudentName = student.name || id;
+      selectedCurriculum = student.curriculum || '';
+      selectedGrade = student.grade || '';
       document.getElementById('student-name').value = selectedStudentName;
+      document.getElementById('student-curriculum').value = selectedCurriculum;
+      document.getElementById('student-grade').value = selectedGrade;
+      document.getElementById('trial-expiry').value = student.trialExpiry || '';
       currentProblems = (student.problems || []).map(p => ({
         ...p,
         url: p.url ? p.url.replace('https://credito-scorer.github.io/math-practice/', PRACTICE_BASE) : p.url
@@ -825,8 +881,11 @@
 
   // ── Save profile (name only) ───────────────────────────────────
   async function saveProfile() {
-    const id   = document.getElementById('student-id').value.trim();
-    const name = document.getElementById('student-name').value.trim();
+    const id          = document.getElementById('student-id').value.trim();
+    const name        = document.getElementById('student-name').value.trim();
+    const curriculum  = document.getElementById('student-curriculum').value || '';
+    const grade       = document.getElementById('student-grade').value || '';
+    const trialExpiry = document.getElementById('trial-expiry').value || '';
 
     if (!id || !name) {
       showStatus('profile-status', 'err', 'Enter both student ID and name.');
@@ -844,7 +903,7 @@
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${teacherSecret}`
         },
-        body: JSON.stringify({ name })
+        body: JSON.stringify({ name, curriculum, grade, trialExpiry })
       });
 
       if (res.status === 401) {
@@ -855,6 +914,8 @@
 
       selectedStudentId = id;
       selectedStudentName = name;
+      selectedCurriculum = curriculum;
+      selectedGrade = grade;
       showStudentCompact();
       showDownstreamCards();
       updateDashboardLink(id);
