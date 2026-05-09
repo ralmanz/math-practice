@@ -1,1707 +1,876 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nuvo Studio</title>
-<link rel="icon" type="image/x-icon" href="favicon.ico">
-<link rel="apple-touch-icon" href="icon-180.png">
-<link rel="manifest" href="manifest.json">
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=DM+Mono:wght@400;500&display=swap');
-
-  :root {
-    --bg: #FAFAF8;
-    --card: #FFFFFF;
-    --text: #1A1A1A;
-    --text-secondary: #6B6B6B;
-    --border: #E8E8E4;
-    --accent: #2D6A4F;
-    --accent-light: #D8F3DC;
-    --accent-bg: #F0FAF3;
-    --correct: #2D6A4F;
-    --correct-bg: #D8F3DC;
-    --wrong: #C1453B;
-    --wrong-bg: #FDE8E6;
-    --nudge: #B8860B;
-    --nudge-bg: #FFF8E7;
-    --unsure: #5A6B7A;
-    --unsure-bg: #EDF1F5;
-    --mono: 'DM Mono', monospace;
-    --sans: 'DM Sans', sans-serif;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    font-family: var(--sans);
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-  }
-
-  /* ── Setup Screen (Teacher Mode) ── */
-  #setup-screen {
-    max-width: 640px;
-    width: 100%;
-    margin-top: 40px;
-  }
-
-  #setup-screen h1 {
-    font-size: 1.6rem;
-    font-weight: 700;
-    margin-bottom: 6px;
-    letter-spacing: -0.02em;
-  }
-
-  #setup-screen .subtitle {
-    color: var(--text-secondary);
-    font-size: 0.95rem;
-    margin-bottom: 24px;
-    line-height: 1.5;
-  }
-
-  /* ── Problem Builder Cards ── */
-  #cards-container {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-bottom: 10px;
-  }
-
-  .builder-card {
-    background: var(--card);
-    border: 1.5px solid var(--border);
-    border-radius: 14px;
-    padding: 20px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-    animation: slideIn 0.2s ease;
-  }
-
-  .builder-card-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 14px;
-  }
-
-  .builder-card-title {
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--accent);
-  }
-
-  .builder-delete-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 0.95rem;
-    color: var(--text-secondary);
-    padding: 4px 6px;
-    border-radius: 6px;
-    line-height: 1;
-    transition: background 0.15s, color 0.15s;
-  }
-
-  .builder-delete-btn:hover { background: var(--wrong-bg); color: var(--wrong); }
-
-  .builder-field {
-    margin-bottom: 10px;
-  }
-
-  .builder-field:last-child { margin-bottom: 0; }
-
-  .builder-field-label {
-    display: block;
-    font-size: 0.72rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--text-secondary);
-    margin-bottom: 5px;
-  }
-
-  .builder-type-select {
-    width: 100%;
-    padding: 9px 32px 9px 12px;
-    border: 1.5px solid var(--border);
-    border-radius: 8px;
-    font-family: var(--sans);
-    font-size: 0.9rem;
-    background: var(--bg);
-    color: var(--text);
-    outline: none;
-    cursor: pointer;
-    transition: border-color 0.2s;
-    -webkit-appearance: none;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' viewBox='0 0 12 7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B6B6B' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-  }
-
-  .builder-type-select:focus { border-color: var(--accent); }
-
-  .builder-input {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1.5px solid var(--border);
-    border-radius: 8px;
-    font-family: var(--mono);
-    font-size: 0.9rem;
-    background: var(--card);
-    color: var(--text);
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-
-  .builder-input:focus { border-color: var(--accent); }
-
-  .builder-input.active-field {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-light);
-  }
-
-  .add-problem-btn {
-    width: 100%;
-    padding: 12px;
-    background: transparent;
-    color: var(--accent);
-    border: 1.5px dashed var(--accent);
-    border-radius: 10px;
-    font-family: var(--sans);
-    font-weight: 600;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: background 0.15s;
-    margin-bottom: 14px;
-  }
-
-  .add-problem-btn:hover { background: var(--accent-bg); }
-
-  .format-hint {
-    font-size: 0.78rem;
-    color: var(--text-secondary);
-    margin-top: 10px;
-    margin-bottom: 16px;
-    line-height: 1.5;
-    background: var(--accent-bg);
-    padding: 10px 12px;
-    border-radius: 8px;
-    border-left: 3px solid var(--accent);
-  }
-
-  .setup-error {
-    color: var(--wrong);
-    font-size: 0.85rem;
-    margin-top: 8px;
-    margin-bottom: 8px;
-    display: none;
-  }
-
-  .btn-primary {
-    width: 100%;
-    padding: 14px;
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-family: var(--sans);
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: opacity 0.2s, transform 0.1s;
-  }
-
-  .btn-primary:hover { opacity: 0.9; }
-  .btn-primary:active { transform: scale(0.99); }
-  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-
-  /* ── Link Generated Screen ── */
-  #link-screen {
-    max-width: 640px;
-    width: 100%;
-    margin-top: 40px;
-    display: none;
-    text-align: center;
-  }
-
-  #link-screen h2 {
-    font-size: 1.4rem;
-    font-weight: 700;
-    margin-bottom: 8px;
-  }
-
-  #link-screen .subtitle {
-    color: var(--text-secondary);
-    font-size: 0.92rem;
-    margin-bottom: 24px;
-  }
-
-  .link-box {
-    background: var(--card);
-    border: 1.5px solid var(--border);
-    border-radius: 10px;
-    padding: 14px;
-    font-family: var(--mono);
-    font-size: 0.75rem;
-    word-break: break-all;
-    text-align: left;
-    color: var(--text-secondary);
-    margin-bottom: 14px;
-    max-height: 80px;
-    overflow-y: auto;
-  }
-
-  .btn-row {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 14px;
-  }
-
-  .btn-row button { flex: 1; }
-
-  .btn-secondary {
-    padding: 12px 16px;
-    background: transparent;
-    color: var(--accent);
-    border: 1.5px solid var(--accent);
-    border-radius: 10px;
-    font-family: var(--sans);
-    font-weight: 600;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-
-  .btn-secondary:hover { background: var(--accent-bg); }
-
-  .copy-toast {
-    font-size: 0.85rem;
-    color: var(--correct);
-    opacity: 0;
-    transition: opacity 0.3s;
-    margin-bottom: 10px;
-  }
-
-  .copy-toast.show { opacity: 1; }
-
-  .problem-summary {
-    text-align: left;
-    background: var(--accent-bg);
-    border-radius: 10px;
-    padding: 16px;
-    margin-top: 16px;
-  }
-
-  .problem-summary h4 {
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--accent);
-    margin-bottom: 10px;
-  }
-
-  .problem-summary li {
-    font-family: var(--mono);
-    font-size: 0.82rem;
-    margin-bottom: 5px;
-    list-style: none;
-    padding-left: 20px;
-    position: relative;
-    color: var(--text);
-  }
-
-  .problem-summary li::before {
-    content: attr(data-num);
-    position: absolute;
-    left: 0;
-    color: var(--accent);
-    font-weight: 600;
-  }
-
-  /* ── Practice Screen (Student Mode) ── */
-  #practice-screen {
-    max-width: 640px;
-    width: 100%;
-    margin-top: 30px;
-    display: none;
-  }
-
-  .student-header {
-    text-align: center;
-    margin-bottom: 24px;
-  }
-
-  .student-header h1 {
-    font-size: 1.4rem;
-    font-weight: 700;
-    margin-bottom: 4px;
-  }
-
-  .student-header p {
-    font-size: 0.88rem;
-    color: var(--text-secondary);
-  }
-
-  .progress-bar-container {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 28px;
-  }
-
-  .progress-bar {
-    flex: 1;
-    height: 6px;
-    background: var(--border);
-    border-radius: 3px;
-    overflow: hidden;
-  }
-
-  .progress-fill {
-    height: 100%;
-    background: var(--accent);
-    border-radius: 3px;
-    transition: width 0.4s ease;
-    width: 0%;
-  }
-
-  .progress-text {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    white-space: nowrap;
-  }
-
-  .problem-card {
-    background: var(--card);
-    border: 1.5px solid var(--border);
-    border-radius: 14px;
-    padding: 28px;
-    margin-bottom: 20px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-  }
-
-  .problem-label {
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--accent);
-    margin-bottom: 10px;
-  }
-
-  .problem-text {
-    font-family: var(--mono);
-    font-size: 1.15rem;
-    font-weight: 500;
-    line-height: 1.6;
-    color: var(--text);
-  }
-
-  /* ── Step History ── */
-  .step-entry {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 10px 14px;
-    border-radius: 10px;
-    margin-bottom: 6px;
-    animation: slideIn 0.25s ease;
-  }
-
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .step-entry.correct { background: var(--correct-bg); }
-
-  .step-entry .step-icon {
-    font-size: 1rem;
-    margin-top: 1px;
-    flex-shrink: 0;
-  }
-
-  .step-entry .step-text {
-    font-family: var(--mono);
-    font-size: 0.92rem;
-    line-height: 1.5;
-  }
-
-  /* ── Feedback ── */
-  .feedback {
-    padding: 12px 14px;
-    border-radius: 10px;
-    margin-bottom: 14px;
-    font-size: 0.88rem;
-    line-height: 1.5;
-    animation: slideIn 0.25s ease;
-    display: none;
-  }
-
-  .feedback.wrong  { background: var(--wrong-bg);  color: var(--wrong);  display: block; }
-  .feedback.nudge  { background: var(--nudge-bg);  color: var(--nudge);  display: block; }
-  .feedback.unsure { background: var(--unsure-bg); color: var(--unsure); display: block; }
-  .feedback.reveal { background: var(--accent-bg); color: var(--accent); display: block; font-family: var(--mono); }
-
-  /* ── Calculator Display ── */
-  #input-area {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 16px;
-  }
-
-  #step-input {
-    width: 100%;
-    padding: 12px 14px;
-    border: 1.5px solid var(--border);
-    border-radius: 10px;
-    font-family: var(--mono);
-    font-size: 1rem;
-    background: var(--card);
-    color: var(--text);
-    outline: none;
-    transition: border-color 0.2s;
-  }
-
-  #step-input:focus { border-color: var(--accent); }
-
-  /* ── Math preview (live rendered fraction display) ── */
-  .math-preview {
-    display: none;
-    font-family: var(--mono);
-    font-size: 1.05rem;
-    padding: 10px 14px;
-    background: var(--accent-bg);
-    border: 1.5px solid var(--accent-light);
-    border-radius: 10px;
-    line-height: 2.2;
-    color: var(--text);
-    min-height: 48px;
-  }
-  .math-preview.visible { display: block; }
-
-  /* ── Stacked fraction rendering ── */
-  .math-frac {
-    display: inline-flex;
-    flex-direction: column;
-    align-items: center;
-    vertical-align: middle;
-    margin: 0 2px;
-  }
-  .math-num {
-    border-bottom: 1.5px solid currentColor;
-    padding: 0 4px;
-    text-align: center;
-    line-height: 1.5;
-  }
-  .math-den {
-    padding: 0 4px;
-    text-align: center;
-    line-height: 1.5;
-  }
-
-  /* Disabled state (student only) */
-  #calc-grid.disabled .calc-btn   { opacity: 0.45; pointer-events: none; }
-  #calc-grid.disabled .toggle-btn { opacity: 0.45; pointer-events: none; }
-
-  .loading-indicator {
-    display: none;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.82rem;
-    color: var(--text-secondary);
-    padding: 8px 0;
-  }
-
-  .loading-indicator.show { display: flex; }
-
-  .spinner {
-    width: 16px;
-    height: 16px;
-    border: 2px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .completed-card {
-    background: var(--correct-bg);
-    border: 1.5px solid var(--correct);
-    border-radius: 14px;
-    padding: 24px;
-    text-align: center;
-    margin-bottom: 20px;
-    animation: slideIn 0.3s ease;
-    display: none;
-  }
-
-  .completed-card .check { font-size: 2rem; margin-bottom: 8px; }
-  .completed-card h3 { color: var(--correct); font-size: 1.1rem; margin-bottom: 4px; }
-  .completed-card p  { color: var(--correct); font-size: 0.88rem; opacity: 0.8; }
-
-  #next-problem-btn {
-    width: 100%;
-    padding: 14px;
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-family: var(--sans);
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: opacity 0.2s;
-    display: none;
-  }
-
-  #next-problem-btn:hover { opacity: 0.9; }
-
-  /* ── Done Screen ── */
-  #done-screen {
-    max-width: 640px;
-    width: 100%;
-    margin-top: 60px;
-    text-align: center;
-    display: none;
-  }
-
-  #done-screen .done-icon { font-size: 3rem; margin-bottom: 16px; }
-  #done-screen h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; }
-  #done-screen p  { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5; }
-
-  .ask-ronel-list {
-    margin-top: 20px;
-    text-align: left;
-    background: var(--unsure-bg);
-    border-radius: 10px;
-    padding: 16px 20px;
-  }
-
-  .ask-ronel-list h4 {
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--unsure);
-    margin-bottom: 10px;
-  }
-
-  .ask-ronel-list li {
-    font-family: var(--mono);
-    font-size: 0.85rem;
-    margin-bottom: 6px;
-    list-style: none;
-    padding-left: 16px;
-    position: relative;
-    color: var(--text);
-  }
-
-  .ask-ronel-list li::before {
-    content: '?';
-    position: absolute;
-    left: 0;
-    color: var(--unsure);
-    font-weight: 700;
-  }
-
-  @media (max-width: 500px) {
-    body { padding: 14px; }
-    .problem-card { padding: 20px; }
-    .problem-text { font-size: 1rem; }
-  }
-</style>
-<script src="calculator.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/algebrite@1.4.0/dist/algebrite.bundle-for-browser.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nuvo Math — Algebra practice that actually teaches</title>
+  <meta name="description" content="Step-by-step guided algebra practice and live tutoring for grades 6–9. Cambridge curriculum. No more getting stuck alone.">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:        #2563EB;
+      --blue-dark:   #1E40AF;
+      --blue-mid:    #3B82F6;
+      --blue-light:  #DBEAFE;
+      --blue-xlight: #EFF6FF;
+      --text:        #111827;
+      --text-mid:    #374151;
+      --text-muted:  #6B7280;
+      --border:      #E5E7EB;
+      --bg:          #F9FAFB;
+      --white:       #FFFFFF;
+      --radius:      12px;
+      --radius-lg:   20px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: var(--white);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .nav-logo {
+      font-weight: 800;
+      font-size: 1.2rem;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.03em;
+      flex-shrink: 0;
+    }
+
+    .nav-logo span { color: var(--blue); }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-mid);
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.15s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-block;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 0.92rem;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: none;
+      line-height: 1;
+    }
+
+    .btn-primary {
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .btn-primary:hover { background: var(--blue-dark); }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--blue);
+      border: 2px solid var(--blue);
+    }
+
+    .btn-outline:hover { background: var(--blue-xlight); }
+
+    /* ── Hamburger (mobile) ── */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+      background: none;
+      border: none;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--text);
+      border-radius: 2px;
+      transition: all 0.2s;
+    }
+
+    /* ── Shared section layout ── */
+    section { padding: 88px 24px; }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--blue);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: clamp(1.75rem, 3.5vw, 2.25rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+
+    .section-sub {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+      max-width: 560px;
+    }
+
+    /* ─────────────────────────────────────────
+       HERO
+    ───────────────────────────────────────── */
+    #hero {
+      background: var(--white);
+      padding: 108px 24px 96px;
+      text-align: center;
+    }
+
+    .hero-eyebrow {
+      display: inline-block;
+      background: var(--blue-light);
+      color: var(--blue-dark);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 5px 16px;
+      border-radius: 20px;
+      margin-bottom: 28px;
+    }
+
+    .hero-headline {
+      font-size: clamp(2.6rem, 6vw, 4rem);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.08;
+      margin-bottom: 24px;
+      max-width: 760px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero-sub {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      max-width: 560px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .hero-ctas .btn {
+      padding: 14px 30px;
+      font-size: 1rem;
+      border-radius: 10px;
+    }
+
+    /* ─────────────────────────────────────────
+       PROBLEM SECTION
+    ───────────────────────────────────────── */
+    #problem { background: var(--bg); }
+
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 52px;
+    }
+
+    .problem-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px 28px 32px;
+    }
+
+    .problem-icon {
+      width: 48px;
+      height: 48px;
+      background: var(--blue-xlight);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      margin-bottom: 18px;
+    }
+
+    .problem-card h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      letter-spacing: -0.01em;
+    }
+
+    .problem-card p {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    /* ─────────────────────────────────────────
+       HOW IT WORKS
+    ───────────────────────────────────────── */
+    #how-it-works { background: var(--white); }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 40px;
+      margin-top: 52px;
+    }
+
+    .step { text-align: center; }
+
+    .step-circle {
+      width: 56px;
+      height: 56px;
+      background: var(--blue);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      font-weight: 800;
+      margin: 0 auto 16px;
+    }
+
+    .step-emoji {
+      font-size: 2rem;
+      margin-bottom: 14px;
+      line-height: 1;
+    }
+
+    .step h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      letter-spacing: -0.01em;
+    }
+
+    .step p {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+      max-width: 260px;
+      margin: 0 auto;
+    }
+
+    /* ─────────────────────────────────────────
+       CURRICULUM
+    ───────────────────────────────────────── */
+    #curriculum { background: var(--bg); }
+
+    .curriculum-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--blue-light);
+      color: var(--blue-dark);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 20px;
+      margin-top: 20px;
+    }
+
+    .units-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 12px;
+      margin-top: 44px;
+    }
+
+    .unit-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 22px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .unit-num {
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: var(--blue);
+      background: var(--blue-xlight);
+      padding: 3px 8px;
+      border-radius: 6px;
+      flex-shrink: 0;
+      margin-top: 3px;
+      letter-spacing: 0.03em;
+    }
+
+    .unit-text h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 5px;
+      letter-spacing: -0.01em;
+    }
+
+    .unit-text p {
+      font-size: 0.83rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* ─────────────────────────────────────────
+       PRICING
+    ───────────────────────────────────────── */
+    #pricing { background: var(--white); }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin-top: 52px;
+      max-width: 780px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .pricing-card {
+      background: var(--white);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 36px 32px 32px;
+      position: relative;
+    }
+
+    .pricing-card.featured {
+      border-color: var(--blue);
+      background: #FAFCFF;
+    }
+
+    .popular-badge {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--blue);
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 4px 16px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    .plan-name {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 10px;
+    }
+
+    .plan-price {
+      font-size: 2.8rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .plan-price span {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: 0;
+    }
+
+    .plan-features {
+      list-style: none;
+      margin: 26px 0 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 13px;
+    }
+
+    .plan-features li {
+      display: flex;
+      gap: 11px;
+      align-items: flex-start;
+      font-size: 0.92rem;
+      color: var(--text-mid);
+      line-height: 1.45;
+    }
+
+    .plan-features li::before {
+      content: '✓';
+      color: var(--blue);
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .plan-cta {
+      width: 100%;
+      padding: 14px;
+      font-size: 1rem;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .pricing-note {
+      text-align: center;
+      margin-top: 22px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* ─────────────────────────────────────────
+       FOOTER
+    ───────────────────────────────────────── */
+    footer {
+      background: #111827;
+      color: #D1D5DB;
+      padding: 56px 24px 40px;
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      text-align: center;
+    }
+
+    .footer-logo {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: white;
+      letter-spacing: -0.03em;
+    }
+
+    .footer-logo span { color: #93C5FD; }
+
+    .footer-tagline {
+      font-size: 0.88rem;
+      color: #9CA3AF;
+      max-width: 380px;
+      line-height: 1.55;
+    }
+
+    .footer-contact {
+      display: flex;
+      gap: 28px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 4px;
+    }
+
+    .footer-contact a {
+      color: #9CA3AF;
+      text-decoration: none;
+      font-size: 0.88rem;
+      transition: color 0.15s;
+    }
+
+    .footer-contact a:hover { color: white; }
+
+    .footer-divider {
+      width: 100%;
+      max-width: 400px;
+      height: 1px;
+      background: #1F2937;
+    }
+
+    .footer-copy {
+      font-size: 0.8rem;
+      color: #4B5563;
+    }
+
+    /* ─────────────────────────────────────────
+       SCROLL FADE-IN
+    ───────────────────────────────────────── */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* stagger children of a grid when parent is the fade target */
+    .fade-in-group > * {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .fade-in-group.visible > *:nth-child(1) { transition-delay: 0s;    opacity: 1; transform: none; }
+    .fade-in-group.visible > *:nth-child(2) { transition-delay: 0.1s;  opacity: 1; transform: none; }
+    .fade-in-group.visible > *:nth-child(3) { transition-delay: 0.2s;  opacity: 1; transform: none; }
+    .fade-in-group.visible > *:nth-child(4) { transition-delay: 0.3s;  opacity: 1; transform: none; }
+    .fade-in-group.visible > *:nth-child(5) { transition-delay: 0.35s; opacity: 1; transform: none; }
+    .fade-in-group.visible > *:nth-child(6) { transition-delay: 0.4s;  opacity: 1; transform: none; }
+    .fade-in-group.visible > *:nth-child(7) { transition-delay: 0.45s; opacity: 1; transform: none; }
+
+    /* ─────────────────────────────────────────
+       RESPONSIVE
+    ───────────────────────────────────────── */
+    @media (max-width: 768px) {
+      section { padding: 64px 20px; }
+      #hero { padding: 80px 20px 68px; }
+
+      .nav-links { display: none; }
+      .nav-links.open {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        position: absolute;
+        top: 64px;
+        left: 0;
+        right: 0;
+        background: white;
+        padding: 20px 24px 24px;
+        border-bottom: 1px solid var(--border);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+      }
+
+      .nav-links.open a { font-size: 1rem; padding: 8px 0; }
+
+      .hamburger { display: flex; }
+      .nav-cta { display: none; }
+
+      .pricing-grid { grid-template-columns: 1fr; max-width: 440px; }
+    }
+
+    @media (max-width: 480px) {
+      .hero-ctas { flex-direction: column; align-items: stretch; }
+      .hero-ctas .btn { text-align: center; }
+      .steps-grid { gap: 32px; }
+      .footer-contact { gap: 18px; flex-direction: column; }
+    }
+  </style>
 </head>
 <body>
 
-<!-- ════════ SETUP / TEACHER MODE ════════ -->
-<div id="setup-screen">
-  <h1>Nuvo Studio ✏️</h1>
-  <p class="subtitle">Build your homework problems below, then generate a link for your student.</p>
+<!-- ════════ NAV ════════ -->
+<nav id="nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">Nuvo <span>Math</span></a>
 
-  <!-- Problem cards (dynamically populated) -->
-  <div id="cards-container"></div>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="#how-it-works">How it works</a></li>
+      <li><a href="#curriculum">Curriculum</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+    </ul>
 
-  <button class="add-problem-btn" onclick="addProblemCard()">+ Add Problem</button>
+    <a href="#pricing" class="btn btn-primary nav-cta">Get Started</a>
 
-  <!-- Calculator (populated by calculator.js) -->
-  <div id="setup-calc-wrapper"></div>
-
-  <div class="format-hint">
-    Tap a Question or Answer field, then use the calculator to insert math symbols into that field.
+    <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
   </div>
-  <div class="setup-error" id="setup-error"></div>
+</nav>
 
-  <button class="btn-primary" onclick="generateLink()">Generate Student Link</button>
-</div>
 
-<!-- ════════ LINK GENERATED ════════ -->
-<div id="link-screen">
-  <h2>Link ready! 🔗</h2>
-  <p class="subtitle">Send this link to your student — they'll go straight into practice mode.</p>
-
-  <div class="link-box" id="link-box"></div>
-  <div class="copy-toast" id="copy-toast">✓ Copied to clipboard</div>
-
-  <div class="btn-row">
-    <button class="btn-primary" onclick="copyLink()">Copy Link</button>
-    <button class="btn-secondary" onclick="previewAsStudent()">Preview</button>
+<!-- ════════ HERO ════════ -->
+<section id="hero">
+  <div class="container">
+    <div class="hero-eyebrow">Cambridge Lower Secondary &middot; Grades 6&ndash;9</div>
+    <h1 class="hero-headline">Master Algebra.<br>At Your Own Pace.</h1>
+    <p class="hero-sub">Step-by-step guided practice that builds real understanding — paired with live weekly tutoring so your student never gets stuck alone.</p>
+    <div class="hero-ctas">
+      <a href="#pricing" class="btn btn-primary">Start Practicing</a>
+      <a href="#how-it-works" class="btn btn-outline">See How It Works</a>
+    </div>
   </div>
+</section>
 
-  <div class="problem-summary" id="problem-summary">
-    <h4>Problems loaded</h4>
-    <ul id="summary-list"></ul>
+
+<!-- ════════ PROBLEM SECTION ════════ -->
+<section id="problem">
+  <div class="container">
+    <p class="section-label">Why students struggle</p>
+    <h2 class="section-title">Sound familiar?</h2>
+    <div class="problem-grid fade-in-group">
+
+      <div class="problem-card">
+        <div class="problem-icon">&#x1F630;</div>
+        <h3>Nobody to ask for help</h3>
+        <p>Your student gets stuck on homework and has no one to turn to. They wait until the next session — or worse, give up. Algebra doesn't pause for anyone.</p>
+      </div>
+
+      <div class="problem-card">
+        <div class="problem-icon">&#x1F916;</div>
+        <h3>AI tools just hand over the answer</h3>
+        <p>Most apps show the solution without teaching the thinking. That's not learning — it's copying. Students miss the understanding behind each step.</p>
+      </div>
+
+      <div class="problem-card">
+        <div class="problem-icon">&#x1F4C5;</div>
+        <h3>One weekly session isn't enough</h3>
+        <p>Private tutoring is valuable, but students need daily practice to build fluency. Without it, lessons don't stick between sessions.</p>
+      </div>
+
+    </div>
   </div>
-</div>
+</section>
 
-<!-- ════════ PRACTICE / STUDENT MODE ════════ -->
-<div id="practice-screen">
-  <div class="student-header">
-    <h1>Nuvo Studio ✏️</h1>
-    <p>Work through each problem one step at a time.</p>
+
+<!-- ════════ HOW IT WORKS ════════ -->
+<section id="how-it-works">
+  <div class="container">
+    <p class="section-label">How it works</p>
+    <h2 class="section-title">Simple. Guided. Effective.</h2>
+    <div class="steps-grid fade-in-group">
+
+      <div class="step">
+        <div class="step-circle">1</div>
+        <div class="step-emoji">&#x1F393;</div>
+        <h3>Enroll online</h3>
+        <p>Choose your plan and get immediate access to the full curriculum — no scheduling, no waiting.</p>
+      </div>
+
+      <div class="step">
+        <div class="step-circle">2</div>
+        <div class="step-emoji">&#x1F9E0;</div>
+        <h3>Practice with the Guided Practice Engine</h3>
+        <p>The Guided Practice Engine walks through problems step by step, giving targeted hints when students are stuck — never just handing over the answer.</p>
+      </div>
+
+      <div class="step">
+        <div class="step-circle">3</div>
+        <div class="step-emoji">&#x1F4F9;</div>
+        <h3>Get tutored live</h3>
+        <p>Weekly Google Meet sessions with a real teacher to review progress, answer harder questions, and keep momentum going.</p>
+      </div>
+
+    </div>
   </div>
+</section>
 
-  <div class="progress-bar-container">
-    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
-    <div class="progress-text" id="progress-text">1 / 1</div>
+
+<!-- ════════ CURRICULUM ════════ -->
+<section id="curriculum">
+  <div class="container">
+    <p class="section-label">What they'll learn</p>
+    <h2 class="section-title">A complete algebra foundation</h2>
+    <p class="section-sub">Seven structured units covering the full Cambridge Lower Secondary algebra curriculum, built for grades 6&ndash;9.</p>
+    <div class="curriculum-badge">
+      <span>&#x1F4D0;</span> Cambridge Lower Secondary aligned &middot; Grades 6&ndash;9
+    </div>
+
+    <div class="units-grid fade-in-group">
+
+      <div class="unit-card">
+        <span class="unit-num">01</span>
+        <div class="unit-text">
+          <h4>Algebraic Foundations</h4>
+          <p>Variables, terms, and expressions — building the language of algebra from scratch.</p>
+        </div>
+      </div>
+
+      <div class="unit-card">
+        <span class="unit-num">02</span>
+        <div class="unit-text">
+          <h4>Expanding &amp; Simplifying</h4>
+          <p>Distributive property, collecting like terms, and simplifying complex expressions.</p>
+        </div>
+      </div>
+
+      <div class="unit-card">
+        <span class="unit-num">03</span>
+        <div class="unit-text">
+          <h4>Linear Equations</h4>
+          <p>Solving one- and two-step equations, including with fractions and negative values.</p>
+        </div>
+      </div>
+
+      <div class="unit-card">
+        <span class="unit-num">04</span>
+        <div class="unit-text">
+          <h4>Factorising</h4>
+          <p>Finding common factors, factorising expressions, and verifying by expanding back.</p>
+        </div>
+      </div>
+
+      <div class="unit-card">
+        <span class="unit-num">05</span>
+        <div class="unit-text">
+          <h4>Formulae &amp; Rearranging</h4>
+          <p>Substituting values into formulae and rearranging to change the subject.</p>
+        </div>
+      </div>
+
+      <div class="unit-card">
+        <span class="unit-num">06</span>
+        <div class="unit-text">
+          <h4>Sequences</h4>
+          <p>Term-to-term rules, nth term expressions, and working with arithmetic sequences.</p>
+        </div>
+      </div>
+
+      <div class="unit-card">
+        <span class="unit-num">07</span>
+        <div class="unit-text">
+          <h4>Simultaneous Equations</h4>
+          <p>Solving pairs of linear equations by substitution and elimination methods.</p>
+        </div>
+      </div>
+
+    </div>
   </div>
+</section>
 
-  <div class="problem-card">
-    <div class="problem-label" id="problem-label">Problem <span id="problem-number"></span></div>
-    <div class="problem-text" id="problem-text"></div>
+
+<!-- ════════ PRICING ════════ -->
+<section id="pricing">
+  <div class="container">
+    <p class="section-label">Plans</p>
+    <h2 class="section-title">Simple, honest pricing</h2>
+    <p class="section-sub">No contracts, no upsells. Pick the plan that fits your student best.</p>
+
+    <div class="pricing-grid">
+
+      <div class="pricing-card fade-in">
+        <p class="plan-name">Practice</p>
+        <div class="plan-price">$29<span>&thinsp;/month</span></div>
+        <ul class="plan-features">
+          <li>Full 7-unit curriculum</li>
+          <li>Guided Practice Engine — step-by-step practice</li>
+          <li>Unlimited problems</li>
+          <li>Progress tracking dashboard</li>
+        </ul>
+        <a href="mailto:tutor@nuvostudio.club" class="btn btn-outline plan-cta">Get Started</a>
+      </div>
+
+      <div class="pricing-card featured fade-in">
+        <div class="popular-badge">Most Popular</div>
+        <p class="plan-name">Practice + Tutoring</p>
+        <div class="plan-price">$99<span>&thinsp;/month</span></div>
+        <ul class="plan-features">
+          <li>Everything in Practice</li>
+          <li>4 live sessions/month via Google Meet</li>
+          <li>Personalized homework assignments</li>
+          <li>Direct WhatsApp support</li>
+        </ul>
+        <a href="https://wa.me/5076014-1676" class="btn btn-primary plan-cta">Book a Session</a>
+      </div>
+
+    </div>
+    <p class="pricing-note">No contracts. Cancel anytime.</p>
   </div>
+</section>
 
-  <div id="steps-container"></div>
-  <div class="feedback" id="feedback"></div>
 
-  <div class="loading-indicator" id="loading">
-    <div class="spinner"></div>
-    <span>Checking your step...</span>
+<!-- ════════ FOOTER ════════ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">Nuvo <span>Math</span></div>
+    <p class="footer-tagline">Algebra practice that actually teaches. Guided step-by-step practice and live tutoring for grades 6&ndash;9.</p>
+    <div class="footer-contact">
+      <a href="mailto:tutor@nuvostudio.club">tutor@nuvostudio.club</a>
+      <a href="https://wa.me/5076014-1676">WhatsApp: 6014-1676</a>
+    </div>
+    <div class="footer-divider"></div>
+    <p class="footer-copy">&copy; 2026 Nuvo Math &middot; nuvostudio.club</p>
   </div>
+</footer>
 
-  <div id="input-area">
-    <input type="text" id="step-input" placeholder="Type or tap buttons to enter your answer…"
-      autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
-
-    <!-- Live rendered preview (shows stacked fractions) -->
-    <div class="math-preview" id="step-preview"></div>
-
-    <!-- Student Calculator Grid (populated by calculator.js) -->
-    <div id="calc-grid"></div>
-  </div>
-
-  <div class="completed-card" id="completed-card">
-    <div class="check">✓</div>
-    <h3>Nice work!</h3>
-    <p>You got it. Ready for the next one?</p>
-  </div>
-
-  <button id="next-problem-btn" onclick="nextProblem()">Next Problem →</button>
-</div>
-
-<!-- ════════ DONE SCREEN ════════ -->
-<div id="done-screen">
-  <div class="done-icon">🎉</div>
-  <h2>All done!</h2>
-  <p>You've worked through all the problems. Great effort!</p>
-  <div class="ask-ronel-list" id="ask-ronel-list" style="display:none;">
-    <h4>📋 Ask Ronel about these</h4>
-    <ul id="ask-ronel-items"></ul>
-  </div>
-</div>
 
 <script>
-  // ══════════════════════════════════════════════════
-  const PROXY_URL = 'https://math-practice-proxy.ronelalmanza20.workers.dev';
-  // ══════════════════════════════════════════════════
-
-  let problems = [];
-  let currentIndex = 0;
-  let stepHistory = [];
-  let wrongCount = 0;
-  let formCheckAttempts = 0;
-  let askRonelProblems = [];
-  let generatedLink = '';
-
-  // ── Dashboard tracking (optional — set from URL params ?student=X&pid=Y) ──
-  const _urlParams = new URLSearchParams(window.location.search);
-  const STUDENT_ID  = _urlParams.get('student') || null;
-  const PROBLEM_ID  = _urlParams.get('pid') || null;
-
-  function markProblemComplete() {
-    if (!STUDENT_ID || !PROBLEM_ID) return;
-    fetch(`${PROXY_URL}/student/${encodeURIComponent(STUDENT_ID)}/complete/${encodeURIComponent(PROBLEM_ID)}`, {
-      method: 'POST'
-    }).catch(() => {}); // fire-and-forget, ignore errors silently
-  }
-
-  function logStep(step, correct) {
-    if (!STUDENT_ID || !PROBLEM_ID) return;
-    fetch(`${PROXY_URL}/log-step`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ studentId: STUDENT_ID, problemId: PROBLEM_ID, step, correct })
-    }).catch(() => {}); // fire-and-forget
-  }
-
-  // ── Teacher: active field tracking ──
-  let activeSetupField = null;
-  let cardCounter = 0;
-
-  function setActiveField(el) {
-    if (activeSetupField && activeSetupField !== el) {
-      activeSetupField.classList.remove('active-field');
-    }
-    activeSetupField = el;
-    el.classList.add('active-field');
-    setupCalc.setTarget(el);
-  }
-
-  // ── Add a problem card ──
-  function addProblemCard(type, question, answer) {
-    type = type || 'Expand';
-    question = question || '';
-    answer = answer || '';
-
-    const id = cardCounter++;
-    const card = document.createElement('div');
-    card.className = 'builder-card';
-    card.id = `card-${id}`;
-    card.innerHTML = `
-      <div class="builder-card-header">
-        <span class="builder-card-title">Problem</span>
-        <button class="builder-delete-btn" onclick="deleteProblemCard(${id})" title="Delete">🗑️</button>
-      </div>
-      <div class="builder-field">
-        <label class="builder-field-label">Type</label>
-        <select class="builder-type-select">
-          <option value="Expand">Expand</option>
-          <option value="Factorize">Factorize</option>
-          <option value="Solve">Solve</option>
-          <option value="Evaluate">Evaluate</option>
-          <option value="Rearrange">Rearrange</option>
-          <option value="Translate">Translate</option>
-        </select>
-      </div>
-      <div class="builder-field">
-        <label class="builder-field-label">Question</label>
-        <input type="text" class="builder-input builder-q-input"
-          placeholder="e.g. 3(2x + 5)"
-          autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
-      </div>
-      <div class="builder-field">
-        <label class="builder-field-label">Answer</label>
-        <input type="text" class="builder-input builder-a-input"
-          placeholder="e.g. 6x + 15"
-          autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
-      </div>
-    `;
-
-    // Set values programmatically (avoids HTML escaping issues)
-    card.querySelector('.builder-type-select').value = type;
-    card.querySelector('.builder-q-input').value = question;
-    card.querySelector('.builder-a-input').value = answer;
-
-    // Attach focus listener so the shared calculator targets this input
-    card.querySelectorAll('.builder-input').forEach(input => {
-      input.addEventListener('focus', () => setActiveField(input));
-    });
-
-    document.getElementById('cards-container').appendChild(card);
-    renumberCards();
-
-    // Auto-focus the question field of the newly added card
-    const qInput = card.querySelector('.builder-q-input');
-    qInput.focus();
-    setActiveField(qInput);
-  }
-
-  // ── Delete a problem card ──
-  function deleteProblemCard(id) {
-    const card = document.getElementById(`card-${id}`);
-    if (!card) return;
-    // If deleted card held the active field, clear it
-    if (activeSetupField && card.contains(activeSetupField)) {
-      activeSetupField.classList.remove('active-field');
-      activeSetupField = null;
-      setupCalc.setTarget(null);
-    }
-    card.remove();
-    renumberCards();
-  }
-
-  // ── Renumber card titles after add/delete ──
-  function renumberCards() {
-    document.querySelectorAll('.builder-card').forEach((card, i) => {
-      card.querySelector('.builder-card-title').textContent = `Problem ${i + 1}`;
-    });
-  }
-
-  // ── Generate link from cards ──
-  function generateLink() {
-    const err = document.getElementById('setup-error');
-    err.style.display = 'none';
-
-    const cards = document.querySelectorAll('.builder-card');
-    if (cards.length === 0) {
-      err.textContent = 'Please add at least one problem.';
-      err.style.display = 'block';
-      return;
-    }
-
-    const parsed = [];
-    for (let i = 0; i < cards.length; i++) {
-      const card = cards[i];
-      const type     = card.querySelector('.builder-type-select').value;
-      const question = card.querySelector('.builder-q-input').value.trim();
-      const answer   = card.querySelector('.builder-a-input').value.trim();
-      if (!question || !answer) {
-        err.textContent = `Problem ${i + 1} is missing a ${!question ? 'question' : 'answer'}.`;
-        err.style.display = 'block';
-        return;
-      }
-      parsed.push({ type, question, answer });
-    }
-
-    const data = JSON.stringify({ problems: parsed });
-    const encoded = btoa(encodeURIComponent(data));
-    const baseUrl = window.location.href.split('#')[0];
-    generatedLink = baseUrl + '#' + encoded;
-
-    document.getElementById('setup-screen').style.display = 'none';
-    document.getElementById('link-screen').style.display = 'block';
-    document.getElementById('link-box').textContent = generatedLink;
-
-    const ul = document.getElementById('summary-list');
-    ul.innerHTML = '';
-    parsed.forEach((p, i) => {
-      const li = document.createElement('li');
-      li.setAttribute('data-num', (i + 1) + '.');
-      li.textContent = `[${p.type}] ${p.question}`;
-      ul.appendChild(li);
-    });
-  }
-
-  // ── Convert "L = R" equation to difference form "(L) - (R)" ──
-  // Splits on the first standalone = (not !=, <=, >=, ==)
-  function equationToExpr(str) {
-    for (let i = 0; i < str.length; i++) {
-      if (str[i] === '=' &&
-          str[i - 1] !== '!' && str[i - 1] !== '<' && str[i - 1] !== '>' &&
-          str[i + 1] !== '=') {
-        const left  = str.slice(0, i).trim();
-        const right = str.slice(i + 1).trim();
-        return `(${left}) - (${right})`;
-      }
-    }
-    return str; // no standalone = found, return as-is
-  }
-
-  function containsEquals(str) {
-    for (let i = 0; i < str.length; i++) {
-      if (str[i] === '=' &&
-          str[i - 1] !== '!' && str[i - 1] !== '<' && str[i - 1] !== '>' &&
-          str[i + 1] !== '=') {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  // ── Normalize input for Algebrite ──
-  function normalize(input) {
-    let s = input.trim();
-    s = s.replace(/²/g, '^2');
-    s = s.replace(/³/g, '^3');
-    s = s.replace(/⁴/g, '^4');
-    s = s.replace(/⁵/g, '^5');
-    s = s.replace(/⁶/g, '^6');
-    s = s.replace(/⁷/g, '^7');
-    s = s.replace(/⁸/g, '^8');
-    s = s.replace(/⁹/g, '^9');
-    s = s.replace(/×/g, '*');
-    s = s.replace(/−/g, '-');
-    s = s.replace(/sqrt/gi, '\x01');
-    s = s.replace(/√\(/g, '\x01(');
-    s = s.replace(/√(\d+)/g, '\x01($1)');
-    s = s.replace(/√([a-zA-Z])/g, '\x01($1)');
-    s = s.replace(/(\d)\x01/g, '$1*\x01');
-    s = s.replace(/\)\x01/g, ')*\x01');
-    s = s.replace(/([a-zA-Z])\x01/g, '$1*\x01');
-    s = s.replace(/(\d)([a-zA-Z])/g, '$1*$2');
-    s = s.replace(/([a-zA-Z])([a-zA-Z])/g, '$1*$2');
-    s = s.replace(/o\*r/g, 'or');    // restore "or" mangled by letter-letter rule
-    s = s.replace(/a\*nd/g, 'and');  // restore "and" (and → a*nd in one pass)
-    s = s.replace(/(\d)\(/g, '$1*(');
-    s = s.replace(/\)\(/g, ')*(');
-    s = s.replace(/([a-zA-Z])\(/g, '$1*(');
-    s = s.replace(/\)([a-zA-Z])/g, ')*$1');
-    s = s.replace(/\)(\d)/g, ')*$1');
-    s = s.replace(/\x01/g, 'sqrt');
-    return s;
-  }
-
-  // ── Check algebraic equivalence via Algebrite ──
-  function equationEquivalence(a, b, problemType) {
-    const t0 = performance.now();
-    console.log('[equationEquivalence] entry', { a, b, problemType });
-
-    const normA = normalize(equationToExpr(a));
-    const normB = normalize(equationToExpr(b));
-    console.log('[equationEquivalence] normalized', { normA, normB });
-
-    // Direct diff — works for all types and intermediate Solve steps (e.g. 8x=-8 from 8x-4=-12)
-    const diffResult = Algebrite.run(`simplify((${normA}) - (${normB}))`);
-    const diffTrimmed = diffResult.trim();
-    console.log(`[equationEquivalence] diff="${diffTrimmed}" in ${(performance.now()-t0).toFixed(1)}ms`);
-
-    if (diffTrimmed === '0') {
-      console.log(`[equationEquivalence] matched via diff in ${(performance.now()-t0).toFixed(1)}ms`);
-      return { valid: true };
-    }
-    if (!diffTrimmed || diffTrimmed.toLowerCase().includes('stop') || diffTrimmed.toLowerCase().includes('error')) {
-      return { valid: null, parseError: true };
-    }
-
-    // For Solve: substitution handles final "x = value" answers where diff ≠ 0 due to coefficient scaling
-    // e.g. 8x+8 vs x+1: diff is 7x+7, but subst(-1, x, 8x+8) = 0 ✓
-    if (problemType === 'Solve') {
-      let varPart = null, valPart = null;
-      for (let i = 0; i < b.length; i++) {
-        if (b[i] === '=' &&
-            b[i - 1] !== '!' && b[i - 1] !== '<' && b[i - 1] !== '>' &&
-            b[i + 1] !== '=') {
-          varPart = normalize(b.slice(0, i).trim());
-          valPart = normalize(b.slice(i + 1).trim());
-          break;
-        }
-      }
-      // Only substitute if varPart is a single variable (e.g. "x"), not a compound like "8*x"
-      if (varPart && /^[a-zA-Z]$/.test(varPart)) {
-        const subResult = Algebrite.run(`simplify(subst(${valPart}, ${varPart}, ${normA}))`).trim();
-        console.log(`[equationEquivalence] subst(${valPart}, ${varPart}, normA)="${subResult}" in ${(performance.now()-t0).toFixed(1)}ms`);
-        if (subResult === '0') {
-          console.log(`[equationEquivalence] matched via substitution in ${(performance.now()-t0).toFixed(1)}ms`);
-          return { valid: true };
-        }
-        if (!subResult || subResult.toLowerCase().includes('stop') || subResult.toLowerCase().includes('error')) {
-          return { valid: null, parseError: true };
-        }
-        return { valid: false };
-      }
-    }
-
-    return { valid: false };
-  }
-
-  function hasBalancedParens(str) {
-    let depth = 0;
-    for (let i = 0; i < str.length; i++) {
-      if (str[i] === '(') depth++;
-      else if (str[i] === ')') depth--;
-      if (depth < 0) return false; // more closes than opens at this point
-    }
-    return depth === 0;
-  }
-
-  function checkEquivalence(exprA, exprB, problemType) {
-    const t0 = performance.now();
-    console.log('[checkEquivalence] entry', { exprA, exprB, problemType });
-
-    // Guard: unbalanced parens would cause Algebrite parse errors
-    if (!hasBalancedParens(exprA) || !hasBalancedParens(exprB)) {
-      console.log('[checkEquivalence] unbalanced parens', { exprA, exprB });
-      return { valid: null, parseError: true };
-    }
-
-    // Handle comma-separated answers (e.g. multiple solutions: x = 1, x = -1)
-    const partsA = exprA.split(',').map(s => s.trim()).filter(Boolean);
-    const partsB = exprB.split(',').map(s => s.trim()).filter(Boolean);
-    if (partsA.length > 1 || partsB.length > 1) {
-      if (partsA.length !== partsB.length) {
-        console.log('[checkEquivalence] comma part count mismatch', { partsA, partsB });
-        return { valid: false };
-      }
-      const usedB = new Set();
-      for (const pa of partsA) {
-        let matched = false;
-        for (let i = 0; i < partsB.length; i++) {
-          if (!usedB.has(i) && checkEquivalence(pa, partsB[i], problemType).valid === true) {
-            usedB.add(i);
-            matched = true;
-            break;
-          }
-        }
-        if (!matched) {
-          console.log('[checkEquivalence] no match for comma part:', pa);
-          return { valid: false };
-        }
-      }
-      console.log(`[checkEquivalence] comma parts all matched in ${(performance.now()-t0).toFixed(1)}ms`);
-      return { valid: true };
-    }
-
-    try {
-      if (containsEquals(exprA) && containsEquals(exprB) && problemType !== 'Evaluate') {
-        const result = equationEquivalence(exprA, exprB, problemType);
-        console.log(`[checkEquivalence] exit via equationEquivalence in ${(performance.now()-t0).toFixed(1)}ms`, result);
-        return result;
-      }
-      const normA = normalize(exprA);
-      const normB = normalize(exprB);
-      console.log('[checkEquivalence] Algebrite call', { normA, normB });
-      const diffResult = Algebrite.run(`simplify((${normA}) - (${normB}))`);
-      const diffTrimmed = diffResult.trim();
-      console.log(`[checkEquivalence] Algebrite result="${diffTrimmed}" in ${(performance.now()-t0).toFixed(1)}ms`);
-      if (diffTrimmed === '0') return { valid: true };
-      if (!diffTrimmed || diffTrimmed.toLowerCase().includes('stop') || diffTrimmed.toLowerCase().includes('error')) {
-        return { valid: null, parseError: true };
-      }
-      return { valid: false };
-    } catch (e) {
-      console.error('[checkEquivalence] Algebrite threw:', e);
-      return { valid: null, parseError: true };
-    }
-  }
-
-  function checkIsFinal(studentStep, expectedAnswer, problemType) {
-    return checkEquivalence(studentStep, expectedAnswer, problemType);
-  }
-
-  // ── Translate: submit handler ──
-  async function submitTranslate(input, problem) {
-    const t0 = performance.now();
-    console.log('[submitTranslate] entry', { input });
-
-    let isCorrect = false;
-
-    // Primary: simplify(a - b) === '0'
-    try {
-      const normInput  = normalize(input);
-      const normAnswer = normalize(problem.answer);
-      const diff = Algebrite.run(`simplify((${normInput})-(${normAnswer}))`).trim();
-      isCorrect = diff === '0';
-      console.log(`[submitTranslate] diff="${diff}" isCorrect=${isCorrect} in ${(performance.now()-t0).toFixed(1)}ms`);
-    } catch (e) {
-      console.warn('[submitTranslate] Algebrite threw:', e);
-    }
-
-    // Fallback: ask Claude to rewrite input into standard notation, then re-check
-    if (!isCorrect) {
-      showLoading('Interpreting your input...');
-      const interpreted = await askClaudeToInterpret(input);
-      hideLoading();
-      if (interpreted) {
-        try {
-          const diff2 = Algebrite.run(`simplify((${normalize(interpreted)})-(${normalize(problem.answer)}))`).trim();
-          isCorrect = diff2 === '0';
-          console.log(`[submitTranslate] fallback diff="${diff2}" isCorrect=${isCorrect}`);
-        } catch (e) {
-          console.warn('[submitTranslate] Algebrite (fallback) threw:', e);
-        }
-      }
-    }
-
-    logStep(input, isCorrect);
-
-    if (isCorrect) {
-      wrongCount = 0;
-      stepHistory.push(input);
-      addStepToHistory(input);
-      document.getElementById('feedback').style.display = 'none';
-      markProblemComplete();
-      document.getElementById('input-area').style.display = 'none';
-      document.getElementById('completed-card').style.display = 'block';
-      document.getElementById('next-problem-btn').style.display = 'block';
-      document.getElementById('next-problem-btn').textContent =
-        currentIndex < problems.length - 1 ? 'Next Problem →' : 'Finish ✓';
-    } else {
-      wrongCount++;
-      studentCalc.clear();
-      if (wrongCount >= 2) {
-        showLoading('Getting a hint...');
-        const hint = await askClaudeForTranslateHint(problem, input);
-        hideLoading();
-        showFeedback('nudge', hint || "Think about what each part of the phrase means mathematically.");
-      } else {
-        showFeedback('wrong', "That's not quite right. Try writing the algebraic expression.");
-      }
-      reenableInput();
-    }
-    console.log(`[submitTranslate] total time: ${(performance.now()-t0).toFixed(1)}ms`);
-  }
-
-  async function askClaudeForTranslateHint(problem, wrongInput) {
-    const t0 = performance.now();
-    console.log('[askClaudeForTranslateHint] entry', { wrongInput });
-    try {
-      const response = await fetchWithTimeout(PROXY_URL + '/validate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          system: "You are a warm, encouraging math tutor for a 7th grade student learning to translate word phrases into algebraic expressions. The student made an error. Give a short hint that guides them to think about what each part of the phrase means mathematically — for example, which operation the phrase implies, or what plays the role of the coefficient. Never reveal the correct algebraic expression. Keep it to 1-2 sentences.",
-          messages: [{
-            role: 'user',
-            content: `Word phrase: ${problem.question}\nStudent wrote: ${wrongInput}\n\nGive a gentle hint without revealing the answer.`
-          }]
-        })
-      });
-      if (!response.ok) {
-        console.warn('[askClaudeForTranslateHint] response not ok:', response.status);
-        return null;
-      }
-      const data = await response.json();
-      const result = data.content.map(c => c.text || '').join('').trim() || null;
-      console.log(`[askClaudeForTranslateHint] exit in ${(performance.now()-t0).toFixed(1)}ms:`, result);
-      return result;
-    } catch (e) {
-      console.error(`[askClaudeForTranslateHint] error after ${(performance.now()-t0).toFixed(1)}ms:`, e);
-      return null;
-    }
-  }
-
-  function extractExpression(questionText) {
-    return questionText
-      .replace(/^(expand and simplify|expand|factorise|factorize|simplify|solve|evaluate|find|calculate)\s+/i, '')
-      .trim();
-  }
-
-  // ── Fetch with 10s timeout ──
-  function fetchWithTimeout(url, options, ms = 10000) {
-    const controller = new AbortController();
-    const id = setTimeout(() => {
-      console.warn(`[fetchWithTimeout] TIMED OUT after ${ms}ms: ${url}`);
-      controller.abort();
-    }, ms);
-    return fetch(url, { ...options, signal: controller.signal })
-      .finally(() => clearTimeout(id));
-  }
-
-  // ── Ask Claude helpers ──
-  async function askClaudeToInterpret(input) {
-    const t0 = performance.now();
-    console.log('[askClaudeToInterpret] entry', { input });
-    try {
-      const response = await fetchWithTimeout(PROXY_URL + '/validate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          system: "The student tried to write a math expression but it couldn't be parsed. Convert their input to a valid algebraic expression using standard notation. Return ONLY the expression, nothing else.",
-          messages: [{ role: 'user', content: input }]
-        })
-      });
-      if (!response.ok) {
-        console.warn('[askClaudeToInterpret] response not ok:', response.status);
-        return null;
-      }
-      const data = await response.json();
-      const result = data.content.map(c => c.text || '').join('').trim() || null;
-      console.log(`[askClaudeToInterpret] exit in ${(performance.now()-t0).toFixed(1)}ms:`, result);
-      return result;
-    } catch (e) {
-      console.error(`[askClaudeToInterpret] error after ${(performance.now()-t0).toFixed(1)}ms:`, e);
-      return null;
-    }
-  }
-
-  async function askClaudeForHint(problem, history, currentExpr, wrongInput) {
-    const t0 = performance.now();
-    console.log('[askClaudeForHint] entry', { currentExpr, wrongInput });
-    try {
-      const stepsText = history.length > 0
-        ? `Previous correct steps:\n${history.map((s, i) => `  Step ${i + 1}: ${s}`).join('\n')}\n\n`
-        : '';
-      const response = await fetchWithTimeout(PROXY_URL + '/validate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          system: "You are a warm, encouraging math tutor for a 7th grade student. The student made an error. Give a small hint pointing toward the error without revealing the correct answer. Keep it to 1-2 sentences.",
-          messages: [{
-            role: 'user',
-            content: `Problem type: ${problem.type || 'unknown'}\nProblem: ${problem.question}\nExpected answer: ${problem.answer}\n\n${stepsText}Current expression: ${currentExpr}\nStudent wrote (incorrect): ${wrongInput}\n\nGive a gentle hint.`
-          }]
-        })
-      });
-      if (!response.ok) {
-        console.warn('[askClaudeForHint] response not ok:', response.status);
-        return null;
-      }
-      const data = await response.json();
-      const result = data.content.map(c => c.text || '').join('').trim() || null;
-      console.log(`[askClaudeForHint] exit in ${(performance.now()-t0).toFixed(1)}ms:`, result);
-      return result;
-    } catch (e) {
-      console.error(`[askClaudeForHint] error after ${(performance.now()-t0).toFixed(1)}ms:`, e);
-      return null;
-    }
-  }
-
-  async function askClaudeFormCheck(studentStep, expectedAnswer, problemType) {
-    const t0 = performance.now();
-    console.log('[askClaudeFormCheck] entry', { studentStep, expectedAnswer, problemType, formCheckAttempts });
-    let hintInstruction;
-    if (formCheckAttempts === 0) {
-      hintInstruction = "STRICT RULE: Your feedback must contain ZERO specifics. Do NOT mention any variables, numbers, coefficients, factors, or anything about the structure of the answer. ONLY say something like 'Correct so far, but keep going!' or 'You're on the right track — this can be simplified further.' Nothing else. NEVER hint at what to do next.";
-    } else if (formCheckAttempts === 1) {
-      hintInstruction = "STRICT RULE: Give a direction only — no specifics. You may say something like 'Can you factor out anything else?' or 'Look more carefully at what terms have in common.' Do NOT mention any specific variables, numbers, or coefficients. Do NOT describe what the answer looks like. NEVER reveal the target form.";
-    } else if (formCheckAttempts === 2) {
-      hintInstruction = "STRICT RULE: You may mention the TYPE of thing to look for, but still no specific values. For example: 'There is a common variable you can still factor out' or 'The coefficient outside can be simplified further.' Do NOT name which variable or what the coefficient is. Do NOT show or describe the final answer form.";
-    } else {
-      hintInstruction = "You may now be explicit. Show the expected form and explain clearly what the student should have written.";
-    }
-    try {
-      const typeContext = problemType ? `The problem type is: ${problemType}. ` : '';
-      const response = await fetchWithTimeout(PROXY_URL + '/validate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          system: `${typeContext}The teacher expects the answer in this form: ${expectedAnswer}. The student wrote: ${studentStep}. Both are mathematically equivalent (already verified). Is the student's answer in the SAME STRUCTURAL FORM as the teacher's? Same level of factoring, same grouping, same simplification level. NEVER reveal the final answer form until attempt 3 or higher. NEVER mention specific variables or coefficients to factor out until attempt 2 or higher. ${hintInstruction} Respond with ONLY a JSON object: { "match": true/false, "feedback": "brief message if no match" }`,
-          messages: [{ role: 'user', content: `Teacher's expected form: ${expectedAnswer}\nStudent's answer: ${studentStep}` }]
-        })
-      });
-      if (!response.ok) {
-        console.warn('[askClaudeFormCheck] response not ok:', response.status);
-        return null;
-      }
-      const data = await response.json();
-      const text = data.content.map(c => c.text || '').join('').trim();
-      const start = text.indexOf('{');
-      const end = text.lastIndexOf('}');
-      if (start === -1 || end === -1) {
-        console.warn('[askClaudeFormCheck] could not parse JSON from response:', text);
-        return null;
-      }
-      const result = JSON.parse(text.slice(start, end + 1));
-      console.log(`[askClaudeFormCheck] exit in ${(performance.now()-t0).toFixed(1)}ms:`, result);
-      return result;
-    } catch (e) {
-      console.error(`[askClaudeFormCheck] error after ${(performance.now()-t0).toFixed(1)}ms:`, e);
-      return null;
-    }
-  }
-
-  async function askClaudeForReveal(problem, history, currentExpr) {
-    const t0 = performance.now();
-    console.log('[askClaudeForReveal] entry', { currentExpr });
-    try {
-      const stepsText = history.length > 0
-        ? `Previous correct steps:\n${history.map((s, i) => `  Step ${i + 1}: ${s}`).join('\n')}\n\n`
-        : '';
-      const response = await fetchWithTimeout(PROXY_URL + '/validate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          system: "You are a math tutor for a 7th grade student. The student is struggling. Return ONLY the algebraic expression for a valid next step from their current position. Nothing else — no explanation, just the expression.",
-          messages: [{
-            role: 'user',
-            content: `Problem type: ${problem.type || 'unknown'}\nProblem: ${problem.question}\nExpected answer: ${problem.answer}\n\n${stepsText}Current expression: ${currentExpr}\n\nWhat is a valid next step? Return only the expression.`
-          }]
-        })
-      });
-      if (!response.ok) {
-        console.warn('[askClaudeForReveal] response not ok:', response.status);
-        return null;
-      }
-      const data = await response.json();
-      const result = data.content.map(c => c.text || '').join('').trim() || null;
-      console.log(`[askClaudeForReveal] exit in ${(performance.now()-t0).toFixed(1)}ms:`, result);
-      return result;
-    } catch (e) {
-      console.error(`[askClaudeForReveal] error after ${(performance.now()-t0).toFixed(1)}ms:`, e);
-      return null;
-    }
-  }
-
-  // ── Loading indicator helpers ──
-  function showLoading(text) {
-    const loading = document.getElementById('loading');
-    loading.querySelector('span').textContent = text || 'Thinking...';
-    loading.classList.add('show');
-  }
-
-  function hideLoading() {
-    document.getElementById('loading').classList.remove('show');
-  }
-
-  function reenableInput() {
-    document.getElementById('calc-grid').classList.remove('disabled');
-  }
-
-  // ── Boot: check URL for student data, else show teacher setup ──
-  function init() {
-    const hash = window.location.hash.slice(1);
-    if (hash) {
-      try {
-        const decoded = JSON.parse(decodeURIComponent(atob(hash)));
-        if (decoded.problems && decoded.problems.length > 0) {
-          problems = decoded.problems;
-          document.getElementById('setup-screen').style.display = 'none';
-          document.getElementById('practice-screen').style.display = 'block';
-          loadProblem(0);
-          return;
-        }
-      } catch (e) {
-        console.error('Failed to parse problem data from URL:', e);
-      }
-    }
-    // Teacher mode: show setup with one empty card
-    document.getElementById('setup-screen').style.display = 'block';
-    addProblemCard();
-  }
-
-  // ── Copy link ──
-  async function copyLink() {
-    try {
-      await navigator.clipboard.writeText(generatedLink);
-      showCopyToast();
-    } catch (e) {
-      const ta = document.createElement('textarea');
-      ta.value = generatedLink;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
-      showCopyToast();
-    }
-  }
-
-  function showCopyToast() {
-    const toast = document.getElementById('copy-toast');
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2000);
-  }
-
-  function previewAsStudent() {
-    window.location.href = generatedLink;
-    window.location.reload();
-  }
-
-  // ── Load a problem (student) ──
-  function loadProblem(index) {
-    currentIndex = index;
-    stepHistory = [];
-    wrongCount = 0;
-    formCheckAttempts = 0;
-
-    const p = problems[index];
-    const typeStr = p.type ? ` · ${p.type}` : '';
-    document.getElementById('problem-label').textContent = `Problem ${index + 1} of ${problems.length}${typeStr}`;
-    document.getElementById('problem-text').innerHTML = renderMath(p.question);
-    document.getElementById('steps-container').innerHTML = '';
-    document.getElementById('feedback').className = 'feedback';
-    document.getElementById('feedback').textContent = '';
-    document.getElementById('feedback').style.display = 'none';
-    document.getElementById('completed-card').style.display = 'none';
-    document.getElementById('next-problem-btn').style.display = 'none';
-    document.getElementById('input-area').style.display = 'flex';
-    studentCalc.clear();
-    studentCalc.closePanels();
-    document.getElementById('calc-grid').classList.remove('disabled');
-    updateProgress();
-  }
-
-  function updateProgress() {
-    const total = problems.length;
-    const current = currentIndex + 1;
-    document.getElementById('progress-text').textContent = `${current} / ${total}`;
-    document.getElementById('progress-fill').style.width = `${(current / total) * 100}%`;
-  }
-
-  // ── Submit step (student) ──
-  async function submitStep() {
-    const input = document.getElementById('step-input').value.trim();
-    if (!input) return;
-
-    document.getElementById('calc-grid').classList.add('disabled');
-    document.getElementById('feedback').style.display = 'none';
-
-    const problem = problems[currentIndex];
-
-    // ── Translate: single-step, Algebrite.compare + Claude fallback, no form check ──
-    if (problem.type === 'Translate') {
-      await submitTranslate(input, problem);
-      return;
-    }
-
-    const previousExpression = (problem.type === 'Evaluate' || problem.type === 'Rearrange')
-      ? problem.answer
-      : stepHistory.length > 0
-        ? stepHistory[stepHistory.length - 1]
-        : extractExpression(problem.question);
-
-    const t0 = performance.now();
-    console.log('[submitStep] entry', { input, problemType: problem.type, previousExpression });
-    console.log('[submitStep] normalized input:', JSON.stringify(normalize(input)));
-
-    let equiv;
-    if (input.includes(',')) {
-      console.log('[submitStep] comma answer — skipping step check, treating as final answer');
-      equiv = checkIsFinal(input, problem.answer, problem.type);
-      console.log(`[submitStep] checkIsFinal (comma shortcut) in ${(performance.now()-t0).toFixed(1)}ms:`, equiv);
-    } else {
-      equiv = checkEquivalence(previousExpression, input, problem.type);
-      console.log(`[submitStep] checkEquivalence result in ${(performance.now()-t0).toFixed(1)}ms:`, equiv);
-
-      if (equiv.valid === null) {
-        showLoading('Interpreting your input...');
-        console.log('[submitStep] asking Claude to interpret input...');
-        const tI = performance.now();
-        const interpreted = await askClaudeToInterpret(input);
-        console.log(`[submitStep] Claude interpret returned in ${(performance.now()-tI).toFixed(1)}ms:`, interpreted);
-        hideLoading();
-        if (interpreted) equiv = checkEquivalence(previousExpression, interpreted, problem.type);
-        if (equiv.valid === null) {
-          showFeedback('unsure', "I couldn't understand your answer. Try rewriting it using the math buttons.");
-          reenableInput();
-          return;
-        }
-      }
-    }
-
-    if (equiv.valid === true) {
-      wrongCount = 0;
-      stepHistory.push(input);
-      addStepToHistory(input);
-      logStep(input, true);
-      document.getElementById('feedback').style.display = 'none';
-
-      const isFinal = checkIsFinal(input, problem.answer, problem.type);
-      console.log('[submitStep] checkIsFinal:', isFinal);
-      if (isFinal.valid === true) {
-        if (input.includes(',')) {
-          console.log('[submitStep] comma answer — skipping form check, marking complete');
-          markProblemComplete();
-          document.getElementById('input-area').style.display = 'none';
-          document.getElementById('completed-card').style.display = 'block';
-          document.getElementById('next-problem-btn').style.display = 'block';
-          document.getElementById('next-problem-btn').textContent =
-            currentIndex < problems.length - 1 ? 'Next Problem →' : 'Finish ✓';
-        } else {
-          const useRawMatch = !(problem.modules?.includes('formCheck'));
-          let formMatches, formFeedback;
-          if (useRawMatch) {
-            const rawA = canonicalFormForCheck(input);
-            const rawB = canonicalFormForCheck(problem.answer);
-            formMatches = rawA === rawB;
-            formFeedback = null;
-            console.log('[submitStep] canonical form match:', formMatches, { rawA, rawB });
-          } else {
-            showLoading('Checking answer form...');
-            console.log('[submitStep] calling askClaudeFormCheck...');
-            const tF = performance.now();
-            const formCheck = await askClaudeFormCheck(input, problem.answer, problem.type);
-            console.log(`[submitStep] askClaudeFormCheck returned in ${(performance.now()-tF).toFixed(1)}ms:`, formCheck);
-            hideLoading();
-            if (formCheck === null) {
-              askRonelProblems.push(problem.question);
-              showFeedback('unsure', "I couldn't verify your answer right now — save this one for Ronel to check.");
-              studentCalc.clear();
-              reenableInput();
-              return;
-            }
-            formMatches = formCheck.match === true;
-            formFeedback = formCheck.feedback;
-          }
-
-          if (formMatches) {
-            console.log('[submitStep] problem complete — updating DOM');
-            markProblemComplete();
-            document.getElementById('input-area').style.display = 'none';
-            document.getElementById('completed-card').style.display = 'block';
-            document.getElementById('next-problem-btn').style.display = 'block';
-            document.getElementById('next-problem-btn').textContent =
-              currentIndex < problems.length - 1 ? 'Next Problem →' : 'Finish ✓';
-          } else {
-            formCheckAttempts++;
-            showFeedback('nudge', formFeedback || 'Correct value, but try to simplify or factor further!');
-            studentCalc.clear();
-            reenableInput();
-          }
-        }
-      } else {
-        studentCalc.clear();
-        reenableInput();
-      }
-    } else {
-      wrongCount++;
-      logStep(input, false);
-      studentCalc.clear();
-
-      if (wrongCount >= 4) {
-        showLoading('Getting help...');
-        console.log('[submitStep] calling askClaudeForReveal...');
-        const tR = performance.now();
-        const nextStep = await askClaudeForReveal(problem, stepHistory, previousExpression);
-        console.log(`[submitStep] askClaudeForReveal returned in ${(performance.now()-tR).toFixed(1)}ms:`, nextStep);
-        hideLoading();
-        showFeedback('reveal', nextStep
-          ? `Here's a valid next step: ${nextStep}`
-          : "That step doesn't look right. Keep trying!");
-      } else if (wrongCount >= 2) {
-        showLoading('Getting a hint...');
-        console.log('[submitStep] calling askClaudeForHint...');
-        const tH = performance.now();
-        const hint = await askClaudeForHint(problem, stepHistory, previousExpression, input);
-        console.log(`[submitStep] askClaudeForHint returned in ${(performance.now()-tH).toFixed(1)}ms:`, hint);
-        hideLoading();
-        showFeedback('nudge', hint || "That step doesn't look right. Try again!");
-      } else {
-        showFeedback('wrong', "That step doesn't look right. Try again!");
-      }
-      reenableInput();
-    }
-    console.log(`[submitStep] total time: ${(performance.now()-t0).toFixed(1)}ms`);
-  }
-
-  // ── Student calculator input ──
-  // ── UI helpers ──
-  function addStepToHistory(text) {
-    const container = document.getElementById('steps-container');
-    const div = document.createElement('div');
-    div.className = 'step-entry correct';
-    div.innerHTML = `<span class="step-icon">✓</span><span class="step-text">${renderMath(text)}</span>`;
-    container.appendChild(div);
-  }
-
-  function showFeedback(type, message) {
-    const fb = document.getElementById('feedback');
-    fb.className = `feedback ${type}`;
-    fb.textContent = message;
-    fb.style.display = 'block';
-  }
-
-  function escapeHtml(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-  }
-
-  // ── Render math expression as HTML with stacked fractions and superscripts ──
-  function renderMath(text) {
-    let s = escapeHtml(text);
-
-    // Unicode superscripts → <sup>
-    s = s.replace(/²/g, '<sup>2</sup>');
-    s = s.replace(/³/g, '<sup>3</sup>');
-    s = s.replace(/⁴/g, '<sup>4</sup>');
-    s = s.replace(/⁵/g, '<sup>5</sup>');
-    s = s.replace(/⁶/g, '<sup>6</sup>');
-    s = s.replace(/⁷/g, '<sup>7</sup>');
-    s = s.replace(/⁸/g, '<sup>8</sup>');
-    s = s.replace(/⁹/g, '<sup>9</sup>');
-    // ^N notation
-    s = s.replace(/\^(\d+)/g, '<sup>$1</sup>');
-
-    // Stacked fractions — applied in specificity order so parens are respected
-    // (A)/(B)
-    s = s.replace(/\(([^()]*)\)\/\(([^()]*)\)/g, (_, n, d) =>
-      `<span class="math-frac"><span class="math-num">${n}</span><span class="math-den">${d}</span></span>`
-    );
-    // (A)/B  — parenthesized numerator, simple denominator
-    s = s.replace(/\(([^()]*)\)\/([\w]+)/g, (_, n, d) =>
-      `<span class="math-frac"><span class="math-num">${n}</span><span class="math-den">${d}</span></span>`
-    );
-    // A/(B)  — simple numerator, parenthesized denominator
-    s = s.replace(/([\w]+)\/\(([^()]*)\)/g, (_, n, d) =>
-      `<span class="math-frac"><span class="math-num">${n}</span><span class="math-den">${d}</span></span>`
-    );
-    // A/B  — both sides are plain word-char tokens with no surrounding spaces
-    // (e.g. 1/2, x/y typed without spaces).  The ÷ button inserts " / " with
-    // spaces so it intentionally doesn't match here.
-    s = s.replace(/([\w]+)\/([\w]+)/g, (_, n, d) =>
-      `<span class="math-frac"><span class="math-num">${n}</span><span class="math-den">${d}</span></span>`
-    );
-
-    return s;
-  }
-
-  // ── Canonical form for raw form-check comparison ──
-  // Normalises variable order within additive terms so that commutativity of
-  // addition doesn't cause false "wrong form" nudges.
-  function canonicalFormForCheck(expr) {
-    let s = normalize(expr).replace(/\s/g, '').toLowerCase();
-    // Strip redundant parentheses around a single atom: (3) → 3, (x) → x
-    let prev;
-    do {
-      prev = s;
-      s = s.replace(/\(([a-z0-9]+)\)/g, '$1');
-    } while (s !== prev);
-    // Sort single-variable additive terms within parenthesised groups.
-    // Only applies when the group contains purely letters, digits and '+' (no
-    // '*', '-', '/') so that compound or subtraction terms are left alone.
-    s = s.replace(/\(([^()]+)\)/g, function (match, inner) {
-      if (inner.includes('+') && /^[a-z0-9+]+$/.test(inner)) {
-        const terms = inner.split('+').sort();
-        return '(' + terms.join('+') + ')';
-      }
-      return match;
-    });
-    return s;
-  }
-
-  function nextProblem() {
-    if (currentIndex < problems.length - 1) {
-      loadProblem(currentIndex + 1);
-    } else {
-      const studentId = new URLSearchParams(window.location.search).get('student');
-      window.location.href = 'dashboard.html?student=' + studentId;
-    }
-  }
-
-  // Enter key submits on student screen
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && document.getElementById('practice-screen').style.display !== 'none') {
-      if (!document.getElementById('calc-grid').classList.contains('disabled')) submitStep();
-    }
+  // ── Mobile nav toggle ──
+  const hamburger = document.getElementById('hamburger');
+  const navLinks  = document.getElementById('nav-links');
+
+  hamburger.addEventListener('click', () => {
+    const open = navLinks.classList.toggle('open');
+    hamburger.setAttribute('aria-expanded', open);
   });
 
-  // ── Attach calculators ──
-  const setupCalc   = attachCalculator(null, document.getElementById('setup-calc-wrapper'));
-  const studentCalc = attachCalculator(
-    document.getElementById('step-input'),
-    document.getElementById('calc-grid'),
-    { onSubmit: submitStep }
-  );
+  navLinks.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      navLinks.classList.remove('open');
+      hamburger.setAttribute('aria-expanded', false);
+    });
+  });
 
-  // ── Live math preview (shows stacked fractions as student types) ──
-  (function () {
-    const input   = document.getElementById('step-input');
-    const preview = document.getElementById('step-preview');
-    input.addEventListener('input', function () {
-      const val = input.value.trim();
-      if (!val) {
-        preview.classList.remove('visible');
-        preview.innerHTML = '';
-      } else {
-        const rendered = renderMath(val);
-        // Only show the preview when fractions are present (otherwise plain text
-        // is already visible in the input field — no need for a duplicate).
-        const hasFrac = rendered.includes('math-frac') || rendered.includes('<sup>');
-        if (hasFrac) {
-          preview.innerHTML = rendered;
-          preview.classList.add('visible');
-        } else {
-          preview.classList.remove('visible');
-          preview.innerHTML = '';
-        }
+  // ── Scroll fade-in ──
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
       }
     });
-  }());
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 
-  // ── Boot ──
-  init();
+  document.querySelectorAll('.fade-in, .fade-in-group').forEach(el => observer.observe(el));
 </script>
 
 </body>
