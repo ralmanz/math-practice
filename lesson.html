@@ -364,7 +364,7 @@
         <div class="state-card">
           <div class="icon">📚</div>
           <h2>Lesson not found</h2>
-          <p>No lesson has been created for ${escHtml(curriculumLabel(curriculum))} · Unit ${escHtml(unit)} · Stage ${escHtml(stage)} yet.</p>
+          <p>No lesson has been created for ${escHtml(curriculumLabel(curriculum))} · Unit ${escHtml(unit)} · Level ${escHtml(stage)} yet.</p>
         </div>`);
       return;
     }
@@ -389,7 +389,7 @@
     const ex        = lesson.example || {};
     const steps     = ex.steps       || [];
     const hasVisual = !!ex.visual;
-    const badgeText = `${curriculumLabel(curriculum)} · Unit ${unit} · Stage ${stage}`;
+    const badgeText = `${curriculumLabel(curriculum)} · Unit ${unit} · Level ${stage}`;
 
     const rulesHtml = (lesson.rules || []).map((rule, i) =>
       `<li>

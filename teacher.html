@@ -553,13 +553,13 @@
       </select>
     </div>
     <div class="field">
-      <label>Stage</label>
+      <label>Level</label>
       <select id="new-stage">
-        <option value="" disabled selected>Select stage...</option>
-        <option value="1">Stage 1</option>
-        <option value="2">Stage 2</option>
-        <option value="3">Stage 3</option>
-        <option value="4">Stage 4</option>
+        <option value="" disabled selected>Select level...</option>
+        <option value="1">Level 1</option>
+        <option value="2">Level 2</option>
+        <option value="3">Level 3</option>
+        <option value="4">Level 4</option>
       </select>
     </div>
     <div class="field">
@@ -620,11 +620,11 @@
         <option value="8">Unit 8</option>
       </select>
       <select class="filter-select" onchange="problemFilters.stage=this.value;renderProblems()">
-        <option value="">All stages</option>
-        <option value="1">Stage 1</option>
-        <option value="2">Stage 2</option>
-        <option value="3">Stage 3</option>
-        <option value="4">Stage 4</option>
+        <option value="">All levels</option>
+        <option value="1">Level 1</option>
+        <option value="2">Level 2</option>
+        <option value="3">Level 3</option>
+        <option value="4">Level 4</option>
       </select>
       <select class="filter-select" onchange="problemFilters.problemType=this.value;renderProblems()">
         <option value="">All types</option>
@@ -1017,7 +1017,7 @@
     const parts = [];
     if (p.curriculum) parts.push(`<span class="prob-tag prob-tag--curriculum">${escHtml(curriculumLabels[p.curriculum] || p.curriculum)}</span>`);
     if (p.unit)        parts.push(`<span class="prob-tag prob-tag--unit">Unit ${escHtml(String(p.unit))}</span>`);
-    if (p.stage)       parts.push(`<span class="prob-tag prob-tag--stage">Stage ${escHtml(String(p.stage))}</span>`);
+    if (p.stage)       parts.push(`<span class="prob-tag prob-tag--stage">Level ${escHtml(String(p.stage))}</span>`);
     if (p.problemType) parts.push(`<span class="prob-tag prob-tag--type">${escHtml(p.problemType.charAt(0).toUpperCase() + p.problemType.slice(1))}</span>`);
     return parts.join('');
   }
