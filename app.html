@@ -848,7 +848,7 @@
 
   // ── Dashboard tracking (optional — set from URL params ?student=X&pid=Y) ──
   const _urlParams = new URLSearchParams(window.location.search);
-  const STUDENT_ID       = _urlParams.get('student')    || null;
+  const STUDENT_ID       = localStorage.getItem('studentId') || _urlParams.get('student') || null;
   const PROBLEM_ID       = _urlParams.get('pid')        || null;
   const PARAM_CURRICULUM = _urlParams.get('curriculum') || null;
   const PARAM_UNIT       = _urlParams.get('unit')       || null;
@@ -1475,9 +1475,12 @@
       loadCurriculumProblems(PARAM_CURRICULUM, PARAM_UNIT, PARAM_STAGE);
       return;
     }
-    // Teacher mode: show setup with one empty card
-    document.getElementById('setup-screen').style.display = 'block';
-    addProblemCard();
+    // Direct access with no params — redirect based on localStorage
+    if (localStorage.getItem('studentId')) {
+      window.location.href = 'home.html';
+    } else {
+      window.location.href = 'login.html';
+    }
   }
 
   // ── Load problems filtered by curriculum/unit/stage ──
@@ -1518,11 +1521,9 @@
     loadProblem(0);
   }
 
-  // ── Navigate back to dashboard from curriculum flow ──
+  // ── Navigate back to curriculum home ──
   function backToCurriculum() {
-    window.location.href = STUDENT_ID
-      ? 'dashboard.html?student=' + encodeURIComponent(STUDENT_ID)
-      : 'dashboard.html';
+    window.location.href = 'home.html';
   }
 
   // ── Copy link ──
@@ -1825,8 +1826,7 @@
       const backBtn = document.getElementById('back-to-curriculum-btn');
       if (backBtn) backBtn.style.display = 'block';
     } else {
-      const studentId = new URLSearchParams(window.location.search).get('student');
-      window.location.href = 'dashboard.html?student=' + studentId;
+      window.location.href = 'home.html';
     }
   }
 

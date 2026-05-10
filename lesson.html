@@ -280,6 +280,30 @@
   .state-card h2    { font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
   .state-card p     { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5; }
 
+  /* ── Back nav ── */
+  .lesson-topnav {
+    width: 100%;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    background: var(--card);
+    margin-bottom: 0;
+  }
+
+  .back-link {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--accent);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: opacity 0.15s;
+  }
+
+  .back-link:hover { opacity: 0.75; }
+
   @media (max-width: 500px) {
     body { padding: 16px 12px 48px; }
     h1   { font-size: 1.3rem; }
@@ -288,6 +312,9 @@
 </style>
 </head>
 <body>
+<nav class="lesson-topnav">
+  <a href="home.html" class="back-link">&#8592; Back to curriculum</a>
+</nav>
 <div class="container" id="app">
   <div class="state-card">
     <div class="icon">⏳</div>
@@ -513,11 +540,12 @@
 
   // ── Build practice URL ─────────────────────────────────────────
   function buildPracticeUrl() {
+    const sid = localStorage.getItem('studentId') || studentId;
     let url = 'app.html'
       + '?curriculum=' + encodeURIComponent(curriculum)
       + '&unit='       + encodeURIComponent(unit)
       + '&stage='      + encodeURIComponent(stage);
-    if (studentId) url += '&student=' + encodeURIComponent(studentId);
+    if (sid) url += '&student=' + encodeURIComponent(sid);
     return url;
   }
 

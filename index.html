@@ -88,6 +88,17 @@
 
     .nav-links a:hover { color: var(--text); }
 
+    .nav-signin {
+      text-decoration: none;
+      color: var(--text-mid);
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.15s;
+      flex-shrink: 0;
+    }
+
+    .nav-signin:hover { color: var(--text); }
+
     /* ── Buttons ── */
     .btn {
       display: inline-block;
@@ -223,6 +234,19 @@
       font-size: 1rem;
       border-radius: 10px;
     }
+
+    .hero-signin-note {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 18px;
+    }
+
+    .hero-signin-note a {
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+
+    .hero-signin-note a:hover { text-decoration: underline; }
 
     /* ─────────────────────────────────────────
        PROBLEM SECTION
@@ -629,6 +653,7 @@
       <li><a href="#pricing">Pricing</a></li>
     </ul>
 
+    <a href="login.html" class="nav-signin nav-cta">Sign in</a>
     <a href="#pricing" class="btn btn-primary nav-cta">Get Started</a>
 
     <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">
@@ -648,6 +673,7 @@
       <a href="app.html" class="btn btn-primary">Start Practicing</a>
       <a href="#how-it-works" class="btn btn-outline">See How It Works</a>
     </div>
+    <p class="hero-signin-note">Already enrolled? <a href="login.html">Sign in &rarr;</a></p>
   </div>
 </section>
 

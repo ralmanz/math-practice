@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Curriculum — Nuvo Math</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green:        #2D6A4F;
+      --green-dark:   #1A5C45;
+      --green-light:  #D8F3DC;
+      --green-bg:     #F0FAF3;
+      --blue:         #2563EB;
+      --blue-dark:    #1E40AF;
+      --blue-light:   #DBEAFE;
+      --blue-xlight:  #EFF6FF;
+      --text:         #111827;
+      --text-mid:     #374151;
+      --text-muted:   #6B7280;
+      --border:       #E5E7EB;
+      --bg:           #F9FAFB;
+      --white:        #FFFFFF;
+      --radius:       12px;
+      --radius-lg:    20px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .nav-logo {
+      font-weight: 800;
+      font-size: 1.2rem;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.03em;
+      flex-shrink: 0;
+    }
+
+    .nav-logo span { color: var(--green); }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .nav-student {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-mid);
+    }
+
+    .nav-signout {
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .nav-signout:hover { color: var(--text); }
+
+    /* ── Main ── */
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    /* ── Welcome ── */
+    .welcome-section {
+      margin-bottom: 36px;
+    }
+
+    .welcome-heading {
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 10px;
+    }
+
+    .curriculum-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--green-bg);
+      color: var(--green-dark);
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 5px 14px;
+      border-radius: 20px;
+    }
+
+    /* ── Section heading ── */
+    .section-heading {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 20px;
+      letter-spacing: -0.01em;
+    }
+
+    /* ── Units grid ── */
+    .units-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 16px;
+      margin-bottom: 52px;
+    }
+
+    /* ── Unit card ── */
+    .unit-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 22px 24px 20px;
+      transition: box-shadow 0.15s;
+    }
+
+    .unit-card:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
+    }
+
+    .unit-card-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .unit-number-badge {
+      font-size: 0.68rem;
+      font-weight: 800;
+      color: var(--green);
+      background: var(--green-bg);
+      padding: 3px 9px;
+      border-radius: 6px;
+      flex-shrink: 0;
+      margin-top: 3px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .unit-name {
+      font-size: 0.96rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      line-height: 1.35;
+      color: var(--text);
+    }
+
+    /* ── Level pills ── */
+    .level-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .level-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 13px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: opacity 0.15s, transform 0.1s;
+      white-space: nowrap;
+      cursor: default;
+      user-select: none;
+    }
+
+    /* Completed */
+    .level-pill.complete {
+      background: var(--green);
+      color: #fff;
+    }
+
+    /* Available (current / unlocked) */
+    .level-pill.available {
+      background: var(--blue);
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .level-pill.available:hover {
+      opacity: 0.88;
+      transform: translateY(-1px);
+    }
+
+    /* Locked */
+    .level-pill.locked {
+      background: var(--bg);
+      color: var(--text-muted);
+      border: 1.5px solid var(--border);
+    }
+
+    /* ── Trial expired overlay ── */
+    #trial-expired {
+      display: none;
+      max-width: 540px;
+      margin: 80px auto;
+      text-align: center;
+      padding: 0 24px;
+    }
+
+    #trial-expired .expired-logo {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 28px;
+      letter-spacing: -0.02em;
+    }
+
+    #trial-expired h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      letter-spacing: -0.02em;
+    }
+
+    #trial-expired p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.55;
+      margin-bottom: 28px;
+    }
+
+    .expired-btn-row {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .expired-btn {
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: 1.5px solid var(--green);
+      transition: opacity 0.15s;
+    }
+
+    .expired-btn:hover { opacity: 0.85; }
+
+    .expired-btn-primary {
+      background: var(--green);
+      color: white;
+    }
+
+    .expired-btn-outline {
+      background: transparent;
+      color: var(--green);
+    }
+
+    .expired-note {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .expired-note a {
+      color: var(--text-muted);
+      text-decoration: underline;
+    }
+
+    /* ── Loading state ── */
+    #loading-state {
+      display: flex;
+      justify-content: center;
+      padding: 80px 24px;
+    }
+
+    .spinner-wrap {
+      text-align: center;
+    }
+
+    .spinner {
+      width: 28px;
+      height: 28px;
+      border: 3px solid var(--border);
+      border-top-color: var(--green);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto 14px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .spinner-wrap p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    /* ── Home footer ── */
+    .home-footer {
+      border-top: 1px solid var(--border);
+      padding-top: 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      text-align: center;
+    }
+
+    .help-link {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--green);
+      text-decoration: none;
+    }
+
+    .help-link:hover { text-decoration: underline; }
+
+    .session-note {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      main { padding: 32px 16px 60px; }
+      .units-grid { grid-template-columns: 1fr; }
+      .nav-student { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════ NAV ════════ -->
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">Nuvo <span>Math</span></a>
+    <div class="nav-right">
+      <span class="nav-student" id="nav-student-name"></span>
+      <a href="#" class="nav-signout" id="signout-btn">Sign out</a>
+    </div>
+  </div>
+</nav>
+
+
+<!-- ════════ TRIAL EXPIRED ════════ -->
+<div id="trial-expired">
+  <div class="expired-logo">Nuvo Math</div>
+  <h2>Your free trial has ended</h2>
+  <p>You're one step away from full access. Choose a plan to keep practicing.</p>
+  <div class="expired-btn-row">
+    <a id="expired-practice-btn" href="#" class="expired-btn expired-btn-outline">Practice &mdash; $29/month</a>
+    <a href="https://wa.me/5076014-1676" target="_blank" class="expired-btn expired-btn-primary">Practice + Tutoring &mdash; $99/month</a>
+  </div>
+  <p class="expired-note">Questions? Email <a href="mailto:tutor@nuvostudio.club">tutor@nuvostudio.club</a> or WhatsApp 6014-1676.</p>
+</div>
+
+
+<!-- ════════ LOADING ════════ -->
+<div id="loading-state">
+  <div class="spinner-wrap">
+    <div class="spinner"></div>
+    <p>Loading your curriculum&hellip;</p>
+  </div>
+</div>
+
+
+<!-- ════════ HOME CONTENT ════════ -->
+<main id="home-content" style="display:none;">
+  <div class="welcome-section">
+    <h1 class="welcome-heading">Welcome back, <span id="student-name">there</span></h1>
+    <span class="curriculum-badge" id="curriculum-badge">&#x1F4D0; Loading&hellip;</span>
+  </div>
+
+  <h2 class="section-heading">Your curriculum</h2>
+  <div class="units-grid" id="units-grid"></div>
+
+  <div class="home-footer">
+    <a href="https://wa.me/5076014-1676" target="_blank" class="help-link">Need help? Ask Ronel</a>
+    <p class="session-note">Your next session: check WhatsApp for scheduling</p>
+  </div>
+</main>
+
+
+<script>
+  const WORKER = 'https://math-practice-proxy.ronelalmanza20.workers.dev';
+
+  const UNIT_NAMES = {
+    1: 'Algebraic Foundations',
+    2: 'Expanding & Simplifying',
+    3: 'Factorising',
+    4: 'Linear Equations & Inequalities',
+    5: 'Formulae & Rearranging',
+    6: 'Sequences',
+    7: 'Simultaneous Equations',
+    8: 'Linear Functions & Graphs',
+  };
+
+  const LEVELS = [1, 2, 3, 4];
+
+  // ── Sign out ──
+  document.getElementById('signout-btn').addEventListener('click', (e) => {
+    e.preventDefault();
+    localStorage.removeItem('studentId');
+    window.location.href = 'login.html';
+  });
+
+  // ── Curriculum display label ──
+  function curriculumLabel(curriculum, grade) {
+    const names = {
+      cambridge:     'Cambridge',
+      'common-core': 'Common Core',
+      'ib-myp':      'IB MYP',
+      general:       'General',
+    };
+    const prefix = names[curriculum] || curriculum;
+    if (curriculum === 'cambridge') return `${prefix} Stage ${grade}`;
+    if (curriculum === 'ib-myp')    return `${prefix} Year ${grade}`;
+    return `${prefix} Grade ${grade}`;
+  }
+
+  // ── Cross-unit prerequisite check ──
+  function crossUnitPrereqMet(unitNum, levelNum, progress) {
+    if (unitNum === 2) return (progress['1'] || {})[String(levelNum)] === 'complete';
+    if (unitNum === 3) return (progress['2'] || {})[String(levelNum)] === 'complete';
+    if (unitNum === 7) return (progress['4'] || {})[String(levelNum)] === 'complete';
+    if (unitNum === 8) return (progress['4'] || {})[String(levelNum)] === 'complete';
+    return true;
+  }
+
+  // ── Check if a level is unlocked ──
+  function isUnlocked(unitNum, levelNum, progress) {
+    // Level 1: only cross-unit prerequisite applies (no prior level needed)
+    if (levelNum === 1) return crossUnitPrereqMet(unitNum, levelNum, progress);
+
+    // Level N>1: prior level must be complete AND cross-unit prereq met
+    const prevComplete = (progress[String(unitNum)] || {})[String(levelNum - 1)] === 'complete';
+    if (!prevComplete) return false;
+    return crossUnitPrereqMet(unitNum, levelNum, progress);
+  }
+
+  // ── Determine display state for a level pill ──
+  // Returns: 'complete' | 'available' | 'locked'
+  function getLevelState(unitNum, levelNum, progress, hasProgress) {
+    if (!hasProgress) {
+      // Default: only Unit 1 Level 1 is available
+      return (unitNum === 1 && levelNum === 1) ? 'available' : 'locked';
+    }
+
+    const unitProg = progress[String(unitNum)] || {};
+    const status   = unitProg[String(levelNum)];
+
+    if (status === 'complete') return 'complete';
+    if (status === 'current')  return 'available';
+
+    // Not explicitly in progress — apply unlock logic
+    return isUnlocked(unitNum, levelNum, progress) ? 'available' : 'locked';
+  }
+
+  // ── Build lesson URL ──
+  function lessonUrl(curriculum, unitNum, levelNum) {
+    return `lesson.html?curriculum=${encodeURIComponent(curriculum)}&unit=${encodeURIComponent(unitNum)}&stage=${encodeURIComponent(levelNum)}`;
+  }
+
+  // ── Render the unit cards ──
+  function renderCurriculum(student) {
+    const progress   = (student.progress && Object.keys(student.progress).length > 0)
+      ? student.progress
+      : null;
+    const hasProgress = !!progress;
+    const curriculum  = student.curriculum || 'cambridge';
+
+    const grid = document.getElementById('units-grid');
+    grid.innerHTML = '';
+
+    for (let u = 1; u <= 8; u++) {
+      const card = document.createElement('div');
+      card.className = 'unit-card';
+
+      const pillsHtml = LEVELS.map(l => {
+        const state = getLevelState(u, l, progress || {}, hasProgress);
+        const label = `Level ${l}`;
+
+        if (state === 'complete') {
+          return `<span class="level-pill complete">&#x2713; ${label}</span>`;
+        }
+        if (state === 'available') {
+          const url = lessonUrl(curriculum, u, l);
+          return `<a href="${url}" class="level-pill available">${label}</a>`;
+        }
+        // locked
+        return `<span class="level-pill locked">&#x1F512; ${label}</span>`;
+      }).join('');
+
+      card.innerHTML = `
+        <div class="unit-card-header">
+          <span class="unit-number-badge">Unit ${u}</span>
+          <span class="unit-name">${UNIT_NAMES[u]}</span>
+        </div>
+        <div class="level-pills">${pillsHtml}</div>
+      `;
+
+      grid.appendChild(card);
+    }
+  }
+
+  // ── Trial expiry check ──
+  function checkTrialExpiry(student) {
+    if (!student.trialExpiry) return false;
+
+    const today = new Date();
+    const todayStr = today.getFullYear() + '-' +
+      String(today.getMonth() + 1).padStart(2, '0') + '-' +
+      String(today.getDate()).padStart(2, '0');
+
+    if (todayStr > student.trialExpiry) {
+      const sName   = encodeURIComponent(student.name || '');
+      const subject = encodeURIComponent('Subscribe: Practice Plan');
+      const body    = encodeURIComponent(`Hi, I'd like to subscribe to the Practice plan for ${student.name || ''}.`);
+      document.getElementById('expired-practice-btn').href =
+        `mailto:tutor@nuvostudio.club?subject=${subject}&body=${body}`;
+      document.getElementById('trial-expired').style.display = 'block';
+      return true;
+    }
+    return false;
+  }
+
+  // ── Boot ──
+  async function init() {
+    const studentId = localStorage.getItem('studentId');
+    if (!studentId) {
+      window.location.href = 'login.html';
+      return;
+    }
+
+    let student;
+    try {
+      const res = await fetch(`${WORKER}/student/${encodeURIComponent(studentId)}`);
+      if (!res.ok) {
+        // Student not found — clear localStorage and redirect to login
+        localStorage.removeItem('studentId');
+        window.location.href = 'login.html';
+        return;
+      }
+      student = await res.json();
+    } catch {
+      // Network error — still show something useful
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('home-content').style.display = 'block';
+      document.getElementById('student-name').textContent = studentId;
+      document.getElementById('nav-student-name').textContent = studentId;
+      document.getElementById('curriculum-badge').textContent = 'Offline — check your connection';
+      return;
+    }
+
+    document.getElementById('loading-state').style.display = 'none';
+
+    // Trial check
+    if (checkTrialExpiry(student)) return;
+
+    // Populate nav + welcome
+    const displayName = student.name || studentId;
+    document.getElementById('student-name').textContent = displayName;
+    document.getElementById('nav-student-name').textContent = displayName;
+
+    const badgeText = curriculumLabel(student.curriculum || 'cambridge', student.grade || '');
+    document.getElementById('curriculum-badge').innerHTML = `&#x1F4D0; ${badgeText}`;
+    document.title = `${displayName} — Nuvo Math`;
+
+    // Show content and render curriculum map
+    document.getElementById('home-content').style.display = 'block';
+    renderCurriculum(student);
+  }
+
+  init();
+</script>
+
+</body>
+</html>
