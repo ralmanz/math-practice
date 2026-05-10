@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nuvo Studio</title>
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.json">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #FAFAF8;
+    --card: #FFFFFF;
+    --text: #1A1A1A;
+    --text-secondary: #6B6B6B;
+    --border: #E8E8E4;
+    --accent: #2D6A4F;
+    --accent-light: #D8F3DC;
+    --accent-bg: #F0FAF3;
+    --sans: 'DM Sans', sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 24px 16px 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .container { max-width: 600px; width: 100%; }
+
+  /* Progress bar */
+  .progress-bar-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .progress-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 3px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  .progress-text {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+
+  /* Badge */
+  .lesson-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: var(--accent-bg);
+    color: var(--accent);
+    border-radius: 99px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  /* Title */
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+  }
+
+  .subtitle {
+    color: var(--text-secondary);
+    font-size: 0.88rem;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+
+  .card-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    margin-bottom: 14px;
+  }
+
+  /* Rules list */
+  .rules-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .rules-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+
+  .rule-num {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-top: 1px;
+  }
+
+  /* Tab switcher */
+  .tab-row {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 14px;
+  }
+
+  .tab-btn {
+    padding: 6px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    font-family: var(--sans);
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+  }
+
+  .tab-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+
+  /* Equation display */
+  .equation-display {
+    font-family: var(--mono);
+    font-size: 1.2rem;
+    font-weight: 500;
+    padding: 16px;
+    background: var(--accent-bg);
+    border: 1.5px solid var(--accent-light);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    min-height: 56px;
+    display: flex;
+    align-items: center;
+    transition: background 0.2s;
+    word-break: break-all;
+  }
+
+  /* Annotation */
+  .annotation-box {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 10px;
+    min-height: 1.2em;
+  }
+
+  /* Narration */
+  .narration-box {
+    padding: 12px 14px;
+    background: #F8F8F6;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.88rem;
+    line-height: 1.55;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+    min-height: 48px;
+  }
+
+  /* Step dots */
+  .step-dots {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .step-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: background 0.25s;
+    flex-shrink: 0;
+  }
+
+  .step-dot.active { background: var(--accent); }
+  .step-dot.done   { background: var(--accent-light); }
+
+  /* Main button */
+  .main-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+
+  .main-btn:hover  { opacity: 0.9; }
+  .main-btn:active { transform: scale(0.99); }
+
+  /* Visual panel */
+  .visual-panel {
+    padding: 16px;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+  }
+
+  /* State card (loading/error) */
+  .state-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 40px 24px;
+    text-align: center;
+    margin-top: 60px;
+  }
+
+  .state-card .icon { font-size: 2.5rem; margin-bottom: 12px; }
+  .state-card h2    { font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
+  .state-card p     { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5; }
+
+  @media (max-width: 500px) {
+    body { padding: 16px 12px 48px; }
+    h1   { font-size: 1.3rem; }
+    .equation-display { font-size: 1rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container" id="app">
+  <div class="state-card">
+    <div class="icon">⏳</div>
+    <h2>Loading lesson…</h2>
+    <p>Just a moment!</p>
+  </div>
+</div>
+
+<script>
+  const WORKER = 'https://math-practice-proxy.ronelalmanza20.workers.dev';
+
+  const _params    = new URLSearchParams(window.location.search);
+  const curriculum = _params.get('curriculum') || '';
+  const unit       = _params.get('unit')       || '';
+  const stage      = _params.get('stage')      || '';
+  const studentId  = _params.get('student')    || '';
+
+  let lesson      = null;
+  let currentStep = 0; // index of the next step to reveal
+
+  // ── Helpers ────────────────────────────────────────────────────
+  function curriculumLabel(c) {
+    const map = {
+      cambridge:     'Cambridge',
+      'common-core': 'Common Core',
+      'ib-myp':      'IB MYP',
+      general:       'General',
+    };
+    return map[c] || c;
+  }
+
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function render(html) {
+    document.getElementById('app').innerHTML = html;
+  }
+
+  // ── Boot ───────────────────────────────────────────────────────
+  async function init() {
+    if (!curriculum || !unit || !stage) {
+      render(`
+        <div class="state-card">
+          <div class="icon">🤔</div>
+          <h2>Missing lesson parameters</h2>
+          <p>This page requires <code>curriculum</code>, <code>unit</code>, and <code>stage</code> URL parameters.</p>
+        </div>`);
+      return;
+    }
+
+    let res;
+    try {
+      res = await fetch(
+        `${WORKER}/lesson/${encodeURIComponent(curriculum)}/${encodeURIComponent(unit)}/${encodeURIComponent(stage)}`
+      );
+    } catch {
+      render(`
+        <div class="state-card">
+          <div class="icon">📡</div>
+          <h2>Couldn't load lesson</h2>
+          <p>Check your internet connection and try refreshing the page.</p>
+        </div>`);
+      return;
+    }
+
+    if (res.status === 404) {
+      render(`
+        <div class="state-card">
+          <div class="icon">📚</div>
+          <h2>Lesson not found</h2>
+          <p>No lesson has been created for ${escHtml(curriculumLabel(curriculum))} · Unit ${escHtml(unit)} · Stage ${escHtml(stage)} yet.</p>
+        </div>`);
+      return;
+    }
+
+    if (!res.ok) {
+      render(`
+        <div class="state-card">
+          <div class="icon">📡</div>
+          <h2>Couldn't load lesson</h2>
+          <p>Server error. Try refreshing the page.</p>
+        </div>`);
+      return;
+    }
+
+    lesson      = await res.json();
+    currentStep = 0;
+    renderLesson();
+  }
+
+  // ── Render the lesson UI ───────────────────────────────────────
+  function renderLesson() {
+    const ex        = lesson.example || {};
+    const steps     = ex.steps       || [];
+    const hasVisual = !!ex.visual;
+    const badgeText = `${curriculumLabel(curriculum)} · Unit ${unit} · Stage ${stage}`;
+
+    const rulesHtml = (lesson.rules || []).map((rule, i) =>
+      `<li>
+        <span class="rule-num">${i + 1}</span>
+        <span>${escHtml(rule)}</span>
+      </li>`
+    ).join('');
+
+    const dotsHtml = steps.map((_, i) =>
+      `<div class="step-dot" id="dot-${i}"></div>`
+    ).join('');
+
+    const tabsHtml = hasVisual ? `
+      <div class="tab-row">
+        <button class="tab-btn active" id="tab-symbolic" onclick="switchTab('symbolic')">Symbolic</button>
+        <button class="tab-btn"        id="tab-visual"   onclick="switchTab('visual')">Visual</button>
+      </div>` : '';
+
+    const initBtnLabel = steps.length === 0 ? 'Start practice &rarr;' : 'Show step 1';
+
+    document.getElementById('app').innerHTML = `
+      <div class="progress-bar-container">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <div class="progress-text" id="progress-text">Lesson</div>
+      </div>
+
+      <div class="lesson-badge">${escHtml(badgeText)}</div>
+      <h1>${escHtml(lesson.title || 'Lesson')}</h1>
+      <p class="subtitle">${escHtml(lesson.subtitle || '')}</p>
+
+      <div class="card">
+        <div class="card-title">Key concepts</div>
+        <ul class="rules-list">${rulesHtml || '<li><span style="color:var(--text-secondary);font-size:0.88rem;">No rules listed.</span></li>'}</ul>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Worked example</div>
+
+        ${tabsHtml}
+
+        <div id="symbolic-panel">
+          <div class="equation-display" id="equation-display">${escHtml(ex.start || '')}</div>
+          <div class="annotation-box"   id="annotation-box"></div>
+        </div>
+
+        ${hasVisual ? `<div id="visual-panel" class="visual-panel" style="display:none;">${ex.visual}</div>` : ''}
+
+        <div class="narration-box" id="narration-box">Follow along — tap the button below to step through the example.</div>
+
+        ${steps.length > 0 ? `<div class="step-dots" id="step-dots">${dotsHtml}</div>` : ''}
+
+        <button class="main-btn" id="main-btn" onclick="handleMainBtn()">${initBtnLabel}</button>
+      </div>
+    `;
+  }
+
+  // ── Tab switcher ───────────────────────────────────────────────
+  function switchTab(tab) {
+    const symPanel = document.getElementById('symbolic-panel');
+    const visPanel = document.getElementById('visual-panel');
+    const tabSym   = document.getElementById('tab-symbolic');
+    const tabVis   = document.getElementById('tab-visual');
+
+    if (tab === 'symbolic') {
+      symPanel.style.display = '';
+      if (visPanel) visPanel.style.display = 'none';
+      tabSym.classList.add('active');
+      tabVis.classList.remove('active');
+    } else {
+      symPanel.style.display = 'none';
+      if (visPanel) visPanel.style.display = '';
+      tabSym.classList.remove('active');
+      tabVis.classList.add('active');
+    }
+  }
+
+  // ── Step through the example ───────────────────────────────────
+  function handleMainBtn() {
+    const ex    = lesson.example || {};
+    const steps = ex.steps       || [];
+
+    if (currentStep >= steps.length) {
+      // All steps revealed — navigate to practice
+      window.location.href = buildPracticeUrl();
+      return;
+    }
+
+    const step = steps[currentStep];
+
+    // Update equation, annotation, narration
+    document.getElementById('equation-display').textContent = step.equation  || '';
+    document.getElementById('annotation-box').textContent   = step.annotation || '';
+    document.getElementById('narration-box').textContent    = step.narration  || '';
+
+    // Update step dots
+    for (let i = 0; i < steps.length; i++) {
+      const dot = document.getElementById(`dot-${i}`);
+      if (!dot) continue;
+      if (i < currentStep)      dot.className = 'step-dot done';
+      else if (i === currentStep) dot.className = 'step-dot active';
+      else                       dot.className = 'step-dot';
+    }
+
+    // Update progress bar
+    const pct = Math.round(((currentStep + 1) / steps.length) * 100);
+    const fill = document.getElementById('progress-fill');
+    if (fill) fill.style.width = pct + '%';
+
+    currentStep++;
+
+    // Update button label
+    const btn = document.getElementById('main-btn');
+    if (currentStep >= steps.length) {
+      btn.innerHTML = 'Start practice &rarr;';
+    } else {
+      btn.textContent = `Show step ${currentStep + 1}`;
+    }
+  }
+
+  // ── Build practice URL ─────────────────────────────────────────
+  function buildPracticeUrl() {
+    let url = 'app.html'
+      + '?curriculum=' + encodeURIComponent(curriculum)
+      + '&unit='       + encodeURIComponent(unit)
+      + '&stage='      + encodeURIComponent(stage);
+    if (studentId) url += '&student=' + encodeURIComponent(studentId);
+    return url;
+  }
+
+  init();
+</script>
+</body>
+</html>
