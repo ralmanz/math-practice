@@ -439,7 +439,7 @@
       </div>
       <div class="field">
         <label>Curriculum</label>
-        <select id="student-curriculum">
+        <select id="student-curriculum" onchange="updateGradeOptions(this.value)">
           <option value="" disabled selected>Select curriculum...</option>
           <option value="cambridge">Cambridge Lower Secondary</option>
           <option value="common-core">Common Core (US)</option>
@@ -451,10 +451,6 @@
         <label>Grade / Stage</label>
         <select id="student-grade">
           <option value="" disabled selected>Select grade...</option>
-          <option value="6">Grade 6 / Stage 7 / MYP 1</option>
-          <option value="7">Grade 7 / Stage 8 / MYP 2</option>
-          <option value="8">Grade 8 / Stage 9 / MYP 3</option>
-          <option value="9">Grade 9 / MYP 4</option>
         </select>
       </div>
       <div class="field">
@@ -669,13 +665,38 @@
     document.getElementById('student-form').style.display = 'none';
   }
 
+  function updateGradeOptions(curriculum) {
+    const sel     = document.getElementById('student-grade');
+    const prevVal = sel.value;
+
+    const optionSets = {
+      cambridge:    [{ v: '7', l: 'Stage 7' }, { v: '8', l: 'Stage 8' }, { v: '9', l: 'Stage 9' }],
+      'common-core':[{ v: '6', l: 'Grade 6' }, { v: '7', l: 'Grade 7' }, { v: '8', l: 'Grade 8' }, { v: '9', l: 'Grade 9' }],
+      'ib-myp':     [{ v: '1', l: 'MYP 1'   }, { v: '2', l: 'MYP 2'   }, { v: '3', l: 'MYP 3'   }, { v: '4', l: 'MYP 4'   }],
+    };
+
+    const defaultLabel = curriculum === 'cambridge' ? 'Select stage...' :
+                         curriculum === 'ib-myp'    ? 'Select year...'  : 'Select grade...';
+
+    const opts = optionSets[curriculum] || [
+      { v: '6', l: 'Year 6 / Grade 6' }, { v: '7', l: 'Year 7 / Grade 7' },
+      { v: '8', l: 'Year 8 / Grade 8' }, { v: '9', l: 'Year 9 / Grade 9' },
+    ];
+
+    sel.innerHTML = `<option value="" disabled selected>${defaultLabel}</option>` +
+      opts.map(o => `<option value="${o.v}">${o.l}</option>`).join('');
+
+    // Restore previous value if it still exists in the new option set
+    if (prevVal && opts.find(o => o.v === prevVal)) sel.value = prevVal;
+  }
+
   function formatMeta(curriculum, grade) {
     if (!curriculum || !grade) return '';
     const stageMap = {
-      cambridge:    { '6': 'Stage 7', '7': 'Stage 8', '8': 'Stage 9', '9': 'Stage 9' },
+      cambridge:    { '7': 'Stage 7', '8': 'Stage 8', '9': 'Stage 9' },
       'common-core': { '6': 'Grade 6', '7': 'Grade 7', '8': 'Grade 8', '9': 'Grade 9' },
-      'ib-myp':     { '6': 'MYP 1',   '7': 'MYP 2',   '8': 'MYP 3',  '9': 'MYP 4'   },
-      other:        { '6': 'Grade 6', '7': 'Grade 7', '8': 'Grade 8', '9': 'Grade 9' }
+      'ib-myp':     { '1': 'MYP 1',   '2': 'MYP 2',   '3': 'MYP 3',  '4': 'MYP 4'   },
+      other:        { '6': 'Year 6',  '7': 'Year 7',  '8': 'Year 8', '9': 'Year 9'  },
     };
     const nameMap = { cambridge: 'Cambridge', 'common-core': 'Common Core', 'ib-myp': 'IB MYP', other: 'Other' };
     const stage = (stageMap[curriculum] || {})[grade] || `Grade ${grade}`;
@@ -708,6 +729,7 @@
       document.getElementById('student-id').value = selectedStudentId;
       document.getElementById('student-name').value = selectedStudentName;
       document.getElementById('student-curriculum').value = selectedCurriculum;
+      updateGradeOptions(selectedCurriculum);
       document.getElementById('student-grade').value = selectedGrade;
       showStudentCompact();
     } else {
@@ -743,7 +765,7 @@
     document.getElementById('student-id').value = '';
     document.getElementById('student-name').value = '';
     document.getElementById('student-curriculum').value = '';
-    document.getElementById('student-grade').value = '';
+    updateGradeOptions('');
     document.getElementById('trial-expiry').value = '';
     selectedCurriculum = '';
     selectedGrade = '';
@@ -781,6 +803,7 @@
       selectedGrade = student.grade || '';
       document.getElementById('student-name').value = selectedStudentName;
       document.getElementById('student-curriculum').value = selectedCurriculum;
+      updateGradeOptions(selectedCurriculum);
       document.getElementById('student-grade').value = selectedGrade;
       document.getElementById('trial-expiry').value = student.trialExpiry || '';
       currentProblems = (student.problems || []).map(p => ({
