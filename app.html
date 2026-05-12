@@ -1513,8 +1513,8 @@
 
   // ── Boot: check URL for student data, else show teacher setup ──
   function init() {
-    // Guest mode: PAA practice without login
-    if (PARAM_GUEST && PARAM_CURRICULUM === 'PAA') {
+    // Guest mode: curriculum practice without login
+    if (PARAM_GUEST && PARAM_CURRICULUM) {
       loadGuestProblems();
       return;
     }
@@ -1602,18 +1602,27 @@
     document.getElementById('setup-screen').style.display = 'none';
     document.getElementById('practice-screen').style.display = 'block';
 
+    const curriculumLabelMap = {
+      PAA: 'PAA',
+      cambridge: 'Cambridge',
+      'common-core': 'Common Core',
+      'ib-myp': 'IB MYP'
+    };
+    const defaultUnit = PARAM_CURRICULUM === 'PAA' ? 'aritmetica' : '1';
+    const unit = PARAM_UNIT || defaultUnit;
+    const level = PARAM_STAGE || PARAM_LEVEL || '1';
+
     const breadcrumb = document.getElementById('curriculum-breadcrumb');
     if (breadcrumb) {
       const guestPhase = PARAM_MODE === 'test' ? 'Prueba' : 'Pr\u00e1ctica';
-      breadcrumb.textContent = 'PAA \u00b7 Aritm\u00e9tica \u00b7 Nivel ' + (PARAM_STAGE || PARAM_LEVEL || '1') + ' \u00b7 ' + guestPhase;
+      breadcrumb.textContent = (curriculumLabelMap[PARAM_CURRICULUM] || PARAM_CURRICULUM) + ' \u00b7 Unidad ' + unit + ' \u00b7 Nivel ' + level + ' \u00b7 ' + guestPhase;
       breadcrumb.style.display = 'block';
     }
 
-    const level = PARAM_STAGE || PARAM_LEVEL || '1';
     const problemType = PARAM_MODE === 'test' ? 'test' : 'practice';
     try {
       const res = await fetch(
-        `${PROXY_URL}/problems/curriculum/PAA/aritmetica/${encodeURIComponent(level)}/${encodeURIComponent(problemType)}`
+        `${PROXY_URL}/problems/curriculum/${encodeURIComponent(PARAM_CURRICULUM)}/${encodeURIComponent(unit)}/${encodeURIComponent(level)}/${encodeURIComponent(problemType)}`
       );
       if (!res.ok) throw new Error('Failed');
       problems = await res.json();
@@ -1645,6 +1654,15 @@
     if (paywall) {
       paywall.style.display = 'block';
       Lang.apply();
+      const subtitleEl = paywall.querySelector('.paywall-subtitle');
+      const loginBtn = paywall.querySelector('[data-i18n="guest_paywall_login_btn"]');
+      if (PARAM_CURRICULUM && PARAM_CURRICULUM !== 'PAA') {
+        if (subtitleEl) subtitleEl.textContent = Lang.t('guest_paywall_subtitle_secondary');
+        if (loginBtn) loginBtn.setAttribute('href', 'login.html?curriculum=' + encodeURIComponent(PARAM_CURRICULUM));
+      } else {
+        if (subtitleEl) subtitleEl.textContent = Lang.t('guest_paywall_subtitle');
+        if (loginBtn) loginBtn.setAttribute('href', 'login.html?curriculum=PAA');
+      }
     }
   }
 

@@ -459,12 +459,15 @@
 
   const LEVELS = [1, 2, 3, 4];
 
-  function isGuestPAA() {
-    return PARAM_GUEST && PARAM_CURRICULUM === 'PAA';
+  function isGuestMode() {
+    return PARAM_GUEST && !!PARAM_CURRICULUM;
   }
 
   // ── Sign out ──
   document.getElementById('signout-btn').addEventListener('click', (e) => {
+    if (isGuestMode()) {
+      return;
+    }
     e.preventDefault();
     localStorage.removeItem('studentId');
     window.location.href = 'login.html';
@@ -700,6 +703,77 @@
     }).join('');
   }
 
+  function renderGuestSecondaryHome() {
+    const badge = document.getElementById('curriculum-badge');
+    const guestBanner = document.getElementById('guest-banner');
+    const studentName = document.getElementById('student-name');
+    const navName = document.getElementById('nav-student-name');
+    const grid = document.getElementById('units-grid');
+    const heading = document.querySelector('.section-heading');
+    const signoutBtn = document.getElementById('signout-btn');
+
+    document.title = Lang.t('guest_secondary_home_title');
+    studentName.textContent = Lang.t('guest_secondary_home_header_title');
+    navName.textContent = '';
+    badge.innerHTML = `&#x1F4D0; ${Lang.t('guest_secondary_badge')}`;
+    heading.textContent = Lang.t('guest_secondary_home_subtitle');
+    signoutBtn.textContent = Lang.t('guest_login_cta');
+    signoutBtn.href = 'login.html?curriculum=cambridge';
+
+    guestBanner.style.display = 'block';
+    guestBanner.textContent = Lang.t('guest_secondary_trial_banner');
+
+    const cards = [
+      {
+        number: '1',
+        title: Lang.t('guest_secondary_card1_title'),
+        desc: Lang.t('guest_secondary_card1_desc'),
+        status: Lang.t('guest_unit_available'),
+        href: 'lesson.html?curriculum=cambridge&unit=1&level=1&guest=true',
+        locked: false
+      },
+      {
+        number: '2',
+        title: Lang.t('guest_secondary_card2_title'),
+        desc: Lang.t('guest_secondary_card2_desc'),
+        status: Lang.t('guest_unit_locked'),
+        locked: true
+      },
+      {
+        number: '3',
+        title: Lang.t('guest_secondary_card3_title'),
+        desc: Lang.t('guest_secondary_card3_desc'),
+        status: Lang.t('guest_unit_locked'),
+        locked: true
+      },
+      {
+        number: '4',
+        title: Lang.t('guest_secondary_card4_title'),
+        desc: Lang.t('guest_secondary_card4_desc'),
+        status: Lang.t('guest_unit_locked'),
+        locked: true
+      }
+    ];
+
+    grid.innerHTML = cards.map((card) => {
+      const cardClass = card.locked ? 'unit-card guest-locked' : 'unit-card';
+      const statusClass = card.locked ? 'level-pill locked' : 'level-pill available';
+      const statusPill = `<span class="${statusClass}">${card.locked ? '&#x1F512; ' : ''}${card.status}</span>`;
+      const levelsPill = `<span class="level-pill complete">${Lang.t('level_label')} 1-4</span>`;
+      const cardBody = `
+        <div class="unit-card-header">
+          <span class="unit-number-badge">${Lang.t('unit_label')} ${card.number}</span>
+          <span class="unit-name">${card.title}</span>
+        </div>
+        <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:14px;line-height:1.5;">${card.desc}</p>
+        <div class="level-pills" style="margin-bottom:8px;">${levelsPill}</div>
+        <div class="level-pills">${statusPill}</div>
+      `;
+      if (card.locked) return `<div class="${cardClass}">${cardBody}</div>`;
+      return `<a href="${card.href}" class="${cardClass}" style="display:block;text-decoration:none;color:inherit;">${cardBody}</a>`;
+    }).join('');
+  }
+
   // ── Trial expiry check ──
   function checkTrialExpiry(student) {
     if (!student.trialExpiry) return false;
@@ -723,10 +797,14 @@
 
   // ── Boot ──
   async function init() {
-    if (isGuestPAA()) {
+    if (isGuestMode()) {
       document.getElementById('loading-state').style.display = 'none';
       document.getElementById('home-content').style.display = 'block';
-      renderGuestPAAHome();
+      if (PARAM_CURRICULUM === 'PAA') {
+        renderGuestPAAHome();
+      } else {
+        renderGuestSecondaryHome();
+      }
       return;
     }
 

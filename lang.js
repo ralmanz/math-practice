@@ -247,6 +247,19 @@
       guest_paa_home_header_title: 'UTP Admission Test',
       guest_paa_home_subtitle: 'Select a unit to begin',
       guest_paa_trial_banner: 'You are in free trial mode \u2014 Arithmetic is available for free. Subscribe to access all content.',
+      guest_secondary_home_title: 'Secondary Math \u2014 Nuvo Math',
+      guest_secondary_home_header_title: 'Secondary School Math',
+      guest_secondary_home_subtitle: 'Select a unit to begin',
+      guest_secondary_badge: 'Secondary Math',
+      guest_secondary_trial_banner: 'You are in free trial mode \u2014 one algebra unit is available for free. Subscribe to unlock the full curriculum.',
+      guest_secondary_card1_title: 'Algebra Foundations',
+      guest_secondary_card1_desc: 'Expressions, like terms, and core algebra skills',
+      guest_secondary_card2_title: 'Linear Equations',
+      guest_secondary_card2_desc: 'One-step, two-step, and multi-step equations',
+      guest_secondary_card3_title: 'Functions and Graphs',
+      guest_secondary_card3_desc: 'Patterns, coordinate plane, and linear relationships',
+      guest_secondary_card4_title: 'Advanced Algebra',
+      guest_secondary_card4_desc: 'Factorisation, systems, and higher-level practice',
       guest_unit_arit_title: 'Arithmetic',
       guest_unit_arit_desc: 'Operations, ratios, percentages, and number theory',
       guest_unit_algebra_title: 'Algebra',
@@ -260,6 +273,8 @@
       guest_login_cta: 'Sign in',
       guest_lesson_complete_title: 'You completed Arithmetic Level 1!',
       guest_lesson_complete_subtitle: 'Subscribe to continue with the next levels and unlock Algebra, Geometry, and more.',
+      guest_lesson_complete_title_secondary: 'You completed Algebra Level 1!',
+      guest_lesson_complete_subtitle_secondary: 'Subscribe to continue to higher levels and unlock the full secondary curriculum.',
 
       // === filter.html ===
       filter_heading: 'What do you want to practice?',
@@ -275,6 +290,7 @@
       // === guest paywall ===
       guest_paywall_title: 'Ready to keep practicing?',
       guest_paywall_subtitle: 'You\u2019ve completed your free practice. Subscribe to access all levels of the Admission Test \u2014 Arithmetic, Algebra, Geometry, and more.',
+      guest_paywall_subtitle_secondary: 'You\u2019ve completed your free practice. Subscribe to unlock all secondary units and levels.',
       guest_paywall_subscribe_btn: 'Subscribe \u2192',
       guest_paywall_login_btn: 'I have an account \u2192 Sign in',
       guest_paywall_contact: 'Questions? WhatsApp 6014-1676'
@@ -525,6 +541,19 @@
       guest_paa_home_header_title: 'Prueba de Admisi\u00F3n \u2014 UTP',
       guest_paa_home_subtitle: 'Selecciona una unidad para comenzar',
       guest_paa_trial_banner: 'Est\u00E1s en modo de prueba gratuita \u2014 Aritm\u00E9tica disponible gratis. Suscr\u00EDbete para acceder a todo el contenido.',
+      guest_secondary_home_title: 'Matem\u00E1ticas de Secundaria \u2014 Nuvo Math',
+      guest_secondary_home_header_title: 'Matem\u00E1ticas de Secundaria',
+      guest_secondary_home_subtitle: 'Selecciona una unidad para comenzar',
+      guest_secondary_badge: 'Matem\u00E1ticas de Secundaria',
+      guest_secondary_trial_banner: 'Est\u00E1s en modo de prueba gratuita \u2014 una unidad de \u00E1lgebra est\u00E1 disponible gratis. Suscr\u00EDbete para desbloquear el curr\u00EDculo completo.',
+      guest_secondary_card1_title: 'Fundamentos de \u00C1lgebra',
+      guest_secondary_card1_desc: 'Expresiones, t\u00E9rminos semejantes y habilidades base de \u00E1lgebra',
+      guest_secondary_card2_title: 'Ecuaciones Lineales',
+      guest_secondary_card2_desc: 'Ecuaciones de uno, dos y varios pasos',
+      guest_secondary_card3_title: 'Funciones y Gr\u00E1ficas',
+      guest_secondary_card3_desc: 'Patrones, plano cartesiano y relaciones lineales',
+      guest_secondary_card4_title: '\u00C1lgebra Avanzada',
+      guest_secondary_card4_desc: 'Factorizaci\u00F3n, sistemas y pr\u00E1ctica de mayor nivel',
       guest_unit_arit_title: 'Aritm\u00E9tica',
       guest_unit_arit_desc: 'Operaciones, razones, porcentajes y teor\u00EDa de n\u00FAmeros',
       guest_unit_algebra_title: '\u00C1lgebra',
@@ -538,6 +567,8 @@
       guest_login_cta: 'Iniciar sesi\u00F3n',
       guest_lesson_complete_title: '\u00A1Completaste Aritm\u00E9tica Nivel 1!',
       guest_lesson_complete_subtitle: 'Suscr\u00EDbete para continuar con los niveles siguientes y acceder a \u00C1lgebra, Geometr\u00EDa y m\u00E1s.',
+      guest_lesson_complete_title_secondary: '\u00A1Completaste \u00C1lgebra Nivel 1!',
+      guest_lesson_complete_subtitle_secondary: 'Suscr\u00EDbete para continuar a niveles superiores y desbloquear todo el curr\u00EDculo de secundaria.',
 
       // === filter.html ===
       filter_heading: '\u00BFQu\u00E9 quieres practicar?',
@@ -553,6 +584,7 @@
       // === guest paywall ===
       guest_paywall_title: '\u00BFListo para seguir practicando?',
       guest_paywall_subtitle: 'Completaste tu pr\u00E1ctica gratuita. Suscr\u00EDbete para acceder a todos los niveles de la Prueba de Admisi\u00F3n \u2014 Aritm\u00E9tica, \u00C1lgebra, Geometr\u00EDa y m\u00E1s.',
+      guest_paywall_subtitle_secondary: 'Completaste tu pr\u00E1ctica gratuita. Suscr\u00EDbete para desbloquear todas las unidades y niveles de secundaria.',
       guest_paywall_subscribe_btn: 'Suscribirme \u2192',
       guest_paywall_login_btn: 'Ya tengo cuenta \u2192 Iniciar sesi\u00F3n',
       guest_paywall_contact: '\u00BFPreguntas? WhatsApp 6014-1676'

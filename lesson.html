@@ -491,15 +491,19 @@
   }
 
   function showGuestCompletionCard() {
+    const isPAA = curriculum === 'PAA';
+    const loginCurriculum = isPAA ? 'PAA' : 'cambridge';
+    const titleKey = isPAA ? 'guest_lesson_complete_title' : 'guest_lesson_complete_title_secondary';
+    const subtitleKey = isPAA ? 'guest_lesson_complete_subtitle' : 'guest_lesson_complete_subtitle_secondary';
     render(`
       ${progressBarHtml(5)}
       <div class="result-card pass">
         <div class="result-icon">&#127942;</div>
-        <h2>${Lang.t('guest_lesson_complete_title')}</h2>
-        <p>${Lang.t('guest_lesson_complete_subtitle')}</p>
+        <h2>${Lang.t(titleKey)}</h2>
+        <p>${Lang.t(subtitleKey)}</p>
         <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;">
           <a class="result-btn primary" href="mailto:tutor@nuvostudio.club?subject=${encodeURIComponent('Quiero suscribirme a Nuvo Math')}">${Lang.t('guest_paywall_subscribe_btn')}</a>
-          <a class="result-btn" style="background:transparent;color:var(--accent);border:1.5px solid var(--accent);" href="login.html?curriculum=PAA">${Lang.t('guest_paywall_login_btn')}</a>
+          <a class="result-btn" style="background:transparent;color:var(--accent);border:1.5px solid var(--accent);" href="login.html?curriculum=${encodeURIComponent(loginCurriculum)}">${Lang.t('guest_paywall_login_btn')}</a>
         </div>
       </div>
     `);
@@ -558,7 +562,7 @@
 
     const backLink = document.querySelector('.back-link');
     if (guestMode) {
-      backLink.href = 'home.html?curriculum=PAA&guest=true';
+      backLink.href = 'home.html?curriculum=' + encodeURIComponent(curriculum) + '&guest=true';
     }
 
     if (guestMode && phaseParam === 'test') {
