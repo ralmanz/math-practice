@@ -903,6 +903,8 @@
   const PARAM_STAGE      = _urlParams.get('stage')      || null;
   const PARAM_GUEST      = _urlParams.get('guest') === 'true';
   const PARAM_LEVEL      = _urlParams.get('level') || null;
+  const PARAM_MODE       = _urlParams.get('mode') || '';
+  const PARAM_RETURN_TO  = _urlParams.get('returnTo') || '';
 
   function markProblemComplete() {
     if (!STUDENT_ID || !PROBLEM_ID) return;
@@ -1249,7 +1251,7 @@
     const t0 = performance.now();
     console.log('[submitTranslate] entry', { input });
 
-    if (PARAM_GUEST && !guestProblemAttempted) {
+    if (PARAM_GUEST && PARAM_MODE !== 'test' && !guestProblemAttempted) {
       guestProblemAttempted = true;
       const c = parseInt(localStorage.getItem('nuvo_guest_count') || '0', 10);
       localStorage.setItem('nuvo_guest_count', String(c + 1));
@@ -1590,9 +1592,9 @@
       localStorage.setItem('nuvo_guest_count', '0');
     }
 
-    // Already used up free problems — show paywall immediately
+    // Already used up free practice problems — show paywall immediately
     const guestCount = parseInt(localStorage.getItem('nuvo_guest_count') || '0', 10);
-    if (guestCount >= 5) {
+    if (PARAM_MODE !== 'test' && guestCount >= 5) {
       showGuestPaywall();
       return;
     }
@@ -1602,14 +1604,16 @@
 
     const breadcrumb = document.getElementById('curriculum-breadcrumb');
     if (breadcrumb) {
-      breadcrumb.textContent = 'PAA \u00b7 Aritm\u00e9tica \u00b7 Nivel 1';
+      const guestPhase = PARAM_MODE === 'test' ? 'Prueba' : 'Pr\u00e1ctica';
+      breadcrumb.textContent = 'PAA \u00b7 Aritm\u00e9tica \u00b7 Nivel ' + (PARAM_STAGE || PARAM_LEVEL || '1') + ' \u00b7 ' + guestPhase;
       breadcrumb.style.display = 'block';
     }
 
-    const level = PARAM_LEVEL || '1';
+    const level = PARAM_STAGE || PARAM_LEVEL || '1';
+    const problemType = PARAM_MODE === 'test' ? 'test' : 'practice';
     try {
       const res = await fetch(
-        `${PROXY_URL}/problems/curriculum/PAA/aritmetica/${encodeURIComponent(level)}/practice`
+        `${PROXY_URL}/problems/curriculum/PAA/aritmetica/${encodeURIComponent(level)}/${encodeURIComponent(problemType)}`
       );
       if (!res.ok) throw new Error('Failed');
       problems = await res.json();
@@ -1713,7 +1717,7 @@
     const input = document.getElementById('step-input').value.trim();
     if (!input) return;
 
-    if (PARAM_GUEST && !guestProblemAttempted) {
+    if (PARAM_GUEST && PARAM_MODE !== 'test' && !guestProblemAttempted) {
       guestProblemAttempted = true;
       const c = parseInt(localStorage.getItem('nuvo_guest_count') || '0', 10);
       localStorage.setItem('nuvo_guest_count', String(c + 1));
@@ -1947,7 +1951,7 @@
   }
 
   function nextProblem() {
-    if (PARAM_GUEST) {
+    if (PARAM_GUEST && PARAM_MODE !== 'test') {
       const count = parseInt(localStorage.getItem('nuvo_guest_count') || '0', 10);
       if (count >= 5) {
         showGuestPaywall();
@@ -1957,8 +1961,18 @@
     if (currentIndex < problems.length - 1) {
       loadProblem(currentIndex + 1);
     } else if (PARAM_GUEST) {
-      // All problems exhausted in guest mode — show paywall
-      showGuestPaywall();
+      if (PARAM_MODE === 'test') {
+        if (PARAM_RETURN_TO) {
+          window.location.href = PARAM_RETURN_TO;
+        } else {
+          window.location.href = 'lesson.html?curriculum=PAA&unit=aritmetica&stage=1&guest=true&phase=complete';
+        }
+      } else if (PARAM_RETURN_TO) {
+        window.location.href = PARAM_RETURN_TO;
+      } else {
+        // All problems exhausted in guest practice mode — show paywall
+        showGuestPaywall();
+      }
     } else if (PARAM_CURRICULUM && PARAM_UNIT && PARAM_STAGE) {
       // Curriculum flow: show done screen with back-to-curriculum button
       document.getElementById('practice-screen').style.display = 'none';

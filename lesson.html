@@ -433,7 +433,9 @@
   const _params    = new URLSearchParams(window.location.search);
   const curriculum = _params.get('curriculum') || '';
   const unit       = _params.get('unit')       || '';
-  const stage      = _params.get('stage')      || '';
+  const stage      = _params.get('stage') || _params.get('level') || '';
+  const guestMode  = _params.get('guest') === 'true';
+  const phaseParam = _params.get('phase') || '';
   const studentId  = localStorage.getItem('studentId') || _params.get('student') || '';
 
   // ── Phase state ──────────────────────────────────────────────
@@ -457,6 +459,50 @@
 
   function render(html) {
     document.getElementById('app').innerHTML = html;
+  }
+
+  function buildLessonUrl(extra) {
+    const q = new URLSearchParams({
+      curriculum: curriculum,
+      unit: unit,
+      stage: stage
+    });
+    if (guestMode) q.set('guest', 'true');
+    if (studentId && !guestMode) q.set('student', studentId);
+    Object.keys(extra || {}).forEach(function (k) {
+      if (extra[k] !== undefined && extra[k] !== null && String(extra[k]) !== '') {
+        q.set(k, String(extra[k]));
+      }
+    });
+    return 'lesson.html?' + q.toString();
+  }
+
+  function guestAppUrl(mode, nextPhase) {
+    const returnUrl = buildLessonUrl({ phase: nextPhase });
+    const q = new URLSearchParams({
+      curriculum: curriculum,
+      unit: unit,
+      stage: stage,
+      guest: 'true',
+      mode: mode,
+      returnTo: returnUrl
+    });
+    return 'app.html?' + q.toString();
+  }
+
+  function showGuestCompletionCard() {
+    render(`
+      ${progressBarHtml(5)}
+      <div class="result-card pass">
+        <div class="result-icon">&#127942;</div>
+        <h2>${Lang.t('guest_lesson_complete_title')}</h2>
+        <p>${Lang.t('guest_lesson_complete_subtitle')}</p>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;">
+          <a class="result-btn primary" href="mailto:tutor@nuvostudio.club?subject=${encodeURIComponent('Quiero suscribirme a Nuvo Math')}">${Lang.t('guest_paywall_subscribe_btn')}</a>
+          <a class="result-btn" style="background:transparent;color:var(--accent);border:1.5px solid var(--accent);" href="login.html?curriculum=PAA">${Lang.t('guest_paywall_login_btn')}</a>
+        </div>
+      </div>
+    `);
   }
 
   // ── Boot ─────────────────────────────────────────────────────
@@ -510,6 +556,19 @@
       try { testProblems = await testResult.value.json(); } catch { testProblems = []; }
     }
 
+    const backLink = document.querySelector('.back-link');
+    if (guestMode) {
+      backLink.href = 'home.html?curriculum=PAA&guest=true';
+    }
+
+    if (guestMode && phaseParam === 'test') {
+      showTest();
+      return;
+    }
+    if (guestMode && phaseParam === 'complete') {
+      showGuestCompletionCard();
+      return;
+    }
     showCover();
   }
 
@@ -655,6 +714,11 @@
 
   // ── Phase 4: Practice ─────────────────────────────────────────
   function showPractice() {
+    if (guestMode) {
+      window.location.href = guestAppUrl('practice', 'test');
+      return;
+    }
+
     if (practiceProblems.length === 0) {
       // Skip to test if no practice problems
       showTest();
@@ -684,6 +748,11 @@
 
   // ── Phase 5: Test ─────────────────────────────────────────────
   function showTest() {
+    if (guestMode) {
+      window.location.href = guestAppUrl('test', 'complete');
+      return;
+    }
+
     if (testProblems.length === 0) {
       // No test problems — mark as complete automatically if student is known
       markProgressAndShow('complete', null, null);
@@ -714,6 +783,11 @@
 
   // ── Update progress + show result card ───────────────────────
   async function markProgressAndShow(status, score, total) {
+    if (guestMode) {
+      showGuestCompletionCard();
+      return;
+    }
+
     // Update progress on the server if we have a student and a status to set
     if (studentId && status === 'complete') {
       try {
