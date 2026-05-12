@@ -397,24 +397,24 @@
 <!-- ── Auth ── -->
 <div id="auth-screen" class="container-narrow">
   <div class="lock-icon">🔒</div>
-  <h2>Teacher Login</h2>
-  <p>Enter your teacher password to continue.</p>
-  <input type="password" id="auth-input" placeholder="Password" autocomplete="current-password">
+  <h2 data-i18n="teacher_login_h2">Teacher Login</h2>
+  <p data-i18n="teacher_login_p">Enter your teacher password to continue.</p>
+  <input type="password" id="auth-input" placeholder="Password" data-i18n-placeholder="teacher_password_placeholder" autocomplete="current-password">
   <div class="auth-error" id="auth-error"></div>
-  <button class="btn btn-primary" onclick="handleAuth()">Unlock</button>
+  <button class="btn btn-primary" onclick="handleAuth()" data-i18n="teacher_unlock_btn">Unlock</button>
 </div>
 
 <!-- ── Main app ── -->
 <div id="main-app" class="container" style="display:none;">
 
   <div class="page-header">
-    <h1>Teacher Dashboard</h1>
-    <span class="subtitle">Nuvo Studio</span>
+    <h1 data-i18n="teacher_dashboard_h1">Teacher Dashboard</h1>
+    <span class="subtitle" data-i18n="teacher_subtitle">Nuvo Studio</span>
   </div>
 
   <div class="tab-bar">
-    <button class="tab-btn active" id="tab-btn-students" onclick="switchTab('students')">Students &amp; Homework</button>
-    <button class="tab-btn" id="tab-btn-problems" onclick="switchTab('problems')">Problem Bank</button>
+    <button class="tab-btn active" id="tab-btn-students" onclick="switchTab('students')" data-i18n="teacher_tab_students">Students &amp; Homework</button>
+    <button class="tab-btn" id="tab-btn-problems" onclick="switchTab('problems')" data-i18n="teacher_tab_problems">Problem Bank</button>
   </div>
 
   <!-- ══════════════ TAB 1: Students & Homework ══════════════ -->
@@ -425,14 +425,14 @@
       <div>
         <div class="card">
           <div class="card-title card-title-toggle" onclick="toggleStudentList()">
-            ALL STUDENTS
+            <span data-i18n="teacher_all_students">ALL STUDENTS</span>
             <span class="toggle-chevron" id="student-list-chevron">▾</span>
           </div>
           <div class="collapsible-body" id="student-list-body">
             <div class="student-list" id="student-list">
-              <div class="placeholder-msg">Loading…</div>
+              <div class="placeholder-msg" data-i18n="teacher_loading">Loading…</div>
             </div>
-            <button class="btn-new-student" onclick="newStudent()">+ New Student</button>
+            <button class="btn-new-student" onclick="newStudent()" data-i18n="teacher_new_student_btn">+ New Student</button>
           </div>
         </div>
       </div>
@@ -442,7 +442,7 @@
 
         <!-- Placeholder when nothing selected -->
         <div class="card" id="panel-placeholder">
-          <p class="placeholder-msg">Select a student from the list to begin.</p>
+          <p class="placeholder-msg" data-i18n="teacher_select_student">Select a student from the list to begin.</p>
         </div>
 
         <!-- ── Profile card ── -->
@@ -451,8 +451,8 @@
           <!-- Read-only view -->
           <div id="profile-readonly-view">
             <div class="profile-header">
-              <div class="card-title" style="margin-bottom:0;">Student Profile</div>
-              <button class="btn btn-ghost btn-sm" onclick="startEditProfile()">Edit ✏️</button>
+              <div class="card-title" style="margin-bottom:0;" data-i18n="teacher_student_profile">Student Profile</div>
+              <button class="btn btn-ghost btn-sm" onclick="startEditProfile()" data-i18n="teacher_edit_btn">Edit ✏️</button>
             </div>
             <div class="profile-fields" id="profile-readonly-fields"></div>
           </div>
@@ -460,18 +460,18 @@
           <!-- Edit view -->
           <div id="profile-edit-view" style="display:none;">
             <div class="profile-header">
-              <div class="card-title" style="margin-bottom:0;">Edit Profile</div>
+              <div class="card-title" style="margin-bottom:0;" data-i18n="teacher_edit_profile">Edit Profile</div>
             </div>
             <div class="field">
-              <label>Name</label>
+              <label data-i18n="teacher_label_name">Name</label>
               <input type="text" id="student-name" placeholder="e.g. Sofia" autocomplete="off" autocorrect="off" spellcheck="false">
             </div>
             <div class="field">
-              <label>Student ID</label>
+              <label data-i18n="teacher_label_student_id">Student ID</label>
               <input type="text" id="student-id" readonly>
             </div>
             <div class="field">
-              <label>Curriculum</label>
+              <label data-i18n="teacher_label_curriculum">Curriculum</label>
               <select id="student-curriculum" onchange="updateGradeOptions(this.value)">
                 <option value="" disabled selected>Select curriculum...</option>
                 <option value="cambridge">Cambridge Lower Secondary</option>
@@ -481,18 +481,18 @@
               </select>
             </div>
             <div class="field">
-              <label>Grade / Stage</label>
+              <label data-i18n="teacher_label_grade">Grade / Stage</label>
               <select id="student-grade">
                 <option value="" disabled selected>Select grade...</option>
               </select>
             </div>
             <div class="field">
-              <label>Trial expiry <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-secondary);">(optional)</span></label>
+              <label><span data-i18n="teacher_label_trial">Trial expiry</span> <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-secondary);" data-i18n="teacher_optional">(optional)</span></label>
               <input type="date" id="trial-expiry">
             </div>
             <div class="btn-row">
-              <button class="btn btn-primary" id="save-profile-btn" onclick="saveProfile()">Save</button>
-              <button class="btn btn-secondary" onclick="cancelEdit()">Cancel</button>
+              <button class="btn btn-primary" id="save-profile-btn" onclick="saveProfile()" data-i18n="teacher_save_btn">Save</button>
+              <button class="btn btn-secondary" onclick="cancelEdit()" data-i18n="teacher_cancel_btn">Cancel</button>
             </div>
             <div id="profile-status" class="status-msg" style="display:none;"></div>
           </div>
@@ -500,18 +500,18 @@
           <!-- New student view -->
           <div id="new-student-view" style="display:none;">
             <div class="profile-header">
-              <div class="card-title" style="margin-bottom:0;">New Student</div>
+              <div class="card-title" style="margin-bottom:0;" data-i18n="teacher_new_student_title">New Student</div>
             </div>
             <div class="field">
-              <label>Student ID</label>
+              <label data-i18n="teacher_label_student_id">Student ID</label>
               <input type="text" id="ns-id" placeholder="e.g. sofia" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
             </div>
             <div class="field">
-              <label>Name</label>
+              <label data-i18n="teacher_label_name">Name</label>
               <input type="text" id="ns-name" placeholder="e.g. Sofia" autocomplete="off" autocorrect="off" spellcheck="false">
             </div>
             <div class="field">
-              <label>Curriculum</label>
+              <label data-i18n="teacher_label_curriculum">Curriculum</label>
               <select id="ns-curriculum" onchange="updateNewGradeOptions(this.value)">
                 <option value="" disabled selected>Select curriculum...</option>
                 <option value="cambridge">Cambridge Lower Secondary</option>
@@ -521,18 +521,18 @@
               </select>
             </div>
             <div class="field">
-              <label>Grade / Stage</label>
+              <label data-i18n="teacher_label_grade">Grade / Stage</label>
               <select id="ns-grade">
                 <option value="" disabled selected>Select grade...</option>
               </select>
             </div>
             <div class="field">
-              <label>Trial expiry <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-secondary);">(optional)</span></label>
+              <label><span data-i18n="teacher_label_trial">Trial expiry</span> <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-secondary);" data-i18n="teacher_optional">(optional)</span></label>
               <input type="date" id="ns-trial-expiry">
             </div>
             <div class="btn-row">
-              <button class="btn btn-primary" id="create-student-btn" onclick="createStudent()">Create Student</button>
-              <button class="btn btn-secondary" onclick="cancelNewStudent()">Cancel</button>
+              <button class="btn btn-primary" id="create-student-btn" onclick="createStudent()" data-i18n="teacher_create_btn">Create Student</button>
+              <button class="btn btn-secondary" onclick="cancelNewStudent()" data-i18n="teacher_cancel_btn">Cancel</button>
             </div>
             <div id="new-student-status" class="status-msg" style="display:none;"></div>
           </div>
@@ -541,44 +541,44 @@
 
         <!-- ── Homework card ── -->
         <div class="card" id="homework-card" style="display:none;">
-          <div class="card-title">Homework</div>
-          <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:10px;">Assigned problems appear on the student's home screen under "Your homework"</p>
+          <div class="card-title" data-i18n="teacher_homework_title">Homework</div>
+          <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:10px;" data-i18n="teacher_homework_note">Assigned problems appear on the student's home screen under "Your homework"</p>
 
           <div class="hw-list" id="hw-list"></div>
-          <div class="placeholder-msg" id="hw-empty" style="display:none;">No homework assigned yet</div>
+          <div class="placeholder-msg" id="hw-empty" style="display:none;" data-i18n="teacher_no_homework">No homework assigned yet</div>
 
           <hr>
 
           <!-- Assign from bank -->
           <div class="field" style="margin-bottom:8px;">
-            <label>Assign from problem bank</label>
+            <label data-i18n="teacher_assign_label">Assign from problem bank</label>
             <div class="assign-row">
-              <input type="text" id="assign-id-input" placeholder="Problem ID" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-              <button class="btn btn-primary btn-sm" onclick="assignFromBank()">Assign</button>
+              <input type="text" id="assign-id-input" placeholder="Problem ID" data-i18n-placeholder="teacher_problem_id_placeholder" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+              <button class="btn btn-primary btn-sm" onclick="assignFromBank()" data-i18n="teacher_assign_btn">Assign</button>
             </div>
           </div>
 
           <hr>
 
           <!-- One-off problem -->
-          <p style="font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-secondary);margin-bottom:8px;">Or create a one-off problem</p>
+          <p style="font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-secondary);margin-bottom:8px;" data-i18n="teacher_oneoff_heading">Or create a one-off problem</p>
           <div class="field">
-            <label>Question</label>
+            <label data-i18n="teacher_question_label">Question</label>
             <input type="text" id="oneoff-question" placeholder="e.g. Expand 3(x + 2)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
           </div>
           <div class="field">
-            <label>Answer</label>
+            <label data-i18n="teacher_answer_label">Answer</label>
             <input type="text" id="oneoff-answer" placeholder="e.g. 3x + 6" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
           </div>
-          <button class="btn btn-secondary btn-sm" onclick="addOneOff()">Add &amp; assign</button>
+          <button class="btn btn-secondary btn-sm" onclick="addOneOff()" data-i18n="teacher_add_assign_btn">Add &amp; assign</button>
 
           <hr>
 
           <!-- Student link -->
           <div class="link-row" id="student-link-row" style="display:none;">
-            <span class="link-label">Student link:</span>
+            <span class="link-label" data-i18n="teacher_student_link_label">Student link:</span>
             <span class="link-url" id="student-link-url"></span>
-            <button class="btn btn-secondary btn-sm" onclick="copyDashboardLink()">Copy link</button>
+            <button class="btn btn-secondary btn-sm" onclick="copyDashboardLink()" data-i18n="teacher_copy_link_btn">Copy link</button>
           </div>
 
         </div><!-- /homework-card -->
@@ -633,9 +633,9 @@
       <!-- Left: problem list -->
       <div>
         <div class="card">
-          <div class="card-title">Problems</div>
+          <div class="card-title" data-i18n="teacher_problems_title">Problems</div>
           <div class="bank-list" id="bank-list">
-            <div class="placeholder-msg">Loading…</div>
+            <div class="placeholder-msg" data-i18n="teacher_loading">Loading…</div>
           </div>
         </div>
       </div>
@@ -643,11 +643,11 @@
       <!-- Right: add problem form -->
       <div>
         <div class="card">
-          <div class="card-title">Add to Bank</div>
+          <div class="card-title" data-i18n="teacher_add_to_bank_title">Add to Bank</div>
 
           <div class="form-grid-2">
             <div class="field" style="margin-bottom:0;">
-              <label>Curriculum</label>
+              <label data-i18n="teacher_label_curriculum">Curriculum</label>
               <select id="new-curriculum">
                 <option value="" disabled selected>Select...</option>
                 <option value="cambridge">Cambridge</option>
@@ -657,7 +657,7 @@
               </select>
             </div>
             <div class="field" style="margin-bottom:0;">
-              <label>Unit</label>
+              <label data-i18n="teacher_unit_label">Unit</label>
               <select id="new-unit">
                 <option value="" disabled selected>Select...</option>
                 <option value="1">1 — Algebraic Foundations</option>
@@ -671,7 +671,7 @@
               </select>
             </div>
             <div class="field" style="margin-bottom:0;">
-              <label>Level</label>
+              <label data-i18n="teacher_level_label">Level</label>
               <select id="new-stage">
                 <option value="" disabled selected>Select...</option>
                 <option value="1">Level 1</option>
@@ -681,7 +681,7 @@
               </select>
             </div>
             <div class="field" style="margin-bottom:0;">
-              <label>Problem Type</label>
+              <label data-i18n="teacher_problem_type_label">Problem Type</label>
               <select id="new-problem-type">
                 <option value="" disabled selected>Select...</option>
                 <option value="practice">Practice</option>
@@ -692,7 +692,7 @@
           </div>
 
           <div class="field">
-            <label>Math Type</label>
+            <label data-i18n="teacher_math_type_label">Math Type</label>
             <select id="new-type">
               <option value="Expand">Expand</option>
               <option value="Factorize">Factorize</option>
@@ -705,42 +705,42 @@
           </div>
 
           <div class="field">
-            <label id="new-question-label">Question</label>
+            <label id="new-question-label" data-i18n="teacher_question_label">Question</label>
             <input type="text" id="new-question" placeholder="e.g. 3(x + 2)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
           </div>
           <div class="field">
-            <label id="new-answer-label">Answer</label>
+            <label id="new-answer-label" data-i18n="teacher_answer_label">Answer</label>
             <input type="text" id="new-answer" placeholder="e.g. 3x + 6" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
           </div>
 
           <div class="field">
-            <label>Calculator <span style="font-weight:400;font-size:0.7rem;text-transform:none;letter-spacing:0;color:var(--text-secondary);">(tap Question or Answer first)</span></label>
+            <label><span data-i18n="teacher_calc_label">Calculator</span> <span style="font-weight:400;font-size:0.7rem;text-transform:none;letter-spacing:0;color:var(--text-secondary);" data-i18n="teacher_calc_hint">(tap Question or Answer first)</span></label>
             <div id="teacher-calc"></div>
           </div>
 
-          <div class="hints-toggle" onclick="toggleHints()">Add hints ▾</div>
+          <div class="hints-toggle" id="hints-toggle" onclick="toggleHints()" data-i18n="teacher_add_hints">Add hints ▾</div>
           <div class="hints-body" id="hints-body">
             <div class="field">
-              <label>Hint 1</label>
+              <label data-i18n="teacher_hint_label_1">Hint 1</label>
               <input type="text" id="new-hint1" placeholder="First hint…" autocomplete="off" spellcheck="false">
             </div>
             <div class="field">
-              <label>Hint 2</label>
+              <label data-i18n="teacher_hint_label_2">Hint 2</label>
               <input type="text" id="new-hint2" placeholder="Second hint…" autocomplete="off" spellcheck="false">
             </div>
             <div class="field">
-              <label>Hint 3</label>
+              <label data-i18n="teacher_hint_label_3">Hint 3</label>
               <input type="text" id="new-hint3" placeholder="Third hint…" autocomplete="off" spellcheck="false">
             </div>
           </div>
 
           <div class="field">
-            <label>Problem ID <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-secondary);">(auto-generated)</span></label>
+            <label><span data-i18n="teacher_pid_label">Problem ID</span> <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-secondary);" data-i18n="teacher_auto_generated">(auto-generated)</span></label>
             <input type="text" id="new-pid" readonly>
           </div>
 
-          <button class="btn btn-primary btn-full" id="save-to-bank-btn" onclick="saveToBankForm()" style="margin-top:4px;">Save to bank</button>
-          <div class="save-flash" id="bank-save-flash">Saved to bank ✓</div>
+          <button class="btn btn-primary btn-full" id="save-to-bank-btn" onclick="saveToBankForm()" style="margin-top:4px;" data-i18n="teacher_save_to_bank_btn">Save to bank</button>
+          <div class="save-flash" id="bank-save-flash" data-i18n="teacher_saved_to_bank">Saved to bank ✓</div>
         </div>
       </div>
 
@@ -751,8 +751,10 @@
 
 <div class="toast" id="toast"></div>
 
+<script src="lang.js"></script>
 <script src="calculator.js"></script>
 <script>
+  Lang.apply();
   const WORKER        = 'https://math-practice-proxy.ronelalmanza20.workers.dev';
   const DASHBOARD_BASE = 'https://nuvostudio.club/home.html';
   const PRACTICE_BASE  = 'https://nuvo-studio.github.io/math-practice/app.html';
@@ -784,17 +786,17 @@
   // Translate: swap field labels
   document.getElementById('new-type').addEventListener('change', function () {
     const isTranslate = this.value === 'Translate';
-    document.getElementById('new-question-label').textContent = isTranslate ? 'Word description' : 'Question';
+    document.getElementById('new-question-label').textContent = isTranslate ? Lang.t('teacher_word_desc') : Lang.t('teacher_question_label');
     document.getElementById('new-question').placeholder = isTranslate
       ? 'e.g. the triple of a number x, decreased by 4' : 'e.g. 3(x + 2)';
-    document.getElementById('new-answer-label').textContent = isTranslate ? 'Expected answer' : 'Answer';
+    document.getElementById('new-answer-label').textContent = isTranslate ? Lang.t('teacher_expected_answer') : Lang.t('teacher_answer_label');
     document.getElementById('new-answer').placeholder = isTranslate ? 'e.g. 3x - 4' : 'e.g. 3x + 6';
   });
 
   // ── Auth ─────────────────────────────────────────────────────
   function handleAuth() {
     const val = document.getElementById('auth-input').value.trim();
-    if (!val) { document.getElementById('auth-error').textContent = 'Please enter a password.'; return; }
+    if (!val) { document.getElementById('auth-error').textContent = Lang.t('teacher_auth_error_empty'); return; }
     teacherSecret = val;
     sessionStorage.setItem('teacherSecret', val);
     showApp();
@@ -834,7 +836,7 @@
   // ── Load student list ─────────────────────────────────────────
   async function loadStudentList() {
     const list = document.getElementById('student-list');
-    list.innerHTML = '<div class="placeholder-msg">Loading…</div>';
+    list.innerHTML = `<div class="placeholder-msg">${Lang.t('teacher_loading')}</div>`;
     try {
       const res = await fetch(`${WORKER}/students`, {
         headers: { 'Authorization': `Bearer ${teacherSecret}` }
@@ -857,7 +859,7 @@
 
       list.innerHTML = withProgress.map(s => renderStudentRow(s)).join('');
     } catch {
-      list.innerHTML = '<div class="placeholder-msg" style="color:var(--wrong)">Could not load students.</div>';
+      list.innerHTML = `<div class="placeholder-msg" style="color:var(--wrong)">${Lang.t('teacher_toast_failed_students')}</div>`;
     }
   }
 
@@ -871,7 +873,7 @@
       const expiry = new Date(s.trialExpiry);
       if (expiry > new Date()) {
         const days = Math.ceil((expiry - new Date()) / 86400000);
-        badgeHtml = `<span class="badge badge-trial">Trial · ${days}d left</span>`;
+        badgeHtml = `<span class="badge badge-trial">Trial · ${Lang.t('teacher_trial_days_left').replace('{n}', days)}</span>`;
       }
     }
     if (!badgeHtml && s.curriculum && s.grade) {
@@ -953,24 +955,24 @@
       const days = Math.ceil((d - now) / 86400000);
       const expired = d <= now;
       const color = expired ? 'var(--wrong)' : 'var(--amber)';
-      trialHtml = `<span style="color:${color};">${escHtml(selectedTrialExpiry)} (${expired ? 'Expired' : days + 'd left'})</span>`;
+      trialHtml = `<span style="color:${color};">${escHtml(selectedTrialExpiry)} (${expired ? Lang.t('teacher_trial_expired_label') : Lang.t('teacher_trial_days_left').replace('{n}', days)})</span>`;
     }
 
     document.getElementById('profile-readonly-fields').innerHTML = `
       <div class="pf-row">
-        <span class="pf-label">Name</span>
+        <span class="pf-label">${Lang.t('teacher_label_name')}</span>
         <span class="pf-value">${escHtml(selectedStudentName || '—')}</span>
       </div>
       <div class="pf-row">
-        <span class="pf-label">Student ID</span>
+        <span class="pf-label">${Lang.t('teacher_label_student_id')}</span>
         <span class="pf-value mono">${escHtml(selectedStudentId || '—')}</span>
       </div>
       <div class="pf-row">
-        <span class="pf-label">Curriculum &amp; Grade</span>
+        <span class="pf-label">${Lang.t('teacher_pf_curriculum_grade')}</span>
         <span class="pf-value">${escHtml(formatMeta(selectedCurriculum, selectedGrade) || '—')}</span>
       </div>
       <div class="pf-row">
-        <span class="pf-label">Trial expiry</span>
+        <span class="pf-label">${Lang.t('teacher_label_trial')}</span>
         <span class="pf-value">${trialHtml}</span>
       </div>`;
   }
@@ -1036,7 +1038,7 @@
       document.getElementById('homework-card').style.display = '';
       updateStudentLink(id);
     } catch {
-      showToast('Failed to load student data.');
+      showToast(Lang.t('teacher_toast_failed_student'));
     }
   }
 
@@ -1092,11 +1094,11 @@
     const grade       = document.getElementById('student-grade').value || '';
     const trialExpiry = document.getElementById('trial-expiry').value || '';
 
-    if (!id || !name) { showStatus('profile-status', 'err', 'ID and name are required.'); return; }
+    if (!id || !name) { showStatus('profile-status', 'err', Lang.t('teacher_id_required')); return; }
 
     const btn = document.getElementById('save-profile-btn');
     btn.disabled = true;
-    showStatus('profile-status', 'ok', 'Saving…');
+    showStatus('profile-status', 'ok', Lang.t('teacher_saving'));
 
     try {
       const res = await fetch(`${WORKER}/student/${encodeURIComponent(id)}/profile`, {
@@ -1104,7 +1106,7 @@
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${teacherSecret}` },
         body: JSON.stringify({ name, curriculum, grade, trialExpiry })
       });
-      if (res.status === 401) { showStatus('profile-status', 'err', 'Wrong password.'); return; }
+      if (res.status === 401) { showStatus('profile-status', 'err', Lang.t('teacher_toast_wrong_password')); return; }
       if (!res.ok) throw new Error();
 
       selectedStudentId   = id;
@@ -1117,7 +1119,7 @@
       loadStudentList();
       showToast(`"${name}" saved.`);
     } catch {
-      showStatus('profile-status', 'err', 'Save failed. Check connection.');
+      showStatus('profile-status', 'err', Lang.t('teacher_toast_failed_save'));
     } finally {
       btn.disabled = false;
     }
@@ -1131,11 +1133,11 @@
     const grade       = document.getElementById('ns-grade').value || '';
     const trialExpiry = document.getElementById('ns-trial-expiry').value || '';
 
-    if (!id || !name) { showStatus('new-student-status', 'err', 'ID and name are required.'); return; }
+    if (!id || !name) { showStatus('new-student-status', 'err', Lang.t('teacher_id_required')); return; }
 
     const btn = document.getElementById('create-student-btn');
     btn.disabled = true;
-    showStatus('new-student-status', 'ok', 'Creating…');
+    showStatus('new-student-status', 'ok', Lang.t('teacher_creating'));
 
     try {
       const res = await fetch(`${WORKER}/student/${encodeURIComponent(id)}/profile`, {
@@ -1143,7 +1145,7 @@
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${teacherSecret}` },
         body: JSON.stringify({ name, curriculum, grade, trialExpiry })
       });
-      if (res.status === 401) { showStatus('new-student-status', 'err', 'Wrong password.'); return; }
+      if (res.status === 401) { showStatus('new-student-status', 'err', Lang.t('teacher_toast_wrong_password')); return; }
       if (!res.ok) throw new Error();
 
       isCreatingNewStudent = false;
@@ -1161,7 +1163,7 @@
       updateStudentLink(id);
       showToast(`Student "${name}" created.`);
     } catch {
-      showStatus('new-student-status', 'err', 'Creation failed. Check connection.');
+      showStatus('new-student-status', 'err', Lang.t('teacher_toast_failed_create'));
     } finally {
       btn.disabled = false;
     }
@@ -1183,15 +1185,15 @@
       const tagClass = p.problemType === 'diagnostic' ? 'hw-tag-diagnostic' :
                        p.problemType === 'test'       ? 'hw-tag-test'       :
                        p.oneOff                       ? 'hw-tag-oneoff'     : 'hw-tag-practice';
-      const tagLabel = p.problemType === 'diagnostic' ? 'Diagnostic' :
-                       p.problemType === 'test'       ? 'Test'        :
-                       p.oneOff                       ? 'One-off'     : 'Practice';
+      const tagLabel = p.problemType === 'diagnostic' ? Lang.t('hw_tag_diagnostic') :
+                       p.problemType === 'test'       ? Lang.t('hw_tag_test')        :
+                       p.oneOff                       ? Lang.t('hw_tag_oneoff')      : Lang.t('hw_tag_practice');
       const qText    = p.question || p.title || p.id;
       return `<div>
         <div class="hw-item">
           <span class="hw-question" title="${escHtml(qText)}">${escHtml(qText)}</span>
           <span class="hw-tag ${tagClass}">${tagLabel}</span>
-          <button class="btn btn-secondary btn-sm" onclick="viewStepLog('${escHtml(p.id)}', this)">Steps ▾</button>
+          <button class="btn btn-secondary btn-sm" onclick="viewStepLog('${escHtml(p.id)}', this)">${Lang.t('teacher_steps_show')}</button>
           <button class="btn btn-danger btn-sm" onclick="removeHomework('${escHtml(p.id)}')">✕</button>
         </div>
         <div id="log-${escHtml(p.id)}" class="step-log" style="display:none;"></div>
@@ -1215,34 +1217,34 @@
       });
       if (!res.ok) throw new Error();
     } catch {
-      showToast('Failed to save homework. Check connection.');
+      showToast(Lang.t('teacher_toast_failed_homework'));
     }
   }
 
   // ── Assign from bank by ID ────────────────────────────────────
   async function assignFromBank() {
-    if (!selectedStudentId) { showToast('Select a student first.'); return; }
+    if (!selectedStudentId) { showToast(Lang.t('teacher_toast_select_student')); return; }
     const input = document.getElementById('assign-id-input');
     const pid   = input.value.trim();
-    if (!pid) { showToast('Enter a problem ID.'); return; }
+    if (!pid) { showToast(Lang.t('teacher_toast_enter_pid')); return; }
 
     const problem = bankProblems.find(p => p.id === pid);
-    if (!problem) { showToast(`Problem "${pid}" not found in bank.`); return; }
-    if (currentProblems.find(p => p.id === pid)) { showToast('Already assigned.'); return; }
+    if (!problem) { showToast(Lang.t('teacher_toast_problem_notfound').replace('{pid}', pid)); return; }
+    if (currentProblems.find(p => p.id === pid)) { showToast(Lang.t('teacher_toast_already_assigned')); return; }
 
     currentProblems.push({ ...problem, completed: false });
     renderHomework();
     input.value = '';
     await saveHomework();
-    showToast('Problem assigned.');
+    showToast(Lang.t('teacher_toast_assigned'));
   }
 
   // ── One-off problem ───────────────────────────────────────────
   async function addOneOff() {
-    if (!selectedStudentId) { showToast('Select a student first.'); return; }
+    if (!selectedStudentId) { showToast(Lang.t('teacher_toast_select_student')); return; }
     const question = document.getElementById('oneoff-question').value.trim();
     const answer   = document.getElementById('oneoff-answer').value.trim();
-    if (!question || !answer) { showToast('Enter question and answer.'); return; }
+    if (!question || !answer) { showToast(Lang.t('teacher_toast_enter_qna')); return; }
 
     const pid     = `oneoff_${Date.now()}`;
     const encoded = btoa(encodeURIComponent(JSON.stringify({
@@ -1258,7 +1260,7 @@
     document.getElementById('oneoff-question').value = '';
     document.getElementById('oneoff-answer').value   = '';
     await saveHomework();
-    showToast('One-off problem assigned.');
+    showToast(Lang.t('teacher_toast_oneoff_assigned'));
   }
 
   // ── Student link ──────────────────────────────────────────────
@@ -1280,12 +1282,12 @@
       document.execCommand('copy');
       document.body.removeChild(ta);
     }
-    showToast('Link copied!');
+    showToast(Lang.t('teacher_toast_link_copied'));
   }
 
   // ── Problem bank ──────────────────────────────────────────────
   async function loadBankProblems() {
-    document.getElementById('bank-list').innerHTML = '<div class="placeholder-msg">Loading…</div>';
+    document.getElementById('bank-list').innerHTML = `<div class="placeholder-msg">${Lang.t('teacher_loading')}</div>`;
     try {
       const res = await fetch(`${WORKER}/problems`);
       if (!res.ok) throw new Error();
@@ -1293,7 +1295,7 @@
       renderBankList();
     } catch {
       document.getElementById('bank-list').innerHTML =
-        '<div class="placeholder-msg" style="color:var(--wrong)">Could not load problems.</div>';
+        `<div class="placeholder-msg" style="color:var(--wrong)">${Lang.t('teacher_toast_failed_problems')}</div>`;
     }
   }
 
@@ -1316,7 +1318,7 @@
     });
 
     if (!filtered.length) {
-      list.innerHTML = '<div class="placeholder-msg">No problems yet.</div>';
+      list.innerHTML = `<div class="placeholder-msg">${Lang.t('teacher_no_problems')}</div>`;
       return;
     }
 
@@ -1353,7 +1355,7 @@
     const body   = document.getElementById('hints-body');
     const toggle = document.querySelector('.hints-toggle');
     const open   = body.classList.toggle('open');
-    toggle.textContent = open ? 'Add hints ▴' : 'Add hints ▾';
+    toggle.textContent = open ? Lang.t('teacher_hide_hints') : Lang.t('teacher_add_hints');
   }
 
   // ── Save problem to bank ──────────────────────────────────────
@@ -1370,7 +1372,7 @@
     const hint3       = document.getElementById('new-hint3').value.trim();
 
     if (!curriculum || !unit || !stage || !problemType || !question || !answer) {
-      showToast('Please fill in all required fields.');
+      showToast(Lang.t('teacher_toast_fill_required'));
       return;
     }
 
@@ -1384,7 +1386,7 @@
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${teacherSecret}` },
         body: JSON.stringify({ curriculum, unit, stage, problemType, type, question, answer, modules: ['equivalence'], hints })
       });
-      if (res.status === 401) { showToast('Wrong password.'); return; }
+      if (res.status === 401) { showToast(Lang.t('teacher_toast_wrong_password')); return; }
       if (!res.ok) throw new Error();
       const data = await res.json();
 
@@ -1409,7 +1411,7 @@
       flash.classList.add('show');
       setTimeout(() => flash.classList.remove('show'), 3000);
     } catch {
-      showToast('Failed to save. Check connection.');
+      showToast(Lang.t('teacher_toast_failed_save'));
     } finally {
       btn.disabled = false;
     }
@@ -1421,17 +1423,17 @@
     if (!logDiv) return;
     if (logDiv.style.display !== 'none') {
       logDiv.style.display = 'none';
-      btn.textContent = 'Steps ▾';
+      btn.textContent = Lang.t('teacher_steps_show');
       return;
     }
     logDiv.style.display = '';
-    btn.textContent = 'Steps ▴';
-    logDiv.innerHTML = '<div class="log-empty">Loading…</div>';
+    btn.textContent = Lang.t('teacher_steps_hide');
+    logDiv.innerHTML = `<div class="log-empty">${Lang.t('teacher_loading_logs')}</div>`;
     try {
       const res  = await fetch(`${WORKER}/get-logs?studentId=${encodeURIComponent(selectedStudentId)}&problemId=${encodeURIComponent(pid)}`);
       const data = await res.json();
       const logs = (data.logs || []).slice().reverse();
-      if (!logs.length) { logDiv.innerHTML = '<div class="log-empty">No attempts yet.</div>'; return; }
+      if (!logs.length) { logDiv.innerHTML = `<div class="log-empty">${Lang.t('teacher_no_attempts')}</div>`; return; }
       logDiv.innerHTML = logs.map(entry => {
         const ts      = new Date(entry.timestamp).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
         const correct = entry.correct === true;
@@ -1442,7 +1444,7 @@
         </div>`;
       }).join('');
     } catch {
-      logDiv.innerHTML = '<div class="log-empty" style="color:var(--wrong)">Failed to load logs.</div>';
+      logDiv.innerHTML = `<div class="log-empty" style="color:var(--wrong)">${Lang.t('teacher_failed_logs')}</div>`;
     }
   }
 

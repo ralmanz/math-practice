@@ -410,22 +410,25 @@
 </head>
 <body>
 <nav class="lesson-topnav">
-  <a href="home.html" class="back-link">&#8592; Back to curriculum</a>
+  <a href="home.html" class="back-link" data-i18n="back_to_curriculum">← Back to curriculum</a>
 </nav>
 
 <div class="container" id="app">
   <div class="state-card">
     <div class="icon">&#9203;</div>
-    <h2>Loading lesson&hellip;</h2>
-    <p>Just a moment!</p>
+    <h2 data-i18n="loading_lesson_h2">Loading lesson…</h2>
+    <p data-i18n="loading_just_moment">Just a moment!</p>
   </div>
 </div>
 
+<script src="lang.js"></script>
 <script src="calculator.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/algebrite@1.4.0/dist/algebrite.bundle-for-browser.js"></script>
 <script src="practice-engine.js"></script>
 <script>
   const WORKER = 'https://math-practice-proxy.ronelalmanza20.workers.dev';
+
+  Lang.apply();
 
   const _params    = new URLSearchParams(window.location.search);
   const curriculum = _params.get('curriculum') || '';
@@ -462,8 +465,8 @@
       render(`
         <div class="state-card">
           <div class="icon">&#129300;</div>
-          <h2>Missing lesson parameters</h2>
-          <p>This page requires <code>curriculum</code>, <code>unit</code>, and <code>stage</code> URL parameters.</p>
+          <h2>${Lang.t('error_missing_params_h2')}</h2>
+          <p>${Lang.t('error_missing_params_p')}</p>
         </div>`);
       return;
     }
@@ -481,16 +484,16 @@
         render(`
           <div class="state-card">
             <div class="icon">&#128218;</div>
-            <h2>Lesson not found</h2>
-            <p>No lesson has been created for ${escHtml(curriculumLabel(curriculum))} &middot; Unit ${escHtml(unit)} &middot; Level ${escHtml(stage)} yet.</p>
+            <h2>${Lang.t('error_lesson_not_found_h2')}</h2>
+            <p>No lesson has been created for ${escHtml(curriculumLabel(curriculum))} &middot; ${Lang.t('unit_label')} ${escHtml(unit)} &middot; ${Lang.t('level_label')} ${escHtml(stage)} yet.</p>
           </div>`);
         return;
       }
       render(`
         <div class="state-card">
           <div class="icon">&#128225;</div>
-          <h2>Couldn&rsquo;t load lesson</h2>
-          <p>Check your internet connection and try refreshing.</p>
+          <h2>${Lang.t('error_load_failed_h2')}</h2>
+          <p>${Lang.t('error_load_failed_p')}</p>
         </div>`);
       return;
     }
@@ -514,7 +517,7 @@
   // phaseNum: 1=cover, 2=concepts, 3=example, 4=practice, 5=test
   function progressBarHtml(phaseNum) {
     const pct = Math.round((phaseNum / 5) * 100);
-    const labels = ['', 'Intro', 'Concepts', 'Example', 'Practice', 'Test'];
+    const labels = ['', Lang.t('phase_intro'), Lang.t('phase_concepts'), Lang.t('phase_example'), Lang.t('phase_practice'), Lang.t('phase_test')];
     return `
       <div class="progress-bar-container">
         <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
@@ -534,7 +537,7 @@
       ${badgeHtml()}
       <h1>${escHtml(lesson.title || 'Lesson')}</h1>
       <p class="subtitle">${escHtml(lesson.subtitle || '')}</p>
-      <button class="main-btn" onclick="showConcepts()">Begin Lesson &rarr;</button>
+      <button class="main-btn" onclick="showConcepts()">${Lang.t('cover_begin_btn')}</button>
     `);
   }
 
@@ -552,10 +555,10 @@
       ${badgeHtml()}
       <h1>${escHtml(lesson.title || 'Lesson')}</h1>
       <div class="card">
-        <div class="card-title">Key Concepts</div>
-        <ul class="rules-list">${rulesHtml || '<li><span style="color:var(--text-secondary);font-size:0.88rem;">No rules listed.</span></li>'}</ul>
+        <div class="card-title">${Lang.t('concepts_card_title')}</div>
+        <ul class="rules-list">${rulesHtml || `<li><span style="color:var(--text-secondary);font-size:0.88rem;">${Lang.t('concepts_no_rules')}</span></li>`}</ul>
       </div>
-      <button class="main-btn" onclick="showExample()">Got it &mdash; show me an example &rarr;</button>
+      <button class="main-btn" onclick="showExample()">${Lang.t('concepts_next_btn')}</button>
     `);
   }
 
@@ -576,25 +579,25 @@
 
     const tabsHtml = hasVisual ? `
       <div class="tab-row">
-        <button class="tab-btn active" id="tab-symbolic" onclick="switchExTab('symbolic')">Symbolic</button>
-        <button class="tab-btn"        id="tab-visual"   onclick="switchExTab('visual')">Visual</button>
+        <button class="tab-btn active" id="tab-symbolic" onclick="switchExTab('symbolic')">${Lang.t('example_tab_symbolic')}</button>
+        <button class="tab-btn"        id="tab-visual"   onclick="switchExTab('visual')">${Lang.t('example_tab_visual')}</button>
       </div>` : '';
 
-    const initBtnLabel = steps.length === 0 ? 'Go to Practice &rarr;' : 'Show step 1';
+    const initBtnLabel = steps.length === 0 ? Lang.t('example_btn_goto_practice') : Lang.t('example_btn_show_step_n').replace('{n}', 1);
 
     render(`
       ${progressBarHtml(3)}
       ${badgeHtml()}
       <h1>${escHtml(lesson.title || 'Lesson')}</h1>
       <div class="card">
-        <div class="card-title">Worked Example</div>
+        <div class="card-title">${Lang.t('example_card_title')}</div>
         ${tabsHtml}
         <div id="symbolic-panel">
           <div class="equation-display" id="equation-display">${escHtml(ex.start || '')}</div>
           <div class="annotation-box"   id="annotation-box"></div>
         </div>
         ${hasVisual ? `<div id="visual-panel" class="visual-panel" style="display:none;">${ex.visual}</div>` : ''}
-        <div class="narration-box" id="narration-box">Follow along &mdash; tap the button below to step through the example.</div>
+        <div class="narration-box" id="narration-box">${Lang.t('example_narration_init')}</div>
         ${steps.length > 0 ? `<div class="step-dots" id="step-dots">${dotsHtml}</div>` : ''}
         <button class="main-btn" id="main-btn" onclick="handleExampleBtn()">${initBtnLabel}</button>
       </div>
@@ -645,9 +648,9 @@
     exampleStep++;
 
     const btn = document.getElementById('main-btn');
-    btn.innerHTML = exampleStep >= steps.length
-      ? 'Try it yourself &rarr;'
-      : `Show step ${exampleStep + 1}`;
+    btn.textContent = exampleStep >= steps.length
+      ? Lang.t('example_btn_try_yourself')
+      : Lang.t('example_btn_show_step_n').replace('{n}', exampleStep + 1);
   }
 
   // ── Phase 4: Practice ─────────────────────────────────────────
@@ -661,8 +664,8 @@
     render(`
       ${progressBarHtml(4)}
       ${badgeHtml()}
-      <h1>${escHtml(lesson.title || 'Lesson')} <span class="phase-tag phase-tag-practice">Practice</span></h1>
-      <p class="subtitle">Work through these practice problems. Hints are available.</p>
+      <h1>${escHtml(lesson.title || 'Lesson')} <span class="phase-tag phase-tag-practice">${Lang.t('practice_tag')}</span></h1>
+      <p class="subtitle">${Lang.t('practice_subtitle')}</p>
       <div id="pe-container"></div>
     `);
 
@@ -690,8 +693,8 @@
     render(`
       ${progressBarHtml(5)}
       ${badgeHtml()}
-      <h1>${escHtml(lesson.title || 'Lesson')} <span class="phase-tag phase-tag-test">Level Test</span></h1>
-      <p class="subtitle">Answer all questions. No hints this time!</p>
+      <h1>${escHtml(lesson.title || 'Lesson')} <span class="phase-tag phase-tag-test">${Lang.t('test_tag')}</span></h1>
+      <p class="subtitle">${Lang.t('test_subtitle')}</p>
       <div id="pe-container"></div>
     `);
 
@@ -729,29 +732,30 @@
     if (noTest || status === 'complete') {
       // Passed (or auto-complete)
       const scoreText = noTest
-        ? 'Level complete!'
-        : `You got ${score} of ${total} correct.`;
+        ? Lang.t('result_level_complete')
+        : Lang.t('result_score_correct').replace('{score}', score).replace('{total}', total);
 
       render(`
         ${progressBarHtml(5)}
         <div class="result-card pass">
           <div class="result-icon">&#127941;</div>
           <div class="score-display">${noTest ? '' : `${score} / ${total}`}</div>
-          <h2>Level ${escHtml(stage)} Complete!</h2>
-          <p>${escHtml(scoreText)} Great work &mdash; the next level is now unlocked.</p>
-          <a href="home.html" class="result-btn primary">Back to curriculum &rarr;</a>
+          <h2>${Lang.t('level_label')} ${escHtml(stage)} ${Lang.t('result_complete')}</h2>
+          <p>${escHtml(scoreText)} ${Lang.t('result_great_work')}</p>
+          <a href="home.html" class="result-btn primary">${Lang.t('result_back_btn')}</a>
         </div>
       `);
     } else {
       // Failed
+      const failScoreText = Lang.t('result_score_correct').replace('{score}', score).replace('{total}', total);
       render(`
         ${progressBarHtml(5)}
         <div class="result-card fail">
           <div class="result-icon">&#128218;</div>
           <div class="score-display">${score} / ${total}</div>
-          <h2>Keep Practicing!</h2>
-          <p>You got ${score} of ${total} correct. Review the example again and try the test once more.</p>
-          <button class="result-btn secondary" onclick="showExample()">Review example &rarr;</button>
+          <h2>${Lang.t('result_fail_h2')}</h2>
+          <p>${escHtml(failScoreText)} ${Lang.t('result_fail_review')}</p>
+          <button class="result-btn secondary" onclick="showExample()">${Lang.t('result_fail_btn')}</button>
         </div>
       `);
     }

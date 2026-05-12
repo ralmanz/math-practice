@@ -373,7 +373,7 @@
     <a href="index.html" class="nav-logo">Nuvo <span>Math</span></a>
     <div class="nav-right">
       <span class="nav-student" id="nav-student-name"></span>
-      <a href="#" class="nav-signout" id="signout-btn">Sign out</a>
+      <a href="#" class="nav-signout" id="signout-btn" data-i18n="nav_signout">Sign out</a>
     </div>
   </div>
 </nav>
@@ -382,13 +382,13 @@
 <!-- ════════ TRIAL EXPIRED ════════ -->
 <div id="trial-expired">
   <div class="expired-logo">Nuvo Math</div>
-  <h2>Your free trial has ended</h2>
-  <p>You're one step away from full access. Choose a plan to keep practicing.</p>
+  <h2 data-i18n="trial_expired_heading">Your free trial has ended</h2>
+  <p data-i18n="trial_expired_body">You're one step away from full access. Choose a plan to keep practicing.</p>
   <div class="expired-btn-row">
-    <a id="expired-practice-btn" href="#" class="expired-btn expired-btn-outline">Practice &mdash; $29/month</a>
-    <a href="https://wa.me/5076014-1676" target="_blank" class="expired-btn expired-btn-primary">Practice + Tutoring &mdash; $99/month</a>
+    <a id="expired-practice-btn" href="#" class="expired-btn expired-btn-outline" data-i18n="trial_practice_btn">Practice — $29/month</a>
+    <a href="https://wa.me/5076014-1676" target="_blank" class="expired-btn expired-btn-primary" data-i18n="trial_tutoring_btn">Practice + Tutoring — $99/month</a>
   </div>
-  <p class="expired-note">Questions? Email <a href="mailto:tutor@nuvostudio.club">tutor@nuvostudio.club</a> or WhatsApp 6014-1676.</p>
+  <p class="expired-note" data-i18n="trial_expired_note">Questions? Email tutor@nuvostudio.club or WhatsApp 6014-1676.</p>
 </div>
 
 
@@ -396,7 +396,7 @@
 <div id="loading-state">
   <div class="spinner-wrap">
     <div class="spinner"></div>
-    <p>Loading your curriculum&hellip;</p>
+    <p data-i18n="curriculum_loading">Loading your curriculum…</p>
   </div>
 </div>
 
@@ -404,22 +404,25 @@
 <!-- ════════ HOME CONTENT ════════ -->
 <main id="home-content" style="display:none;">
   <div class="welcome-section">
-    <h1 class="welcome-heading">Welcome back, <span id="student-name">there</span></h1>
+    <h1 class="welcome-heading"><span data-i18n="welcome_back">Welcome back,</span> <span id="student-name">there</span></h1>
     <span class="curriculum-badge" id="curriculum-badge">&#x1F4D0; Loading&hellip;</span>
   </div>
 
-  <h2 class="section-heading">Your curriculum</h2>
+  <h2 class="section-heading" data-i18n="section_your_curriculum">Your curriculum</h2>
   <div class="units-grid" id="units-grid"></div>
 
   <div class="home-footer">
-    <a href="https://wa.me/5076014-1676" target="_blank" class="help-link">Need help? Ask Ronel</a>
-    <p class="session-note">Your next session: check WhatsApp for scheduling</p>
+    <a href="https://wa.me/5076014-1676" target="_blank" class="help-link" data-i18n="home_help_link">Need help? Ask Ronel</a>
+    <p class="session-note" data-i18n="home_session_note">Your next session: check WhatsApp for scheduling</p>
   </div>
 </main>
 
 
+<script src="lang.js"></script>
 <script>
   const WORKER = 'https://math-practice-proxy.ronelalmanza20.workers.dev';
+
+  Lang.apply();
 
   const UNIT_NAMES = {
     1: 'Algebraic Foundations',
@@ -517,7 +520,7 @@
 
       const pillsHtml = LEVELS.map(l => {
         const state = getLevelState(u, l, progress || {}, hasProgress);
-        const label = `Level ${l}`;
+        const label = `${Lang.t('level_label')} ${l}`;
 
         if (state === 'complete') {
           return `<span class="level-pill complete">&#x2713; ${label}</span>`;
@@ -532,7 +535,7 @@
 
       card.innerHTML = `
         <div class="unit-card-header">
-          <span class="unit-number-badge">Unit ${u}</span>
+          <span class="unit-number-badge">${Lang.t('unit_label')} ${u}</span>
           <span class="unit-name">${UNIT_NAMES[u]}</span>
         </div>
         <div class="level-pills">${pillsHtml}</div>
@@ -587,7 +590,7 @@
       document.getElementById('home-content').style.display = 'block';
       document.getElementById('student-name').textContent = studentId;
       document.getElementById('nav-student-name').textContent = studentId;
-      document.getElementById('curriculum-badge').textContent = 'Offline — check your connection';
+      document.getElementById('curriculum-badge').textContent = Lang.t('home_offline');
       return;
     }
 

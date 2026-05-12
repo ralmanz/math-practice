@@ -250,13 +250,16 @@
 <div class="container" id="app">
   <div class="state-card">
     <div class="icon">⏳</div>
-    <h2>Loading your problems…</h2>
-    <p>Just a moment!</p>
+    <h2 data-i18n="loading_problems_h2">Loading your problems…</h2>
+    <p data-i18n="loading_just_moment">Just a moment!</p>
   </div>
 </div>
 
+<script src="lang.js"></script>
 <script>
   const WORKER = 'https://math-practice-proxy.ronelalmanza20.workers.dev';
+
+  Lang.apply();
 
   let currentStudentId = '';
 
@@ -269,8 +272,8 @@
       render(`
         <div class="state-card">
           <div class="icon">🤔</div>
-          <h2>No student ID found</h2>
-          <p>Make sure you opened the right link. Ask your teacher if you're not sure!</p>
+          <h2>${Lang.t('error_no_student_h2')}</h2>
+          <p>${Lang.t('error_no_student_p')}</p>
         </div>`);
       return;
     }
@@ -282,8 +285,8 @@
         render(`
           <div class="state-card">
             <div class="icon">😕</div>
-            <h2>Student not found</h2>
-            <p>We couldn't find a student with the ID <strong>${escHtml(studentId)}</strong>. Check your link or ask your teacher.</p>
+            <h2>${Lang.t('error_student_notfound_h2')}</h2>
+            <p>${Lang.t('error_student_notfound_p').replace('{id}', `<strong>${escHtml(studentId)}</strong>`)}</p>
           </div>`);
         return;
       }
@@ -293,8 +296,8 @@
       render(`
         <div class="state-card">
           <div class="icon">📡</div>
-          <h2>Couldn't load your problems</h2>
-          <p>Check your internet connection and try refreshing the page.</p>
+          <h2>${Lang.t('error_load_problems_h2')}</h2>
+          <p>${Lang.t('error_load_problems_p')}</p>
         </div>`);
       return;
     }
@@ -306,15 +309,15 @@
     const pct = total > 0 ? Math.round((done / total) * 100) : 0;
 
     let progressMsg = '';
-    if (total === 0) progressMsg = 'No problems assigned yet.';
-    else if (allDone) progressMsg = 'Amazing — you\'ve finished everything! 🎉';
-    else if (done === 0) progressMsg = 'Tap a problem below to get started!';
-    else progressMsg = `Keep going — ${total - done} left to go!`;
+    if (total === 0) progressMsg = Lang.t('dashboard_no_problems');
+    else if (allDone) progressMsg = Lang.t('dashboard_all_done');
+    else if (done === 0) progressMsg = Lang.t('dashboard_get_started');
+    else progressMsg = Lang.t('dashboard_keep_going').replace('{n}', total - done);
 
     const problemItems = problems.map(p => {
       const statusClass = p.completed ? 'done' : 'todo';
       const icon = p.completed ? '✅' : '🔵';
-      const statusText = p.completed ? 'Completed' : 'Not started';
+      const statusText = p.completed ? Lang.t('dashboard_completed') : Lang.t('dashboard_not_started');
       const href = buildProblemUrl(p, studentId);
       const canPractice = !!p.completed;
       const expression = p.question || p.expression || p.title || '';
@@ -326,7 +329,7 @@
             <div class="problem-info">
               <div class="problem-title">${escHtml(p.title)}</div>
               <div class="problem-status-text">${statusText}</div>
-              ${canPractice ? `<button class="practice-again-btn" data-expression="${escHtml(expression)}" data-type="${escHtml(p.type)}" data-modules="${modulesJson}" onclick="event.stopPropagation(); startPracticeAgain(this)">Practice again →</button>` : ''}
+              ${canPractice ? `<button class="practice-again-btn" data-expression="${escHtml(expression)}" data-type="${escHtml(p.type)}" data-modules="${modulesJson}" onclick="event.stopPropagation(); startPracticeAgain(this)">${Lang.t('dashboard_practice_again')}</button>` : ''}
             </div>
             <div class="chevron">›</div>
           </a>
@@ -336,18 +339,18 @@
     const allDoneBanner = allDone ? `
       <div class="all-done-banner">
         <div class="icon">🏆</div>
-        <p>You've finished all your problems — brilliant work!</p>
+        <p>${Lang.t('dashboard_all_done_banner')}</p>
       </div>` : '';
 
     render(`
       <div class="header">
         <div class="header-label">Nuvo Studio ✏️</div>
-        <h1>Hi, ${escHtml(student.name)}!</h1>
+        <h1>${Lang.t('dashboard_hi')} ${escHtml(student.name)}!</h1>
       </div>
 
       <div class="progress-block">
         <div class="progress-row">
-          <span class="progress-label">Problems completed</span>
+          <span class="progress-label">${Lang.t('dashboard_problems_label')}</span>
           <span class="progress-count">${done} / ${total}</span>
         </div>
         <div class="progress-bar-track">
@@ -359,7 +362,7 @@
       ${allDoneBanner}
 
       ${total > 0 ? `
-      <div class="section-title">Your Problems</div>
+      <div class="section-title">${Lang.t('dashboard_your_problems')}</div>
       <div class="problem-list">${problemItems}</div>` : ''}
     `);
   }
@@ -400,7 +403,7 @@
     const expression = btn.dataset.expression;
     const type = btn.dataset.type;
     const modules = JSON.parse(btn.dataset.modules || '[]');
-    btn.textContent = 'Generating…';
+    btn.textContent = Lang.t('dashboard_generating');
     btn.disabled = true;
     try {
       const genRes = await fetch(WORKER + '/generate-variant', {
@@ -428,7 +431,7 @@
       if (!saveRes.ok) throw new Error('save failed');
       window.location.href = 'dashboard.html?student=' + encodeURIComponent(currentStudentId);
     } catch {
-      btn.textContent = 'Try again';
+      btn.textContent = Lang.t('dashboard_try_again');
       btn.disabled = false;
     }
   }
