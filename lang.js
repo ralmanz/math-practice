@@ -614,14 +614,14 @@
       pricing_section_label: 'Planes',
       pricing_section_title: 'Precios simples',
       pricing_section_sub: 'Sin contratos, sin extras. Elige el plan que mejor se adapte a sus necesidades.',
-      plan_practice_name: 'Practice Engine Guided Plan',
+      plan_practice_name: 'Plan Guiado con Motor de Pr\u00E1ctica',
       plan_practice_f1: 'Plan de estudios completo de 7 unidades',
       plan_practice_f2: 'Motor de Pr\u00E1ctica Guiada \u2014 pr\u00E1ctica paso a paso',
       plan_practice_f3: 'Problemas ilimitados',
       plan_practice_f4: 'Panel de seguimiento de progreso',
       plan_practice_cta: 'Comenzar Prueba Gratuita',
       plan_popular: 'M\u00E1s Popular',
-      plan_tutoring_name: 'Tutor Guided Plan',
+      plan_tutoring_name: 'Plan Guiado con Tutor\u00EDa',
       plan_tutoring_f1: 'Todo en Pr\u00E1ctica',
       plan_tutoring_f2: '4 sesiones en vivo/mes por Google Meet',
       plan_tutoring_f3: 'Tareas personalizadas',
@@ -687,7 +687,25 @@
     }
   };
 
-  var _lang = (navigator.language || '').startsWith('es') ? 'es' : 'en';
+  function getInitialLang() {
+    try {
+      var params = new URLSearchParams(window.location.search);
+      var requested = params.get('lang');
+      if (requested === 'en' || requested === 'es') {
+        localStorage.setItem('nuvo_lang', requested);
+        return requested;
+      }
+
+      var saved = localStorage.getItem('nuvo_lang');
+      if (saved === 'en' || saved === 'es') return saved;
+    } catch (e) {
+      // If storage or URL parsing is unavailable, keep the product default.
+    }
+
+    return 'es';
+  }
+
+  var _lang = getInitialLang();
 
   window.Lang = {
     detect: function () { return _lang; },
@@ -697,6 +715,7 @@
     },
 
     apply: function () {
+      document.documentElement.lang = _lang;
       // textContent translations
       document.querySelectorAll('[data-i18n]').forEach(function (el) {
         el.textContent = window.Lang.t(el.getAttribute('data-i18n'));
