@@ -207,7 +207,8 @@
 
       // === index.html ===
       hero_eyebrow: 'UTP Admission Test',
-      hero_headline: 'Practice anytime.',
+      hero_headline: 'Prepare for the Admission Test.',
+      hero_kicker: 'Practice anytime.',
       hero_sub: 'Step-by-step guided practice with hints, examples, and immediate feedback \u2014 so you arrive at the exam with confidence.',
       hero_cta_primary: 'Start Practicing',
       hero_cta_secondary: 'See How It Works',
@@ -513,7 +514,8 @@
 
       // === index.html ===
       hero_eyebrow: 'Prueba de Admisi\u00F3n de la UTP',
-      hero_headline: 'Practica cuando quieras.',
+      hero_headline: 'Prep\u00E1rate para la Prueba de Admisi\u00F3n.',
+      hero_kicker: 'Practica cuando quieras.',
       hero_sub: 'Pr\u00E1ctica guiada paso a paso con pistas, ejemplos y retroalimentaci\u00F3n inmediata \u2014 para que llegues al examen con confianza.',
       hero_cta_primary: 'Empezar a practicar',
       hero_cta_secondary: 'Ver c\u00F3mo funciona',
