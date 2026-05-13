@@ -1,0 +1,1447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nuvo Studio</title>
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.json">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #FAFAF8;
+    --card: #FFFFFF;
+    --text: #1A1A1A;
+    --text-secondary: #6B6B6B;
+    --border: #E8E8E4;
+    --accent: #2D6A4F;
+    --accent-light: #D8F3DC;
+    --accent-bg: #F0FAF3;
+    --teal: #1D9E75;
+    --teal-light: #E6F7F2;
+    --wrong: #C1453B;
+    --wrong-bg: #FDE8E6;
+    --amber: #B45309;
+    --amber-bg: #FEF3C7;
+    --blue: #1D4ED8;
+    --blue-light: #EFF6FF;
+    --sans: 'DM Sans', sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ── Top nav ── */
+  .lesson-topnav {
+    width: 100%;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    background: var(--card);
+    flex-shrink: 0;
+  }
+
+  .back-link {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--accent);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: opacity 0.15s;
+  }
+
+  .back-link:hover { opacity: 0.75; }
+
+  /* ── Content area ── */
+  .container {
+    max-width: 600px;
+    width: 100%;
+    padding: 28px 16px 60px;
+  }
+
+  /* ── Progress bar ── */
+  .progress-bar-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .progress-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 3px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  .progress-text {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+
+  /* ── Badge ── */
+  .lesson-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: var(--accent-bg);
+    color: var(--accent);
+    border-radius: 99px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  /* ── Phase label ── */
+  .phase-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+  }
+
+  .subtitle {
+    color: var(--text-secondary);
+    font-size: 0.88rem;
+    line-height: 1.55;
+    margin-bottom: 24px;
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+
+  .card-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    margin-bottom: 14px;
+  }
+
+  /* ── Rules list ── */
+  .rules-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .rules-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+
+  .rule-num {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-top: 1px;
+  }
+
+  /* ── Equation display ── */
+  .equation-display {
+    font-family: var(--mono);
+    font-size: 1.2rem;
+    font-weight: 500;
+    padding: 16px;
+    background: var(--accent-bg);
+    border: 1.5px solid var(--accent-light);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    min-height: 56px;
+    display: flex;
+    align-items: center;
+    transition: background 0.2s;
+    word-break: break-all;
+  }
+
+  .annotation-box {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 10px;
+    min-height: 1.2em;
+  }
+
+  .narration-box {
+    padding: 12px 14px;
+    background: #F8F8F6;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.88rem;
+    line-height: 1.55;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+    min-height: 48px;
+  }
+
+  /* ── Step dots ── */
+  .step-dots {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .step-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: background 0.25s;
+    flex-shrink: 0;
+  }
+
+  .step-dot.active { background: var(--accent); }
+  .step-dot.done   { background: var(--accent-light); }
+
+  /* ── Tabs ── */
+  .tab-row {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 14px;
+  }
+
+  .tab-btn {
+    padding: 6px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    font-family: var(--sans);
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+  }
+
+  .tab-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+
+  /* ── Visual panel ── */
+  .visual-panel {
+    padding: 16px;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+  }
+
+  .teaching-panel {
+    padding: 16px;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 14px;
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: var(--text-secondary);
+  }
+
+  .concept-visual-grid {
+    display: grid;
+    gap: 10px;
+  }
+
+  .concept-visual-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+
+  .formula-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .formula-pill {
+    font-family: var(--mono);
+    color: var(--text);
+    background: var(--accent-bg);
+    border: 1.5px solid var(--accent-light);
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+
+  .visual-term-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .visual-term-chip {
+    font-family: var(--mono);
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--accent-bg);
+    border: 1.5px solid var(--accent-light);
+    border-radius: 999px;
+    padding: 8px 12px;
+  }
+
+  .lesson-visual-board {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .visual-expression-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    padding: 12px;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .term-card {
+    min-width: 58px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    font-family: var(--mono);
+    font-weight: 700;
+    color: var(--text);
+    text-align: center;
+    background: var(--card);
+  }
+
+  .term-card--x {
+    border-color: #93C5FD;
+    background: #EFF6FF;
+    color: #1D4ED8;
+  }
+
+  .term-card--y {
+    border-color: #99F6E4;
+    background: #ECFDF5;
+    color: #0F766E;
+  }
+
+  .visual-group-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+  }
+
+  .visual-group-box {
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+  }
+
+  .visual-group-title {
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+  }
+
+  .coefficient-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-family: var(--mono);
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .operator-badge {
+    color: var(--text-secondary);
+    font-weight: 700;
+  }
+
+  .visual-result {
+    padding: 14px;
+    border-radius: 12px;
+    background: var(--accent-bg);
+    border: 1.5px solid var(--accent-light);
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--accent);
+  }
+
+  .visual-note {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    text-align: center;
+  }
+
+  .algebra-tile-board {
+    width: 100%;
+    display: grid;
+    gap: 14px;
+  }
+
+  .tile-stage {
+    padding: 14px;
+    border-radius: 14px;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+  }
+
+  .tile-stage-title {
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+    text-align: center;
+  }
+
+  .tile-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .algebra-tile {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9px;
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    font-weight: 800;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+
+  .algebra-tile--x {
+    width: 34px;
+    height: 58px;
+    background: #DBEAFE;
+    border: 1.5px solid #60A5FA;
+    color: #1D4ED8;
+  }
+
+  .algebra-tile--y {
+    width: 58px;
+    height: 34px;
+    background: #CCFBF1;
+    border: 1.5px solid #2DD4BF;
+    color: #0F766E;
+  }
+
+  .algebra-tile--negative {
+    background: #FEE2E2;
+    border-color: #F87171;
+    color: #B91C1C;
+  }
+
+  .tile-cancel-pair {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px;
+    border-radius: 12px;
+    background: #FFF7ED;
+    border: 1.5px dashed #FDBA74;
+    position: relative;
+  }
+
+  .tile-cancel-pair::after {
+    content: '';
+    position: absolute;
+    left: 10%;
+    right: 10%;
+    top: 50%;
+    height: 2px;
+    background: #EA580C;
+    transform: rotate(-8deg);
+  }
+
+  .tile-arrow {
+    text-align: center;
+    color: var(--accent);
+    font-weight: 800;
+  }
+
+  .tile-equation {
+    text-align: center;
+    font-family: var(--mono);
+    color: var(--text);
+    font-weight: 800;
+    background: var(--accent-bg);
+    border: 1.5px solid var(--accent-light);
+    border-radius: 12px;
+    padding: 12px;
+  }
+
+  /* ── Balance scale visualization ── */
+  .balance-board {
+    width: 100%;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 22px 18px 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .balance-sides {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    width: 100%;
+    max-width: 480px;
+    align-items: end;
+  }
+
+  .balance-side {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .balance-side-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+  }
+
+  .balance-pan {
+    min-width: 130px;
+    padding: 14px 18px;
+    border-radius: 12px;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .balance-pan.empty {
+    color: var(--text-secondary);
+    font-style: italic;
+  }
+
+  .balance-bar-wrap {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 4px;
+  }
+
+  .balance-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--text);
+    border-radius: 4px;
+    transform-origin: 50% 50%;
+    transition: transform 0.4s ease;
+  }
+
+  .balance-bar.tilt-left  { transform: rotate(-6deg); }
+  .balance-bar.tilt-right { transform: rotate(6deg); }
+
+  .balance-pivot {
+    width: 0;
+    height: 0;
+    margin-top: -2px;
+    border-left: 14px solid transparent;
+    border-right: 14px solid transparent;
+    border-bottom: 18px solid var(--text-secondary);
+  }
+
+  .balance-base {
+    width: 90px;
+    height: 6px;
+    background: var(--text-secondary);
+    border-radius: 3px;
+    margin-top: 2px;
+  }
+
+  .balance-status {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    text-align: center;
+    margin-top: 4px;
+  }
+
+  .balance-status.balanced { color: var(--accent); font-weight: 600; }
+  .balance-status.unbalanced { color: var(--amber); font-weight: 600; }
+
+  .balance-operation {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent-bg);
+    border: 1.5px dashed var(--accent-light);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-family: var(--mono);
+    font-weight: 700;
+    color: var(--accent);
+    font-size: 0.88rem;
+  }
+
+  .balance-operation .op-label {
+    text-transform: uppercase;
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+    font-weight: 800;
+  }
+
+  /* PAA / Aritmética — intuitive concept & example visuals */
+  .paa-order-flow {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: stretch;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .paa-order-step {
+    flex: 1 1 108px;
+    text-align: center;
+    padding: 10px 8px;
+    border-radius: 12px;
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+  }
+
+  .paa-order-step span {
+    display: inline-block;
+    min-width: 26px;
+    height: 26px;
+    line-height: 26px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: white;
+    font-weight: 800;
+    font-size: 0.78rem;
+    margin-bottom: 6px;
+  }
+
+  .paa-order-step strong {
+    display: block;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+  }
+
+  .paa-order-step small {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: var(--text);
+  }
+
+  .paa-mini-compare {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  .paa-meter-row { margin-bottom: 12px; }
+
+  .paa-meter-label {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .paa-meter-track {
+    height: 14px;
+    border-radius: 999px;
+    background: var(--border);
+    overflow: hidden;
+  }
+
+  .paa-meter-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--accent), #38BDF8);
+  }
+
+  .paa-meter-fill--muted {
+    background: linear-gradient(90deg, #94A3B8, #CBD5E1);
+  }
+
+  .paa-tree {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+  }
+
+  .paa-tree-row {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .paa-tree-node {
+    min-width: 46px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    font-family: var(--mono);
+    font-weight: 800;
+    background: var(--card);
+  }
+
+  .paa-tree-node--prime {
+    border-color: #F59E0B;
+    background: #FFFBEB;
+    color: #B45309;
+  }
+
+  .paa-highlight-box {
+    border: 2px solid var(--accent);
+    border-radius: 12px;
+    padding: 10px 12px;
+    background: var(--accent-bg);
+    text-align: center;
+    font-family: var(--mono);
+    font-weight: 800;
+    color: var(--accent);
+  }
+
+  .voice-btn {
+    margin-top: 12px;
+    width: auto;
+    padding: 10px 14px;
+    font-size: 0.88rem;
+  }
+
+  /* ── Main button ── */
+  .main-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+
+  .main-btn:hover  { opacity: 0.9; }
+  .main-btn:active { transform: scale(0.99); }
+  .main-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .example-nav-row {
+    display: grid;
+    grid-template-columns: minmax(120px, 0.7fr) minmax(180px, 1.3fr);
+    gap: 10px;
+  }
+
+  .main-btn.secondary {
+    background: transparent;
+    color: var(--accent);
+    border: 1.5px solid var(--accent);
+  }
+
+  /* ── Result cards ── */
+  .result-card {
+    border-radius: 14px;
+    padding: 28px;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  .result-card .result-icon { font-size: 2.5rem; margin-bottom: 12px; }
+  .result-card h2 { font-size: 1.2rem; font-weight: 700; margin-bottom: 8px; }
+  .result-card p  { font-size: 0.9rem; line-height: 1.55; margin-bottom: 20px; }
+
+  .result-card.pass {
+    background: var(--accent-bg);
+    border: 1.5px solid var(--accent-light);
+  }
+  .result-card.pass h2, .result-card.pass p { color: var(--accent); }
+
+  .result-card.fail {
+    background: var(--amber-bg);
+    border: 1.5px solid #F5D06A;
+  }
+  .result-card.fail h2, .result-card.fail p { color: var(--amber); }
+
+  .result-btn {
+    display: inline-block;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-family: var(--sans);
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.15s;
+  }
+  .result-btn:hover { opacity: 0.85; }
+  .result-btn.primary { background: var(--accent); color: white; }
+  .result-btn.secondary { background: var(--amber); color: white; }
+
+  /* ── Score display ── */
+  .score-display {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  /* ── State card ── */
+  .state-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 40px 24px;
+    text-align: center;
+  }
+
+  .state-card .icon { font-size: 2.5rem; margin-bottom: 12px; }
+  .state-card h2    { font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
+  .state-card p     { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5; }
+
+  /* ── Spinner ── */
+  .spinner-inline {
+    width: 18px;
+    height: 18px;
+    border: 2.5px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Homework-style tag ── */
+  .phase-tag {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 99px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .phase-tag-practice { background: var(--accent-bg); color: var(--accent); }
+  .phase-tag-test     { background: var(--blue-light); color: var(--blue); }
+
+  @media (max-width: 500px) {
+    body { padding: 0; }
+    .container { padding: 20px 12px 48px; }
+    h1 { font-size: 1.3rem; }
+    .equation-display { font-size: 1rem; }
+  }
+</style>
+</head>
+<body>
+<nav class="lesson-topnav">
+  <a href="home.html" class="back-link" data-i18n="back_to_curriculum">← Back to curriculum</a>
+</nav>
+
+<div class="container" id="app">
+  <div class="state-card">
+    <div class="icon">&#9203;</div>
+    <h2 data-i18n="loading_lesson_h2">Loading lesson…</h2>
+    <p data-i18n="loading_just_moment">Just a moment!</p>
+  </div>
+</div>
+
+<script src="lang.js?v=20260513-lesson-app-unified"></script>
+<script src="calculator.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/algebrite@1.4.0/dist/algebrite.bundle-for-browser.js"></script>
+<script>
+  const WORKER = 'https://math-practice-proxy.ronelalmanza20.workers.dev';
+
+  Lang.apply();
+
+  const _params    = new URLSearchParams(window.location.search);
+  const curriculum = _params.get('curriculum') || '';
+  const unit       = _params.get('unit')       || '';
+  const stage      = _params.get('stage') || _params.get('level') || '';
+  const guestMode  = _params.get('guest') === 'true';
+  const phaseParam = _params.get('phase') || '';
+  const studentId  = localStorage.getItem('studentId') || _params.get('student') || '';
+
+  // ── Phase state ──────────────────────────────────────────────
+  // phases: 'cover' | 'concepts' | 'example' | 'practice' | 'test'
+  let lesson           = null;
+  let exampleStep      = 0;
+  let activeConceptTab = 'written';
+  let activeExampleTab = 'symbolic';
+
+  // ── Helpers ──────────────────────────────────────────────────
+  function curriculumLabel(c) {
+    return { cambridge: 'Cambridge', 'common-core': 'Common Core', 'ib-myp': 'IB MYP', general: 'General' }[c] || c;
+  }
+
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  function render(html) {
+    document.getElementById('app').innerHTML = html;
+  }
+
+  function setPanelVisible(id, visible) {
+    const el = document.getElementById(id);
+    if (el) el.style.display = visible ? '' : 'none';
+  }
+
+  function setTabActive(id, active) {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('active', active);
+  }
+
+  function speakText(text) {
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = Lang.detect && Lang.detect() === 'es' ? 'es-ES' : 'en-US';
+    window.speechSynthesis.speak(utterance);
+  }
+
+  function stopVoice() {
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  }
+
+  function formulasFromLesson() {
+    const formulas = lesson.formulas || lesson.example?.formulas || [];
+    if (Array.isArray(formulas) && formulas.length > 0) return formulas;
+    return (lesson.rules || []).filter(rule => String(rule).includes('='));
+  }
+
+  function formulaPanelHtml(formulas) {
+    const items = (formulas || []).map(f => `<div class="formula-pill">${escHtml(f)}</div>`).join('');
+    return `<div class="formula-list">${items || `<span>${Lang.t('formula_no_items')}</span>`}</div>`;
+  }
+
+  function conceptVisualHtml() {
+    if (lesson.conceptVisual) return lesson.conceptVisual;
+    const cards = (lesson.rules || []).map((rule, i) =>
+      `<div class="concept-visual-card"><strong>${Lang.t('concept_visual_step')} ${i + 1}</strong><br>${escHtml(rule)}</div>`
+    ).join('');
+    return `<div class="concept-visual-grid">${cards || escHtml(lesson.subtitle || '')}</div>`;
+  }
+
+  function extractTerms(expr) {
+    return String(expr || '')
+      .replace(/\u2212/g, '-')
+      .replace(/[()]/g, '')
+      .replace(/\s+/g, '')
+      .replace(/-/g, '+-')
+      .split('+')
+      .map(t => t.trim())
+      .filter(Boolean);
+  }
+
+  function exampleVisualHtml(step) {
+    if (step?.visual) return step.visual;
+    const ex = lesson.example || {};
+    if (ex.visual) return ex.visual;
+    const expr = step?.equation || ex.start || '';
+    const terms = extractTerms(expr);
+    if (terms.length === 0) return `<span>${Lang.t('example_visual_empty')}</span>`;
+    return `<div class="visual-term-row">${
+      terms.map(term => `<span class="visual-term-chip">${escHtml(term)}</span>`).join('')
+    }</div>`;
+  }
+
+  function currentExampleVoiceText(step) {
+    const ex = lesson.example || {};
+    return step?.narration || ex.narration_intro || lesson.subtitle || '';
+  }
+
+  function buildLessonUrl(extra) {
+    const q = new URLSearchParams({
+      curriculum: curriculum,
+      unit: unit,
+      stage: stage
+    });
+    if (guestMode) q.set('guest', 'true');
+    if (studentId && !guestMode) q.set('student', studentId);
+    Object.keys(extra || {}).forEach(function (k) {
+      if (extra[k] !== undefined && extra[k] !== null && String(extra[k]) !== '') {
+        q.set(k, String(extra[k]));
+      }
+    });
+    return 'lesson.html?' + q.toString();
+  }
+
+  /** Practice and test run in app.html (same engine for guests and logged-in students). */
+  function curriculumAppUrl(mode, nextPhase) {
+    const returnUrl = buildLessonUrl({ phase: nextPhase });
+    const q = new URLSearchParams({
+      curriculum: curriculum,
+      unit: unit,
+      stage: stage,
+      mode: mode,
+      returnTo: returnUrl
+    });
+    if (guestMode) q.set('guest', 'true');
+    if (studentId && !guestMode) q.set('student', studentId);
+    return 'app.html?' + q.toString();
+  }
+
+  function showGuestCompletionCard() {
+    const isPAA = curriculum === 'PAA';
+    const loginCurriculum = isPAA ? 'PAA' : 'cambridge';
+    const titleKey = isPAA ? 'guest_lesson_complete_title' : 'guest_lesson_complete_title_secondary';
+    const subtitleKey = isPAA ? 'guest_lesson_complete_subtitle' : 'guest_lesson_complete_subtitle_secondary';
+    const trialUrl = 'trial.html?from=guest_lesson&curriculum=' + encodeURIComponent(curriculum) + '&lang=' + encodeURIComponent(Lang.detect());
+    render(`
+      ${progressBarHtml(5)}
+      <div class="result-card pass">
+        <div class="result-icon">&#127942;</div>
+        <h2>${Lang.t(titleKey)}</h2>
+        <p>${Lang.t(subtitleKey)}</p>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;">
+          <a class="result-btn primary" href="${trialUrl}">${Lang.t('guest_paywall_subscribe_btn')}</a>
+          <a class="result-btn" style="background:transparent;color:var(--accent);border:1.5px solid var(--accent);" href="login.html?curriculum=${encodeURIComponent(loginCurriculum)}">${Lang.t('guest_paywall_login_btn')}</a>
+        </div>
+      </div>
+    `);
+  }
+
+  // ── Boot ─────────────────────────────────────────────────────
+  async function init() {
+    if (!curriculum || !unit || !stage) {
+      render(`
+        <div class="state-card">
+          <div class="icon">&#129300;</div>
+          <h2>${Lang.t('error_missing_params_h2')}</h2>
+          <p>${Lang.t('error_missing_params_p')}</p>
+        </div>`);
+      return;
+    }
+
+    // Hand off to app.html for test phase (same URL for guests and logged-in)
+    if (phaseParam === 'test') {
+      window.location.replace(curriculumAppUrl('test', 'complete'));
+      return;
+    }
+
+    if (guestMode && phaseParam === 'complete') {
+      showGuestCompletionCard();
+      return;
+    }
+
+    if (!guestMode && phaseParam === 'complete' && studentId) {
+      await markProgressAndShow('complete', null, null);
+      return;
+    }
+
+    const lessonRes = await fetch(`${WORKER}/lesson/${encodeURIComponent(curriculum)}/${encodeURIComponent(unit)}/${encodeURIComponent(stage)}`);
+
+    if (!lessonRes.ok) {
+      if (lessonRes.status === 404) {
+        render(`
+          <div class="state-card">
+            <div class="icon">&#128218;</div>
+            <h2>${Lang.t('error_lesson_not_found_h2')}</h2>
+            <p>No lesson has been created for ${escHtml(curriculumLabel(curriculum))} &middot; ${Lang.t('unit_label')} ${escHtml(unit)} &middot; ${Lang.t('level_label')} ${escHtml(stage)} yet.</p>
+          </div>`);
+        return;
+      }
+      render(`
+        <div class="state-card">
+          <div class="icon">&#128225;</div>
+          <h2>${Lang.t('error_load_failed_h2')}</h2>
+          <p>${Lang.t('error_load_failed_p')}</p>
+        </div>`);
+      return;
+    }
+
+    lesson = await lessonRes.json();
+
+    const backLink = document.querySelector('.back-link');
+    if (guestMode) {
+      backLink.href = 'home.html?curriculum=' + encodeURIComponent(curriculum) + '&guest=true';
+    }
+
+    showCover();
+  }
+
+  // ── Progress bar helper ───────────────────────────────────────
+  // phaseNum: 1=cover, 2=concepts, 3=example, 4=practice, 5=test
+  function progressBarHtml(phaseNum) {
+    const pct = Math.round((phaseNum / 5) * 100);
+    const labels = ['', Lang.t('phase_intro'), Lang.t('phase_concepts'), Lang.t('phase_example'), Lang.t('phase_practice'), Lang.t('phase_test')];
+    return `
+      <div class="progress-bar-container">
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <div class="progress-text">${labels[phaseNum] || ''}</div>
+      </div>`;
+  }
+
+  function badgeHtml() {
+    return `<div class="lesson-badge">${escHtml(curriculumLabel(curriculum))} &middot; Unit ${escHtml(unit)} &middot; Level ${escHtml(stage)}</div>`;
+  }
+
+  // ── Phase 1: Cover ────────────────────────────────────────────
+  function showCover() {
+    render(`
+      ${progressBarHtml(1)}
+      ${badgeHtml()}
+      <h1>${escHtml(lesson.title || 'Lesson')}</h1>
+      <p class="subtitle">${escHtml(lesson.subtitle || '')}</p>
+      <button class="main-btn" onclick="showConcepts()">${Lang.t('cover_begin_btn')}</button>
+    `);
+  }
+
+  // ── Phase 2: Concepts ─────────────────────────────────────────
+  function showConcepts() {
+    activeConceptTab = 'written';
+    const rulesHtml = (lesson.rules || []).map((rule, i) =>
+      `<li>
+        <span class="rule-num">${i + 1}</span>
+        <span>${escHtml(rule)}</span>
+      </li>`
+    ).join('');
+    const conceptVoiceText = (lesson.conceptVoice || lesson.subtitle || (lesson.rules || []).join(' ')).trim();
+    const formulas = formulasFromLesson();
+
+    render(`
+      ${progressBarHtml(2)}
+      ${badgeHtml()}
+      <h1>${escHtml(lesson.title || 'Lesson')}</h1>
+      <div class="card">
+        <div class="card-title">${Lang.t('concepts_card_title')}</div>
+        <div class="tab-row">
+          <button class="tab-btn active" id="tab-concept-written" onclick="switchConceptTab('written')">${Lang.t('concept_tab_written')}</button>
+          <button class="tab-btn" id="tab-concept-visual" onclick="switchConceptTab('visual')">${Lang.t('concept_tab_visual')}</button>
+          <button class="tab-btn" id="tab-concept-formula" onclick="switchConceptTab('formula')">${Lang.t('concept_tab_formula')}</button>
+          <button class="tab-btn" id="tab-concept-voice" onclick="switchConceptTab('voice')">${Lang.t('concept_tab_voice')}</button>
+        </div>
+        <div id="concept-written-panel">
+          <ul class="rules-list">${rulesHtml || `<li><span style="color:var(--text-secondary);font-size:0.88rem;">${Lang.t('concepts_no_rules')}</span></li>`}</ul>
+        </div>
+        <div id="concept-visual-panel" class="teaching-panel" style="display:none;">${conceptVisualHtml()}</div>
+        <div id="concept-formula-panel" class="teaching-panel" style="display:none;">${formulaPanelHtml(formulas)}</div>
+        <div id="concept-voice-panel" class="teaching-panel" style="display:none;">
+          <div id="concept-voice-text">${escHtml(conceptVoiceText || Lang.t('voice_no_text'))}</div>
+          <button class="main-btn voice-btn" onclick="speakText(document.getElementById('concept-voice-text').textContent)">${Lang.t('voice_listen_btn')}</button>
+          <button class="main-btn secondary voice-btn" onclick="stopVoice()">${Lang.t('voice_stop_btn')}</button>
+        </div>
+      </div>
+      <button class="main-btn" onclick="showExample()">${Lang.t('concepts_next_btn')}</button>
+    `);
+  }
+
+  function switchConceptTab(tab) {
+    activeConceptTab = tab;
+    ['written', 'visual', 'formula', 'voice'].forEach(function (name) {
+      setPanelVisible('concept-' + name + '-panel', name === tab);
+      setTabActive('tab-concept-' + name, name === tab);
+    });
+  }
+
+  // ── Phase 3: Worked example ───────────────────────────────────
+  function showExample() {
+    exampleStep = 0;
+    activeExampleTab = 'symbolic';
+    renderExamplePhase();
+  }
+
+  function renderExamplePhase() {
+    const ex        = lesson.example || {};
+    const steps     = ex.steps       || [];
+    const formulas  = formulasFromLesson();
+
+    const dotsHtml = steps.map((_, i) =>
+      `<div class="step-dot" id="dot-${i}"></div>`
+    ).join('');
+
+    const tabsHtml = `
+      <div class="tab-row">
+        <button class="tab-btn active" id="tab-symbolic" onclick="switchExTab('symbolic')">${Lang.t('example_tab_symbolic')}</button>
+        <button class="tab-btn"        id="tab-visual"   onclick="switchExTab('visual')">${Lang.t('example_tab_visual')}</button>
+        <button class="tab-btn"        id="tab-formula"  onclick="switchExTab('formula')">${Lang.t('concept_tab_formula')}</button>
+        <button class="tab-btn"        id="tab-voice"    onclick="switchExTab('voice')">${Lang.t('concept_tab_voice')}</button>
+      </div>`;
+
+    const initBtnLabel = steps.length === 0 ? Lang.t('example_btn_goto_practice') : Lang.t('example_btn_show_step_n').replace('{n}', 1);
+
+    render(`
+      ${progressBarHtml(3)}
+      ${badgeHtml()}
+      <h1>${escHtml(lesson.title || 'Lesson')}</h1>
+      <div class="card">
+        <div class="card-title">${Lang.t('example_card_title')}</div>
+        ${tabsHtml}
+        <div id="symbolic-panel">
+          <div class="equation-display" id="equation-display">${escHtml(ex.start || '')}</div>
+          <div class="annotation-box"   id="annotation-box"></div>
+        </div>
+        <div id="visual-panel" class="visual-panel" style="display:none;">${exampleVisualHtml(null)}</div>
+        <div id="formula-panel" class="teaching-panel" style="display:none;">${formulaPanelHtml(formulas)}</div>
+        <div id="voice-panel" class="teaching-panel" style="display:none;">
+          <div id="example-voice-text">${escHtml(currentExampleVoiceText(null) || Lang.t('voice_no_text'))}</div>
+          <button class="main-btn voice-btn" onclick="speakText(document.getElementById('example-voice-text').textContent)">${Lang.t('voice_listen_btn')}</button>
+          <button class="main-btn secondary voice-btn" onclick="stopVoice()">${Lang.t('voice_stop_btn')}</button>
+        </div>
+        <div class="narration-box" id="narration-box">${Lang.t('example_narration_init')}</div>
+        ${steps.length > 0 ? `<div class="step-dots" id="step-dots">${dotsHtml}</div>` : ''}
+        <div class="example-nav-row">
+          <button class="main-btn secondary" id="prev-example-btn" onclick="handleExampleBack()" disabled>${Lang.t('example_btn_previous')}</button>
+          <button class="main-btn" id="main-btn" onclick="handleExampleBtn()">${initBtnLabel}</button>
+        </div>
+      </div>
+    `);
+  }
+
+  function switchExTab(tab) {
+    activeExampleTab = tab;
+    ['symbolic', 'visual', 'formula', 'voice'].forEach(function (name) {
+      setPanelVisible(name + '-panel', name === tab);
+      setTabActive('tab-' + name, name === tab);
+    });
+  }
+
+  function handleExampleBtn() {
+    const steps = (lesson.example || {}).steps || [];
+
+    if (exampleStep >= steps.length) {
+      showPractice();
+      return;
+    }
+
+    exampleStep++;
+    renderCurrentExampleStep();
+  }
+
+  function handleExampleBack() {
+    if (exampleStep <= 0) return;
+    exampleStep--;
+    renderCurrentExampleStep();
+  }
+
+  function renderCurrentExampleStep() {
+    const ex = lesson.example || {};
+    const steps = ex.steps || [];
+    const currentStepIndex = exampleStep - 1;
+    const showingStart = exampleStep === 0;
+    const step = showingStart ? null : steps[currentStepIndex];
+
+    document.getElementById('equation-display').textContent = step ? (step.equation || '') : (ex.start || '');
+    document.getElementById('annotation-box').textContent   = step ? (step.annotation || '') : '';
+    document.getElementById('narration-box').textContent    = step ? (step.narration || '') : Lang.t('example_narration_init');
+    const visualPanel = document.getElementById('visual-panel');
+    if (visualPanel) visualPanel.innerHTML = exampleVisualHtml(step);
+    const voiceText = document.getElementById('example-voice-text');
+    if (voiceText) voiceText.textContent = currentExampleVoiceText(step) || Lang.t('voice_no_text');
+    for (let i = 0; i < steps.length; i++) {
+      const dot = document.getElementById(`dot-${i}`);
+      if (!dot) continue;
+      if (i < currentStepIndex)       dot.className = 'step-dot done';
+      else if (i === currentStepIndex) dot.className = 'step-dot active';
+      else                             dot.className = 'step-dot';
+    }
+
+    const pct  = steps.length > 0 ? Math.round((Math.max(exampleStep, 1) / steps.length) * 100) : 100;
+    const fill = document.getElementById('progress-fill');
+    if (fill) fill.style.width = pct + '%';
+
+    const btn = document.getElementById('main-btn');
+    btn.textContent = exampleStep >= steps.length
+      ? Lang.t('example_btn_try_yourself')
+      : Lang.t('example_btn_show_step_n').replace('{n}', exampleStep + 1);
+
+    const prevBtn = document.getElementById('prev-example-btn');
+    if (prevBtn) prevBtn.disabled = exampleStep <= 0;
+  }
+
+  // ── Phase 4: Practice (always app.html — same engine as guests) ──
+  async function showPractice() {
+    try {
+      const r = await fetch(`${WORKER}/problems/curriculum/${encodeURIComponent(curriculum)}/${encodeURIComponent(unit)}/${encodeURIComponent(stage)}/practice`);
+      const arr = r.ok ? await r.json() : [];
+      if (!arr.length) {
+        showTest();
+        return;
+      }
+    } catch (e) {
+      showTest();
+      return;
+    }
+    window.location.href = curriculumAppUrl('practice', 'test');
+  }
+
+  // ── Phase 5: Test (always app.html) ─────────────────────────────
+  async function showTest() {
+    try {
+      const r = await fetch(`${WORKER}/problems/curriculum/${encodeURIComponent(curriculum)}/${encodeURIComponent(unit)}/${encodeURIComponent(stage)}/test`);
+      const arr = r.ok ? await r.json() : [];
+      if (!arr.length) {
+        if (guestMode) showGuestCompletionCard();
+        else await markProgressAndShow('complete', null, null);
+        return;
+      }
+    } catch (e) {
+      if (guestMode) showGuestCompletionCard();
+      else await markProgressAndShow('complete', null, null);
+      return;
+    }
+    window.location.href = curriculumAppUrl('test', 'complete');
+  }
+
+  // ── Update progress + show result card ───────────────────────
+  async function markProgressAndShow(status, score, total) {
+    if (guestMode) {
+      showGuestCompletionCard();
+      return;
+    }
+
+    // Update progress on the server if we have a student and a status to set
+    if (studentId && status === 'complete') {
+      try {
+        await fetch(`${WORKER}/student/${encodeURIComponent(studentId)}/progress`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ unit, stage, status: 'complete' })
+        });
+      } catch (e) {
+        console.warn('Failed to update progress:', e);
+      }
+    }
+
+    const noTest = (score === null && total === null);
+
+    if (noTest || status === 'complete') {
+      // Passed (or auto-complete)
+      const scoreText = noTest
+        ? Lang.t('result_level_complete')
+        : Lang.t('result_score_correct').replace('{score}', score).replace('{total}', total);
+
+      render(`
+        ${progressBarHtml(5)}
+        <div class="result-card pass">
+          <div class="result-icon">&#127941;</div>
+          <div class="score-display">${noTest ? '' : `${score} / ${total}`}</div>
+          <h2>${Lang.t('level_label')} ${escHtml(stage)} ${Lang.t('result_complete')}</h2>
+          <p>${escHtml(scoreText)} ${Lang.t('result_great_work')}</p>
+          <a href="home.html" class="result-btn primary">${Lang.t('result_back_btn')}</a>
+        </div>
+      `);
+    } else {
+      // Failed
+      const failScoreText = Lang.t('result_score_correct').replace('{score}', score).replace('{total}', total);
+      render(`
+        ${progressBarHtml(5)}
+        <div class="result-card fail">
+          <div class="result-icon">&#128218;</div>
+          <div class="score-display">${score} / ${total}</div>
+          <h2>${Lang.t('result_fail_h2')}</h2>
+          <p>${escHtml(failScoreText)} ${Lang.t('result_fail_review')}</p>
+          <button class="result-btn secondary" onclick="showExample()">${Lang.t('result_fail_btn')}</button>
+        </div>
+      `);
+    }
+  }
+
+  init();
+</script>
+</body>
+</html>

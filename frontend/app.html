@@ -1,0 +1,2031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nuvo Studio</title>
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.json">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #FAFAF8;
+    --card: #FFFFFF;
+    --text: #1A1A1A;
+    --text-secondary: #6B6B6B;
+    --border: #E8E8E4;
+    --accent: #2D6A4F;
+    --accent-light: #D8F3DC;
+    --accent-bg: #F0FAF3;
+    --correct: #2D6A4F;
+    --correct-bg: #D8F3DC;
+    --wrong: #C1453B;
+    --wrong-bg: #FDE8E6;
+    --nudge: #B8860B;
+    --nudge-bg: #FFF8E7;
+    --unsure: #5A6B7A;
+    --unsure-bg: #EDF1F5;
+    --mono: 'DM Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+
+  /* ── Setup Screen (Teacher Mode) ── */
+  #setup-screen {
+    max-width: 640px;
+    width: 100%;
+    margin-top: 40px;
+  }
+
+  #setup-screen h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    letter-spacing: -0.02em;
+  }
+
+  #setup-screen .subtitle {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+
+  /* ── Problem Builder Cards ── */
+  #cards-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .builder-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    animation: slideIn 0.2s ease;
+  }
+
+  .builder-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .builder-card-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+  }
+
+  .builder-delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    padding: 4px 6px;
+    border-radius: 6px;
+    line-height: 1;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .builder-delete-btn:hover { background: var(--wrong-bg); color: var(--wrong); }
+
+  .builder-field {
+    margin-bottom: 10px;
+  }
+
+  .builder-field:last-child { margin-bottom: 0; }
+
+  .builder-field-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    margin-bottom: 5px;
+  }
+
+  .builder-type-select {
+    width: 100%;
+    padding: 9px 32px 9px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-family: var(--sans);
+    font-size: 0.9rem;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' viewBox='0 0 12 7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B6B6B' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+  }
+
+  .builder-type-select:focus { border-color: var(--accent); }
+
+  .builder-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-family: var(--mono);
+    font-size: 0.9rem;
+    background: var(--card);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .builder-input:focus { border-color: var(--accent); }
+
+  .builder-input.active-field {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-light);
+  }
+
+  .add-problem-btn {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    color: var(--accent);
+    border: 1.5px dashed var(--accent);
+    border-radius: 10px;
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.15s;
+    margin-bottom: 14px;
+  }
+
+  .add-problem-btn:hover { background: var(--accent-bg); }
+
+  .format-hint {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    margin-top: 10px;
+    margin-bottom: 16px;
+    line-height: 1.5;
+    background: var(--accent-bg);
+    padding: 10px 12px;
+    border-radius: 8px;
+    border-left: 3px solid var(--accent);
+  }
+
+  .setup-error {
+    color: var(--wrong);
+    font-size: 0.85rem;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    display: none;
+  }
+
+  .btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-primary:active { transform: scale(0.99); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* ── Link Generated Screen ── */
+  #link-screen {
+    max-width: 640px;
+    width: 100%;
+    margin-top: 40px;
+    display: none;
+    text-align: center;
+  }
+
+  #link-screen h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  #link-screen .subtitle {
+    color: var(--text-secondary);
+    font-size: 0.92rem;
+    margin-bottom: 24px;
+  }
+
+  .link-box {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    word-break: break-all;
+    text-align: left;
+    color: var(--text-secondary);
+    margin-bottom: 14px;
+    max-height: 80px;
+    overflow-y: auto;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .btn-row button { flex: 1; }
+
+  .btn-secondary {
+    padding: 12px 16px;
+    background: transparent;
+    color: var(--accent);
+    border: 1.5px solid var(--accent);
+    border-radius: 10px;
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-secondary:hover { background: var(--accent-bg); }
+
+  .copy-toast {
+    font-size: 0.85rem;
+    color: var(--correct);
+    opacity: 0;
+    transition: opacity 0.3s;
+    margin-bottom: 10px;
+  }
+
+  .copy-toast.show { opacity: 1; }
+
+  .problem-summary {
+    text-align: left;
+    background: var(--accent-bg);
+    border-radius: 10px;
+    padding: 16px;
+    margin-top: 16px;
+  }
+
+  .problem-summary h4 {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  .problem-summary li {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    margin-bottom: 5px;
+    list-style: none;
+    padding-left: 20px;
+    position: relative;
+    color: var(--text);
+  }
+
+  .problem-summary li::before {
+    content: attr(data-num);
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* ── Practice Screen (Student Mode) ── */
+  #practice-screen {
+    max-width: 640px;
+    width: 100%;
+    margin-top: 30px;
+    display: none;
+  }
+
+  .student-header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .student-header h1 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .student-header p {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+  }
+
+  .progress-bar-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .progress-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 3px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  .progress-text {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+
+  .problem-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 28px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+
+  .problem-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  .problem-text {
+    font-family: var(--mono);
+    font-size: 1.15rem;
+    font-weight: 500;
+    line-height: 1.6;
+    color: var(--text);
+  }
+
+  /* ── Step History ── */
+  .step-entry {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    margin-bottom: 6px;
+    animation: slideIn 0.25s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .step-entry.correct { background: var(--correct-bg); }
+
+  .step-entry .step-icon {
+    font-size: 1rem;
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+
+  .step-entry .step-text {
+    font-family: var(--mono);
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+
+  /* ── Feedback ── */
+  .feedback {
+    padding: 12px 14px;
+    border-radius: 10px;
+    margin-bottom: 14px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    animation: slideIn 0.25s ease;
+    display: none;
+  }
+
+  .feedback.wrong  { background: var(--wrong-bg);  color: var(--wrong);  display: block; }
+  .feedback.nudge  { background: var(--nudge-bg);  color: var(--nudge);  display: block; }
+  .feedback.unsure { background: var(--unsure-bg); color: var(--unsure); display: block; }
+  .feedback.reveal { background: var(--accent-bg); color: var(--accent); display: block; font-family: var(--mono); }
+
+  /* ── Calculator Display ── */
+  #input-area {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  #step-input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-family: var(--mono);
+    font-size: 1rem;
+    background: var(--card);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  #step-input:focus { border-color: var(--accent); }
+
+  /* ── Math preview (live rendered fraction display) ── */
+  .math-preview {
+    display: none;
+    font-family: var(--mono);
+    font-size: 1.05rem;
+    padding: 10px 14px;
+    background: var(--accent-bg);
+    border: 1.5px solid var(--accent-light);
+    border-radius: 10px;
+    line-height: 2.2;
+    color: var(--text);
+    min-height: 48px;
+  }
+  .math-preview.visible { display: block; }
+
+  /* ── Stacked fraction rendering ── */
+  .math-frac {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    vertical-align: middle;
+    margin: 0 2px;
+  }
+  .math-num {
+    border-bottom: 1.5px solid currentColor;
+    padding: 0 4px;
+    text-align: center;
+    line-height: 1.5;
+  }
+  .math-den {
+    padding: 0 4px;
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  /* Disabled state (student only) */
+  #calc-grid.disabled .calc-btn   { opacity: 0.45; pointer-events: none; }
+  #calc-grid.disabled .toggle-btn { opacity: 0.45; pointer-events: none; }
+
+  .loading-indicator {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    padding: 8px 0;
+  }
+
+  .loading-indicator.show { display: flex; }
+
+  .spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .completed-card {
+    background: var(--correct-bg);
+    border: 1.5px solid var(--correct);
+    border-radius: 14px;
+    padding: 24px;
+    text-align: center;
+    margin-bottom: 20px;
+    animation: slideIn 0.3s ease;
+    display: none;
+  }
+
+  .completed-card .check { font-size: 2rem; margin-bottom: 8px; }
+  .completed-card h3 { color: var(--correct); font-size: 1.1rem; margin-bottom: 4px; }
+  .completed-card p  { color: var(--correct); font-size: 0.88rem; opacity: 0.8; }
+
+  #next-problem-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    display: none;
+  }
+
+  #next-problem-btn:hover { opacity: 0.9; }
+
+  /* ── Done Screen ── */
+  #done-screen {
+    max-width: 640px;
+    width: 100%;
+    margin-top: 60px;
+    text-align: center;
+    display: none;
+  }
+
+  #done-screen .done-icon { font-size: 3rem; margin-bottom: 16px; }
+  #done-screen h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; }
+  #done-screen p  { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5; }
+
+  .ask-ronel-list {
+    margin-top: 20px;
+    text-align: left;
+    background: var(--unsure-bg);
+    border-radius: 10px;
+    padding: 16px 20px;
+  }
+
+  .ask-ronel-list h4 {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--unsure);
+    margin-bottom: 10px;
+  }
+
+  .ask-ronel-list li {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    margin-bottom: 6px;
+    list-style: none;
+    padding-left: 16px;
+    position: relative;
+    color: var(--text);
+  }
+
+  .ask-ronel-list li::before {
+    content: '?';
+    position: absolute;
+    left: 0;
+    color: var(--unsure);
+    font-weight: 700;
+  }
+
+  @media (max-width: 500px) {
+    body { padding: 14px; }
+    .problem-card { padding: 20px; }
+    .problem-text { font-size: 1rem; }
+  }
+
+  /* ── Trial banner ── */
+  #trial-banner {
+    display: none;
+    width: 100%;
+    background: #FFF8E7;
+    border-bottom: 1.5px solid #F5D06A;
+    color: #7A5C00;
+    font-size: 0.82rem;
+    font-weight: 500;
+    text-align: center;
+    padding: 9px 16px;
+  }
+
+  #trial-banner a {
+    color: #7A5C00;
+    font-weight: 700;
+    text-decoration: underline;
+  }
+
+  /* ── Trial expired overlay ── */
+  #trial-expired {
+    display: none;
+    max-width: 540px;
+    width: 100%;
+    margin-top: 60px;
+    text-align: center;
+    padding: 0 8px;
+  }
+
+  #trial-expired .expired-logo {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 28px;
+    letter-spacing: -0.02em;
+  }
+
+  #trial-expired h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    letter-spacing: -0.02em;
+  }
+
+  #trial-expired p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.55;
+    margin-bottom: 28px;
+  }
+
+  .expired-btn-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+  }
+
+  .expired-btn {
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-family: var(--sans);
+    font-size: 0.92rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1.5px solid var(--accent);
+    transition: opacity 0.15s;
+  }
+
+  .expired-btn:hover { opacity: 0.85; }
+
+  .expired-btn-primary {
+    background: var(--accent);
+    color: white;
+  }
+
+  .expired-btn-outline {
+    background: transparent;
+    color: var(--accent);
+  }
+
+  .expired-note {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .expired-note a {
+    color: var(--text-secondary);
+    text-decoration: underline;
+  }
+
+</style>
+<script src="lang.js?v=20260513-lesson-app-unified"></script>
+<script src="calculator.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/algebrite@1.4.0/dist/algebrite.bundle-for-browser.js"></script>
+</head>
+<body>
+
+<!-- ── Trial banner (shown when trial is active) ── -->
+<div id="trial-banner"></div>
+
+<!-- ── Trial expired overlay (replaces all content when trial has ended) ── -->
+<div id="trial-expired">
+  <div class="expired-logo">Nuvo Math</div>
+  <h2 data-i18n="trial_expired_heading">Your access has ended</h2>
+  <p data-i18n="trial_expired_body">Submit the enrollment form to choose a plan and arrange payment.</p>
+  <div class="expired-btn-row">
+    <a id="expired-practice-btn" href="#" class="expired-btn expired-btn-outline" data-i18n="trial_practice_btn">Enrollment form →</a>
+    <a href="https://wa.me/5076014-1676" target="_blank" class="expired-btn expired-btn-primary" data-i18n="trial_tutoring_btn">WhatsApp us →</a>
+  </div>
+  <p class="expired-note" data-i18n="trial_expired_note">Questions? Email tutor@nuvostudio.club or WhatsApp 6014-1676.</p>
+</div>
+
+<!-- ════════ SETUP / TEACHER MODE ════════ -->
+<div id="setup-screen">
+  <h1>Nuvo Studio ✏️</h1>
+  <p class="subtitle">Build your homework problems below, then generate a link for your student.</p>
+
+  <!-- Problem cards (dynamically populated) -->
+  <div id="cards-container"></div>
+
+  <button class="add-problem-btn" onclick="addProblemCard()">+ Add Problem</button>
+
+  <!-- Calculator (populated by calculator.js) -->
+  <div id="setup-calc-wrapper"></div>
+
+  <div class="format-hint">
+    Tap a Question or Answer field, then use the calculator to insert math symbols into that field.
+  </div>
+  <div class="setup-error" id="setup-error"></div>
+
+  <button class="btn-primary" onclick="generateLink()">Generate Student Link</button>
+</div>
+
+<!-- ════════ LINK GENERATED ════════ -->
+<div id="link-screen">
+  <h2>Link ready! 🔗</h2>
+  <p class="subtitle">Send this link to your student — they'll go straight into practice mode.</p>
+
+  <div class="link-box" id="link-box"></div>
+  <div class="copy-toast" id="copy-toast">✓ Copied to clipboard</div>
+
+  <div class="btn-row">
+    <button class="btn-primary" onclick="copyLink()">Copy Link</button>
+    <button class="btn-secondary" onclick="previewAsStudent()">Preview</button>
+  </div>
+
+  <div class="problem-summary" id="problem-summary">
+    <h4>Problems loaded</h4>
+    <ul id="summary-list"></ul>
+  </div>
+</div>
+
+<!-- ════════ PRACTICE / STUDENT MODE ════════ -->
+<div id="practice-screen">
+  <div id="curriculum-breadcrumb" style="display:none;font-size:0.78rem;font-weight:600;color:var(--accent);background:var(--accent-bg);padding:5px 14px;border-radius:99px;margin-bottom:16px;text-align:center;"></div>
+  <div class="student-header">
+    <h1>Nuvo Studio ✏️</h1>
+    <p>Work through each problem one step at a time.</p>
+  </div>
+
+  <div class="progress-bar-container">
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    <div class="progress-text" id="progress-text">1 / 1</div>
+  </div>
+
+  <div class="problem-card">
+    <div class="problem-label" id="problem-label">Problem <span id="problem-number"></span></div>
+    <div class="problem-text" id="problem-text"></div>
+  </div>
+
+  <div id="steps-container"></div>
+  <div class="feedback" id="feedback"></div>
+
+  <div class="loading-indicator" id="loading">
+    <div class="spinner"></div>
+    <span>Checking your step...</span>
+  </div>
+
+  <div id="input-area">
+    <input type="text" id="step-input" placeholder="Type or tap buttons to enter your answer…"
+      autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+
+    <!-- Live rendered preview (shows stacked fractions) -->
+    <div class="math-preview" id="step-preview"></div>
+
+    <!-- Student Calculator Grid (populated by calculator.js) -->
+    <div id="calc-grid"></div>
+  </div>
+
+  <div class="completed-card" id="completed-card">
+    <div class="check">✓</div>
+    <h3>Nice work!</h3>
+    <p>You got it. Ready for the next one?</p>
+  </div>
+
+  <button id="next-problem-btn" onclick="nextProblem()">Next Problem →</button>
+</div>
+
+<!-- ════════ DONE SCREEN ════════ -->
+<div id="done-screen">
+  <div class="done-icon">🎉</div>
+  <h2>All done!</h2>
+  <p>You've worked through all the problems. Great effort!</p>
+  <div class="ask-ronel-list" id="ask-ronel-list" style="display:none;">
+    <h4>📋 Ask Ronel about these</h4>
+    <ul id="ask-ronel-items"></ul>
+  </div>
+  <button id="back-to-curriculum-btn" onclick="backToCurriculum()" style="display:none;margin-top:24px;padding:14px 24px;background:var(--accent);color:white;border:none;border-radius:10px;font-family:var(--sans);font-size:1rem;font-weight:600;cursor:pointer;width:100%;">Back to curriculum</button>
+</div>
+
+<script>
+  // ══════════════════════════════════════════════════
+  const PROXY_URL = 'https://math-practice-proxy.ronelalmanza20.workers.dev';
+  // ══════════════════════════════════════════════════
+
+  let problems = [];
+  let currentIndex = 0;
+  let stepHistory = [];
+  let wrongCount = 0;
+  let formCheckAttempts = 0;
+  let askRonelProblems = [];
+  let generatedLink = '';
+  let guestProblemAttempted = false;
+
+  // ── Dashboard tracking (optional — set from URL params ?student=X&pid=Y) ──
+  const _urlParams = new URLSearchParams(window.location.search);
+  const STUDENT_ID       = localStorage.getItem('studentId') || _urlParams.get('student') || null;
+  const PROBLEM_ID       = _urlParams.get('pid')        || null;
+  const PARAM_CURRICULUM = _urlParams.get('curriculum') || null;
+  const PARAM_UNIT       = _urlParams.get('unit')       || null;
+  const PARAM_STAGE      = _urlParams.get('stage')      || null;
+  const PARAM_GUEST      = _urlParams.get('guest') === 'true';
+  const PARAM_LEVEL      = _urlParams.get('level') || null;
+  const PARAM_MODE       = _urlParams.get('mode') || '';
+  const PARAM_RETURN_TO  = _urlParams.get('returnTo') || '';
+
+  function currentProblemRowId() {
+    if (PROBLEM_ID) return PROBLEM_ID;
+    try {
+      const p = problems[currentIndex];
+      return p && p.id ? String(p.id) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function markProblemComplete() {
+    const pid = currentProblemRowId();
+    if (!STUDENT_ID || !pid) return;
+    fetch(`${PROXY_URL}/student/${encodeURIComponent(STUDENT_ID)}/complete/${encodeURIComponent(pid)}`, {
+      method: 'POST'
+    }).catch(() => {}); // fire-and-forget, ignore errors silently
+  }
+
+  function logStep(step, correct) {
+    const pid = currentProblemRowId();
+    if (!STUDENT_ID || !pid) return;
+    fetch(`${PROXY_URL}/log-step`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ studentId: STUDENT_ID, problemId: pid, step, correct })
+    }).catch(() => {}); // fire-and-forget
+  }
+
+  // ── Teacher: active field tracking ──
+  let activeSetupField = null;
+  let cardCounter = 0;
+
+  function setActiveField(el) {
+    if (activeSetupField && activeSetupField !== el) {
+      activeSetupField.classList.remove('active-field');
+    }
+    activeSetupField = el;
+    el.classList.add('active-field');
+    setupCalc.setTarget(el);
+  }
+
+  // ── Add a problem card ──
+  function addProblemCard(type, question, answer) {
+    type = type || 'Expand';
+    question = question || '';
+    answer = answer || '';
+
+    const id = cardCounter++;
+    const card = document.createElement('div');
+    card.className = 'builder-card';
+    card.id = `card-${id}`;
+    card.innerHTML = `
+      <div class="builder-card-header">
+        <span class="builder-card-title">Problem</span>
+        <button class="builder-delete-btn" onclick="deleteProblemCard(${id})" title="Delete">🗑️</button>
+      </div>
+      <div class="builder-field">
+        <label class="builder-field-label">Type</label>
+        <select class="builder-type-select">
+          <option value="Expand">Expand</option>
+          <option value="Factorize">Factorize</option>
+          <option value="Solve">Solve</option>
+          <option value="Evaluate">Evaluate</option>
+          <option value="Rearrange">Rearrange</option>
+          <option value="Translate">Translate</option>
+        </select>
+      </div>
+      <div class="builder-field">
+        <label class="builder-field-label">Question</label>
+        <input type="text" class="builder-input builder-q-input"
+          placeholder="e.g. 3(2x + 5)"
+          autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+      </div>
+      <div class="builder-field">
+        <label class="builder-field-label">Answer</label>
+        <input type="text" class="builder-input builder-a-input"
+          placeholder="e.g. 6x + 15"
+          autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+      </div>
+    `;
+
+    // Set values programmatically (avoids HTML escaping issues)
+    card.querySelector('.builder-type-select').value = type;
+    card.querySelector('.builder-q-input').value = question;
+    card.querySelector('.builder-a-input').value = answer;
+
+    // Attach focus listener so the shared calculator targets this input
+    card.querySelectorAll('.builder-input').forEach(input => {
+      input.addEventListener('focus', () => setActiveField(input));
+    });
+
+    document.getElementById('cards-container').appendChild(card);
+    renumberCards();
+
+    // Auto-focus the question field of the newly added card
+    const qInput = card.querySelector('.builder-q-input');
+    qInput.focus();
+    setActiveField(qInput);
+  }
+
+  // ── Delete a problem card ──
+  function deleteProblemCard(id) {
+    const card = document.getElementById(`card-${id}`);
+    if (!card) return;
+    // If deleted card held the active field, clear it
+    if (activeSetupField && card.contains(activeSetupField)) {
+      activeSetupField.classList.remove('active-field');
+      activeSetupField = null;
+      setupCalc.setTarget(null);
+    }
+    card.remove();
+    renumberCards();
+  }
+
+  // ── Renumber card titles after add/delete ──
+  function renumberCards() {
+    document.querySelectorAll('.builder-card').forEach((card, i) => {
+      card.querySelector('.builder-card-title').textContent = `Problem ${i + 1}`;
+    });
+  }
+
+  // ── Generate link from cards ──
+  function generateLink() {
+    const err = document.getElementById('setup-error');
+    err.style.display = 'none';
+
+    const cards = document.querySelectorAll('.builder-card');
+    if (cards.length === 0) {
+      err.textContent = 'Please add at least one problem.';
+      err.style.display = 'block';
+      return;
+    }
+
+    const parsed = [];
+    for (let i = 0; i < cards.length; i++) {
+      const card = cards[i];
+      const type     = card.querySelector('.builder-type-select').value;
+      const question = card.querySelector('.builder-q-input').value.trim();
+      const answer   = card.querySelector('.builder-a-input').value.trim();
+      if (!question || !answer) {
+        err.textContent = `Problem ${i + 1} is missing a ${!question ? 'question' : 'answer'}.`;
+        err.style.display = 'block';
+        return;
+      }
+      parsed.push({ type, question, answer });
+    }
+
+    const data = JSON.stringify({ problems: parsed });
+    const encoded = btoa(encodeURIComponent(data));
+    const baseUrl = window.location.href.split('#')[0];
+    generatedLink = baseUrl + '#' + encoded;
+
+    document.getElementById('setup-screen').style.display = 'none';
+    document.getElementById('link-screen').style.display = 'block';
+    document.getElementById('link-box').textContent = generatedLink;
+
+    const ul = document.getElementById('summary-list');
+    ul.innerHTML = '';
+    parsed.forEach((p, i) => {
+      const li = document.createElement('li');
+      li.setAttribute('data-num', (i + 1) + '.');
+      li.textContent = `[${p.type}] ${p.question}`;
+      ul.appendChild(li);
+    });
+  }
+
+  // ── Convert "L = R" equation to difference form "(L) - (R)" ──
+  // Splits on the first standalone = (not !=, <=, >=, ==)
+  function equationToExpr(str) {
+    for (let i = 0; i < str.length; i++) {
+      if (str[i] === '=' &&
+          str[i - 1] !== '!' && str[i - 1] !== '<' && str[i - 1] !== '>' &&
+          str[i + 1] !== '=') {
+        const left  = str.slice(0, i).trim();
+        const right = str.slice(i + 1).trim();
+        return `(${left}) - (${right})`;
+      }
+    }
+    return str; // no standalone = found, return as-is
+  }
+
+  function containsEquals(str) {
+    for (let i = 0; i < str.length; i++) {
+      if (str[i] === '=' &&
+          str[i - 1] !== '!' && str[i - 1] !== '<' && str[i - 1] !== '>' &&
+          str[i + 1] !== '=') {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // ── Normalize input for Algebrite ──
+  function normalize(input) {
+    let s = input.trim();
+    s = s.replace(/²/g, '^2');
+    s = s.replace(/³/g, '^3');
+    s = s.replace(/⁴/g, '^4');
+    s = s.replace(/⁵/g, '^5');
+    s = s.replace(/⁶/g, '^6');
+    s = s.replace(/⁷/g, '^7');
+    s = s.replace(/⁸/g, '^8');
+    s = s.replace(/⁹/g, '^9');
+    s = s.replace(/×/g, '*');
+    s = s.replace(/−/g, '-');
+    s = s.replace(/sqrt/gi, '\x01');
+    s = s.replace(/√\(/g, '\x01(');
+    s = s.replace(/√(\d+)/g, '\x01($1)');
+    s = s.replace(/√([a-zA-Z])/g, '\x01($1)');
+    s = s.replace(/(\d)\x01/g, '$1*\x01');
+    s = s.replace(/\)\x01/g, ')*\x01');
+    s = s.replace(/([a-zA-Z])\x01/g, '$1*\x01');
+    s = s.replace(/(\d)([a-zA-Z])/g, '$1*$2');
+    s = s.replace(/([a-zA-Z])([a-zA-Z])/g, '$1*$2');
+    s = s.replace(/o\*r/g, 'or');    // restore "or" mangled by letter-letter rule
+    s = s.replace(/a\*nd/g, 'and');  // restore "and" (and → a*nd in one pass)
+    s = s.replace(/(\d)\(/g, '$1*(');
+    s = s.replace(/\)\(/g, ')*(');
+    s = s.replace(/([a-zA-Z])\(/g, '$1*(');
+    s = s.replace(/\)([a-zA-Z])/g, ')*$1');
+    s = s.replace(/\)(\d)/g, ')*$1');
+    s = s.replace(/\x01/g, 'sqrt');
+    return s;
+  }
+
+  // ── Check algebraic equivalence via Algebrite ──
+  function equationEquivalence(a, b, problemType) {
+    const t0 = performance.now();
+    console.log('[equationEquivalence] entry', { a, b, problemType });
+
+    const normA = normalize(equationToExpr(a));
+    const normB = normalize(equationToExpr(b));
+    console.log('[equationEquivalence] normalized', { normA, normB });
+
+    // Direct diff — works for all types and intermediate Solve steps (e.g. 8x=-8 from 8x-4=-12)
+    const diffResult = Algebrite.run(`simplify((${normA}) - (${normB}))`);
+    const diffTrimmed = diffResult.trim();
+    console.log(`[equationEquivalence] diff="${diffTrimmed}" in ${(performance.now()-t0).toFixed(1)}ms`);
+
+    if (diffTrimmed === '0') {
+      console.log(`[equationEquivalence] matched via diff in ${(performance.now()-t0).toFixed(1)}ms`);
+      return { valid: true };
+    }
+    if (!diffTrimmed || diffTrimmed.toLowerCase().includes('stop') || diffTrimmed.toLowerCase().includes('error')) {
+      return { valid: null, parseError: true };
+    }
+
+    // For Solve: substitution handles final "x = value" answers where diff ≠ 0 due to coefficient scaling
+    // e.g. 8x+8 vs x+1: diff is 7x+7, but subst(-1, x, 8x+8) = 0 ✓
+    if (problemType === 'Solve') {
+      let varPart = null, valPart = null;
+      for (let i = 0; i < b.length; i++) {
+        if (b[i] === '=' &&
+            b[i - 1] !== '!' && b[i - 1] !== '<' && b[i - 1] !== '>' &&
+            b[i + 1] !== '=') {
+          varPart = normalize(b.slice(0, i).trim());
+          valPart = normalize(b.slice(i + 1).trim());
+          break;
+        }
+      }
+      // Only substitute if varPart is a single variable (e.g. "x"), not a compound like "8*x"
+      if (varPart && /^[a-zA-Z]$/.test(varPart)) {
+        const subResult = Algebrite.run(`simplify(subst(${valPart}, ${varPart}, ${normA}))`).trim();
+        console.log(`[equationEquivalence] subst(${valPart}, ${varPart}, normA)="${subResult}" in ${(performance.now()-t0).toFixed(1)}ms`);
+        if (subResult === '0') {
+          console.log(`[equationEquivalence] matched via substitution in ${(performance.now()-t0).toFixed(1)}ms`);
+          return { valid: true };
+        }
+        if (!subResult || subResult.toLowerCase().includes('stop') || subResult.toLowerCase().includes('error')) {
+          return { valid: null, parseError: true };
+        }
+        return { valid: false };
+      }
+    }
+
+    return { valid: false };
+  }
+
+  function hasBalancedParens(str) {
+    let depth = 0;
+    for (let i = 0; i < str.length; i++) {
+      if (str[i] === '(') depth++;
+      else if (str[i] === ')') depth--;
+      if (depth < 0) return false; // more closes than opens at this point
+    }
+    return depth === 0;
+  }
+
+  function checkEquivalence(exprA, exprB, problemType) {
+    const t0 = performance.now();
+    console.log('[checkEquivalence] entry', { exprA, exprB, problemType });
+
+    // Guard: unbalanced parens would cause Algebrite parse errors
+    if (!hasBalancedParens(exprA) || !hasBalancedParens(exprB)) {
+      console.log('[checkEquivalence] unbalanced parens', { exprA, exprB });
+      return { valid: null, parseError: true };
+    }
+
+    // Handle comma-separated answers (e.g. multiple solutions: x = 1, x = -1)
+    const partsA = exprA.split(',').map(s => s.trim()).filter(Boolean);
+    const partsB = exprB.split(',').map(s => s.trim()).filter(Boolean);
+    if (partsA.length > 1 || partsB.length > 1) {
+      if (partsA.length !== partsB.length) {
+        console.log('[checkEquivalence] comma part count mismatch', { partsA, partsB });
+        return { valid: false };
+      }
+      const usedB = new Set();
+      for (const pa of partsA) {
+        let matched = false;
+        for (let i = 0; i < partsB.length; i++) {
+          if (!usedB.has(i) && checkEquivalence(pa, partsB[i], problemType).valid === true) {
+            usedB.add(i);
+            matched = true;
+            break;
+          }
+        }
+        if (!matched) {
+          console.log('[checkEquivalence] no match for comma part:', pa);
+          return { valid: false };
+        }
+      }
+      console.log(`[checkEquivalence] comma parts all matched in ${(performance.now()-t0).toFixed(1)}ms`);
+      return { valid: true };
+    }
+
+    try {
+      if (containsEquals(exprA) && containsEquals(exprB) && problemType !== 'Evaluate') {
+        const result = equationEquivalence(exprA, exprB, problemType);
+        console.log(`[checkEquivalence] exit via equationEquivalence in ${(performance.now()-t0).toFixed(1)}ms`, result);
+        return result;
+      }
+      const normA = normalize(exprA);
+      const normB = normalize(exprB);
+      console.log('[checkEquivalence] Algebrite call', { normA, normB });
+      const diffResult = Algebrite.run(`simplify((${normA}) - (${normB}))`);
+      const diffTrimmed = diffResult.trim();
+      console.log(`[checkEquivalence] Algebrite result="${diffTrimmed}" in ${(performance.now()-t0).toFixed(1)}ms`);
+      if (diffTrimmed === '0') return { valid: true };
+      if (!diffTrimmed || diffTrimmed.toLowerCase().includes('stop') || diffTrimmed.toLowerCase().includes('error')) {
+        return { valid: null, parseError: true };
+      }
+      return { valid: false };
+    } catch (e) {
+      console.error('[checkEquivalence] Algebrite threw:', e);
+      return { valid: null, parseError: true };
+    }
+  }
+
+  function checkIsFinal(studentStep, expectedAnswer, problemType) {
+    return checkEquivalence(studentStep, expectedAnswer, problemType);
+  }
+
+  // ── Translate: submit handler ──
+  async function submitTranslate(input, problem) {
+    const t0 = performance.now();
+    console.log('[submitTranslate] entry', { input });
+
+    if (PARAM_GUEST && PARAM_MODE !== 'test' && !guestProblemAttempted) {
+      guestProblemAttempted = true;
+      const c = parseInt(localStorage.getItem('nuvo_guest_count') || '0', 10);
+      localStorage.setItem('nuvo_guest_count', String(c + 1));
+    }
+
+    let isCorrect = false;
+
+    // Primary: simplify(a - b) === '0'
+    try {
+      const normInput  = normalize(input);
+      const normAnswer = normalize(problem.answer);
+      const diff = Algebrite.run(`simplify((${normInput})-(${normAnswer}))`).trim();
+      isCorrect = diff === '0';
+      console.log(`[submitTranslate] diff="${diff}" isCorrect=${isCorrect} in ${(performance.now()-t0).toFixed(1)}ms`);
+    } catch (e) {
+      console.warn('[submitTranslate] Algebrite threw:', e);
+    }
+
+    // Fallback: ask Claude to rewrite input into standard notation, then re-check
+    if (!isCorrect) {
+      showLoading('Interpreting your input...');
+      const interpreted = await askClaudeToInterpret(input);
+      hideLoading();
+      if (interpreted) {
+        try {
+          const diff2 = Algebrite.run(`simplify((${normalize(interpreted)})-(${normalize(problem.answer)}))`).trim();
+          isCorrect = diff2 === '0';
+          console.log(`[submitTranslate] fallback diff="${diff2}" isCorrect=${isCorrect}`);
+        } catch (e) {
+          console.warn('[submitTranslate] Algebrite (fallback) threw:', e);
+        }
+      }
+    }
+
+    logStep(input, isCorrect);
+
+    if (isCorrect) {
+      wrongCount = 0;
+      stepHistory.push(input);
+      addStepToHistory(input);
+      document.getElementById('feedback').style.display = 'none';
+      markProblemComplete();
+      document.getElementById('input-area').style.display = 'none';
+      document.getElementById('completed-card').style.display = 'block';
+      document.getElementById('next-problem-btn').style.display = 'block';
+      document.getElementById('next-problem-btn').textContent =
+        currentIndex < problems.length - 1 ? 'Next Problem →' : 'Finish ✓';
+    } else {
+      wrongCount++;
+      studentCalc.clear();
+      if (wrongCount >= 2) {
+        showLoading('Getting a hint...');
+        const hint = await askClaudeForTranslateHint(problem, input);
+        hideLoading();
+        showFeedback('nudge', hint || "Think about what each part of the phrase means mathematically.");
+      } else {
+        showFeedback('wrong', "That's not quite right. Try writing the algebraic expression.");
+      }
+      reenableInput();
+    }
+    console.log(`[submitTranslate] total time: ${(performance.now()-t0).toFixed(1)}ms`);
+  }
+
+  async function askClaudeForTranslateHint(problem, wrongInput) {
+    const t0 = performance.now();
+    console.log('[askClaudeForTranslateHint] entry', { wrongInput });
+    try {
+      const response = await fetchWithTimeout(PROXY_URL + '/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          system: "You are a warm, encouraging math tutor for a 7th grade student learning to translate word phrases into algebraic expressions. The student made an error. Give a short hint that guides them to think about what each part of the phrase means mathematically — for example, which operation the phrase implies, or what plays the role of the coefficient. Never reveal the correct algebraic expression. Keep it to 1-2 sentences.",
+          messages: [{
+            role: 'user',
+            content: `Word phrase: ${problem.question}\nStudent wrote: ${wrongInput}\n\nGive a gentle hint without revealing the answer.`
+          }]
+        })
+      });
+      if (!response.ok) {
+        console.warn('[askClaudeForTranslateHint] response not ok:', response.status);
+        return null;
+      }
+      const data = await response.json();
+      const result = data.content.map(c => c.text || '').join('').trim() || null;
+      console.log(`[askClaudeForTranslateHint] exit in ${(performance.now()-t0).toFixed(1)}ms:`, result);
+      return result;
+    } catch (e) {
+      console.error(`[askClaudeForTranslateHint] error after ${(performance.now()-t0).toFixed(1)}ms:`, e);
+      return null;
+    }
+  }
+
+  function extractExpression(questionText) {
+    return questionText
+      .replace(/^(expand and simplify|expand|factorise|factorize|simplify|solve|evaluate|find|calculate)\s+/i, '')
+      .trim();
+  }
+
+  // ── Fetch with 10s timeout ──
+  function fetchWithTimeout(url, options, ms = 10000) {
+    const controller = new AbortController();
+    const id = setTimeout(() => {
+      console.warn(`[fetchWithTimeout] TIMED OUT after ${ms}ms: ${url}`);
+      controller.abort();
+    }, ms);
+    return fetch(url, { ...options, signal: controller.signal })
+      .finally(() => clearTimeout(id));
+  }
+
+  // ── Ask Claude helpers ──
+  async function askClaudeToInterpret(input) {
+    const t0 = performance.now();
+    console.log('[askClaudeToInterpret] entry', { input });
+    try {
+      const response = await fetchWithTimeout(PROXY_URL + '/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          system: "The student tried to write a math expression but it couldn't be parsed. Convert their input to a valid algebraic expression using standard notation. Return ONLY the expression, nothing else.",
+          messages: [{ role: 'user', content: input }]
+        })
+      });
+      if (!response.ok) {
+        console.warn('[askClaudeToInterpret] response not ok:', response.status);
+        return null;
+      }
+      const data = await response.json();
+      const result = data.content.map(c => c.text || '').join('').trim() || null;
+      console.log(`[askClaudeToInterpret] exit in ${(performance.now()-t0).toFixed(1)}ms:`, result);
+      return result;
+    } catch (e) {
+      console.error(`[askClaudeToInterpret] error after ${(performance.now()-t0).toFixed(1)}ms:`, e);
+      return null;
+    }
+  }
+
+  async function askClaudeForHint(problem, history, currentExpr, wrongInput) {
+    const t0 = performance.now();
+    console.log('[askClaudeForHint] entry', { currentExpr, wrongInput });
+    try {
+      const stepsText = history.length > 0
+        ? `Previous correct steps:\n${history.map((s, i) => `  Step ${i + 1}: ${s}`).join('\n')}\n\n`
+        : '';
+      const response = await fetchWithTimeout(PROXY_URL + '/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          system: "You are a warm, encouraging math tutor for a 7th grade student. The student made an error. Give a small hint pointing toward the error without revealing the correct answer. Keep it to 1-2 sentences.",
+          messages: [{
+            role: 'user',
+            content: `Problem type: ${problem.type || 'unknown'}\nProblem: ${problem.question}\nExpected answer: ${problem.answer}\n\n${stepsText}Current expression: ${currentExpr}\nStudent wrote (incorrect): ${wrongInput}\n\nGive a gentle hint.`
+          }]
+        })
+      });
+      if (!response.ok) {
+        console.warn('[askClaudeForHint] response not ok:', response.status);
+        return null;
+      }
+      const data = await response.json();
+      const result = data.content.map(c => c.text || '').join('').trim() || null;
+      console.log(`[askClaudeForHint] exit in ${(performance.now()-t0).toFixed(1)}ms:`, result);
+      return result;
+    } catch (e) {
+      console.error(`[askClaudeForHint] error after ${(performance.now()-t0).toFixed(1)}ms:`, e);
+      return null;
+    }
+  }
+
+  async function askClaudeFormCheck(studentStep, expectedAnswer, problemType) {
+    const t0 = performance.now();
+    console.log('[askClaudeFormCheck] entry', { studentStep, expectedAnswer, problemType, formCheckAttempts });
+    let hintInstruction;
+    if (formCheckAttempts === 0) {
+      hintInstruction = "STRICT RULE: Your feedback must contain ZERO specifics. Do NOT mention any variables, numbers, coefficients, factors, or anything about the structure of the answer. ONLY say something like 'Correct so far, but keep going!' or 'You're on the right track — this can be simplified further.' Nothing else. NEVER hint at what to do next.";
+    } else if (formCheckAttempts === 1) {
+      hintInstruction = "STRICT RULE: Give a direction only — no specifics. You may say something like 'Can you factor out anything else?' or 'Look more carefully at what terms have in common.' Do NOT mention any specific variables, numbers, or coefficients. Do NOT describe what the answer looks like. NEVER reveal the target form.";
+    } else if (formCheckAttempts === 2) {
+      hintInstruction = "STRICT RULE: You may mention the TYPE of thing to look for, but still no specific values. For example: 'There is a common variable you can still factor out' or 'The coefficient outside can be simplified further.' Do NOT name which variable or what the coefficient is. Do NOT show or describe the final answer form.";
+    } else {
+      hintInstruction = "You may now be explicit. Show the expected form and explain clearly what the student should have written.";
+    }
+    try {
+      const typeContext = problemType ? `The problem type is: ${problemType}. ` : '';
+      const response = await fetchWithTimeout(PROXY_URL + '/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          system: `${typeContext}The teacher expects the answer in this form: ${expectedAnswer}. The student wrote: ${studentStep}. Both are mathematically equivalent (already verified). Is the student's answer in the SAME STRUCTURAL FORM as the teacher's? Same level of factoring, same grouping, same simplification level. NEVER reveal the final answer form until attempt 3 or higher. NEVER mention specific variables or coefficients to factor out until attempt 2 or higher. ${hintInstruction} Respond with ONLY a JSON object: { "match": true/false, "feedback": "brief message if no match" }`,
+          messages: [{ role: 'user', content: `Teacher's expected form: ${expectedAnswer}\nStudent's answer: ${studentStep}` }]
+        })
+      });
+      if (!response.ok) {
+        console.warn('[askClaudeFormCheck] response not ok:', response.status);
+        return null;
+      }
+      const data = await response.json();
+      const text = data.content.map(c => c.text || '').join('').trim();
+      const start = text.indexOf('{');
+      const end = text.lastIndexOf('}');
+      if (start === -1 || end === -1) {
+        console.warn('[askClaudeFormCheck] could not parse JSON from response:', text);
+        return null;
+      }
+      const result = JSON.parse(text.slice(start, end + 1));
+      console.log(`[askClaudeFormCheck] exit in ${(performance.now()-t0).toFixed(1)}ms:`, result);
+      return result;
+    } catch (e) {
+      console.error(`[askClaudeFormCheck] error after ${(performance.now()-t0).toFixed(1)}ms:`, e);
+      return null;
+    }
+  }
+
+  async function askClaudeForReveal(problem, history, currentExpr) {
+    const t0 = performance.now();
+    console.log('[askClaudeForReveal] entry', { currentExpr });
+    try {
+      const stepsText = history.length > 0
+        ? `Previous correct steps:\n${history.map((s, i) => `  Step ${i + 1}: ${s}`).join('\n')}\n\n`
+        : '';
+      const response = await fetchWithTimeout(PROXY_URL + '/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          system: "You are a math tutor for a 7th grade student. The student is struggling. Return ONLY the algebraic expression for a valid next step from their current position. Nothing else — no explanation, just the expression.",
+          messages: [{
+            role: 'user',
+            content: `Problem type: ${problem.type || 'unknown'}\nProblem: ${problem.question}\nExpected answer: ${problem.answer}\n\n${stepsText}Current expression: ${currentExpr}\n\nWhat is a valid next step? Return only the expression.`
+          }]
+        })
+      });
+      if (!response.ok) {
+        console.warn('[askClaudeForReveal] response not ok:', response.status);
+        return null;
+      }
+      const data = await response.json();
+      const result = data.content.map(c => c.text || '').join('').trim() || null;
+      console.log(`[askClaudeForReveal] exit in ${(performance.now()-t0).toFixed(1)}ms:`, result);
+      return result;
+    } catch (e) {
+      console.error(`[askClaudeForReveal] error after ${(performance.now()-t0).toFixed(1)}ms:`, e);
+      return null;
+    }
+  }
+
+  // ── Loading indicator helpers ──
+  function showLoading(text) {
+    const loading = document.getElementById('loading');
+    loading.querySelector('span').textContent = text || 'Thinking...';
+    loading.classList.add('show');
+  }
+
+  function hideLoading() {
+    document.getElementById('loading').classList.remove('show');
+  }
+
+  function reenableInput() {
+    document.getElementById('calc-grid').classList.remove('disabled');
+  }
+
+  // ── Boot: check URL for student data, else show teacher setup ──
+  function init() {
+    // Guest mode: curriculum practice without login
+    if (PARAM_GUEST && PARAM_CURRICULUM) {
+      loadGuestProblems();
+      return;
+    }
+
+    const hash = window.location.hash.slice(1);
+    if (hash) {
+      try {
+        const decoded = JSON.parse(decodeURIComponent(atob(hash)));
+        if (decoded.problems && decoded.problems.length > 0) {
+          problems = decoded.problems;
+          document.getElementById('setup-screen').style.display = 'none';
+          document.getElementById('practice-screen').style.display = 'block';
+          loadProblem(0);
+          return;
+        }
+      } catch (e) {
+        console.error('Failed to parse problem data from URL:', e);
+      }
+    }
+    // Curriculum/lesson flow: fetch+filter problems from the problem bank
+    if (PARAM_CURRICULUM && PARAM_UNIT && PARAM_STAGE) {
+      loadCurriculumProblemsFromBank(false);
+      return;
+    }
+    // Direct access with no params — redirect based on localStorage
+    if (localStorage.getItem('studentId')) {
+      window.location.href = 'home.html';
+    } else {
+      window.location.href = 'login.html';
+    }
+  }
+
+  async function fetchBankProblemsForLesson(curriculumKey, unitVal, levelVal, problemType) {
+    try {
+      const res = await fetch(
+        `${PROXY_URL}/problems/curriculum/${encodeURIComponent(curriculumKey)}/${encodeURIComponent(unitVal)}/${encodeURIComponent(levelVal)}/${encodeURIComponent(problemType)}`
+      );
+      if (!res.ok) throw new Error('Failed');
+      return await res.json();
+    } catch (e) {
+      console.error('Failed to load curriculum problems:', e);
+      return [];
+    }
+  }
+
+  async function loadCurriculumProblemsFromBank(useGuestBreadcrumb) {
+    document.getElementById('setup-screen').style.display = 'none';
+    document.getElementById('practice-screen').style.display = 'block';
+
+    const curriculumLabelMap = {
+      PAA: 'PAA',
+      cambridge: 'Cambridge',
+      'common-core': 'Common Core',
+      'ib-myp': 'IB MYP'
+    };
+    const defaultUnit = PARAM_CURRICULUM === 'PAA' ? 'aritmetica' : '1';
+    const unitVal = PARAM_UNIT || defaultUnit;
+    const levelVal = PARAM_STAGE || PARAM_LEVEL || '1';
+    const problemType = PARAM_MODE === 'test' ? 'test' : 'practice';
+
+    const breadcrumb = document.getElementById('curriculum-breadcrumb');
+    if (breadcrumb) {
+      if (useGuestBreadcrumb) {
+        const guestPhase = PARAM_MODE === 'test' ? 'Prueba' : 'Pr\u00e1ctica';
+        breadcrumb.textContent = (curriculumLabelMap[PARAM_CURRICULUM] || PARAM_CURRICULUM) + ' \u00b7 Unidad ' + unitVal + ' \u00b7 Nivel ' + levelVal + ' \u00b7 ' + guestPhase;
+      } else {
+        const phaseLabel = PARAM_MODE === 'test' ? 'Test' : 'Practice';
+        breadcrumb.textContent = (curriculumLabelMap[PARAM_CURRICULUM] || PARAM_CURRICULUM) + ' \u00b7 Unit ' + unitVal + ' \u00b7 Level ' + levelVal + ' \u00b7 ' + phaseLabel;
+      }
+      breadcrumb.style.display = 'block';
+    }
+
+    problems = await fetchBankProblemsForLesson(PARAM_CURRICULUM, unitVal, levelVal, problemType);
+
+    if (problems.length === 0) {
+      document.getElementById('practice-screen').style.display = 'none';
+      const doneEl = document.getElementById('done-screen');
+      doneEl.style.display = 'block';
+      doneEl.querySelector('h2').textContent = useGuestBreadcrumb ? 'No hay problemas disponibles' : 'No problems found';
+      doneEl.querySelector('p').textContent  = useGuestBreadcrumb
+        ? 'No hay problemas de pr\u00e1ctica para este nivel a\u00fan.'
+        : 'There are no problems for this lesson yet.';
+      return;
+    }
+
+    loadProblem(0);
+  }
+
+  // ── Guest mode: load PAA practice problems without login ──
+  async function loadGuestProblems() {
+    // Initialise counter only on first ever visit
+    if (localStorage.getItem('nuvo_guest_count') === null) {
+      localStorage.setItem('nuvo_guest_count', '0');
+    }
+
+    const guestCount = parseInt(localStorage.getItem('nuvo_guest_count') || '0', 10);
+
+    // Guest used free practice quota — send to enrollment form
+    if (PARAM_MODE !== 'test' && guestCount >= 5) {
+      redirectGuestToEnrollment();
+      return;
+    }
+
+    await loadCurriculumProblemsFromBank(true);
+  }
+
+  function guestEnrollmentFormUrl() {
+    var curriculum = PARAM_CURRICULUM || 'PAA';
+    var lang = (typeof Lang !== 'undefined' && Lang.detect) ? Lang.detect() : 'es';
+    return 'trial.html?from=guest&curriculum=' + encodeURIComponent(curriculum) + '&lang=' + encodeURIComponent(lang);
+  }
+
+  function redirectGuestToEnrollment() {
+    window.location.replace(guestEnrollmentFormUrl());
+  }
+
+  // ── Navigate back to curriculum home ──
+  function backToCurriculum() {
+    window.location.href = 'home.html';
+  }
+
+  // ── Copy link ──
+  async function copyLink() {
+    try {
+      await navigator.clipboard.writeText(generatedLink);
+      showCopyToast();
+    } catch (e) {
+      const ta = document.createElement('textarea');
+      ta.value = generatedLink;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showCopyToast();
+    }
+  }
+
+  function showCopyToast() {
+    const toast = document.getElementById('copy-toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  }
+
+  function previewAsStudent() {
+    window.location.href = generatedLink;
+    window.location.reload();
+  }
+
+  // ── Load a problem (student) ──
+  function loadProblem(index) {
+    currentIndex = index;
+    stepHistory = [];
+    wrongCount = 0;
+    formCheckAttempts = 0;
+    guestProblemAttempted = false;
+
+    const p = problems[index];
+    const typeStr = p.type ? ` · ${p.type}` : '';
+    document.getElementById('problem-label').textContent = `Problem ${index + 1} of ${problems.length}${typeStr}`;
+    document.getElementById('problem-text').innerHTML = renderMath(p.question);
+    document.getElementById('steps-container').innerHTML = '';
+    document.getElementById('feedback').className = 'feedback';
+    document.getElementById('feedback').textContent = '';
+    document.getElementById('feedback').style.display = 'none';
+    document.getElementById('completed-card').style.display = 'none';
+    document.getElementById('next-problem-btn').style.display = 'none';
+    document.getElementById('input-area').style.display = 'flex';
+    studentCalc.clear();
+    studentCalc.closePanels();
+    document.getElementById('calc-grid').classList.remove('disabled');
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const total = problems.length;
+    const current = currentIndex + 1;
+    document.getElementById('progress-text').textContent = `${current} / ${total}`;
+    document.getElementById('progress-fill').style.width = `${(current / total) * 100}%`;
+  }
+
+  // ── Submit step (student) ──
+  async function submitStep() {
+    const input = document.getElementById('step-input').value.trim();
+    if (!input) return;
+
+    if (PARAM_GUEST && PARAM_MODE !== 'test' && !guestProblemAttempted) {
+      guestProblemAttempted = true;
+      const c = parseInt(localStorage.getItem('nuvo_guest_count') || '0', 10);
+      localStorage.setItem('nuvo_guest_count', String(c + 1));
+    }
+
+    document.getElementById('calc-grid').classList.add('disabled');
+    document.getElementById('feedback').style.display = 'none';
+
+    const problem = problems[currentIndex];
+
+    // ── Translate: single-step, Algebrite.compare + Claude fallback, no form check ──
+    if (problem.type === 'Translate') {
+      await submitTranslate(input, problem);
+      return;
+    }
+
+    const previousExpression = (problem.type === 'Evaluate' || problem.type === 'Rearrange')
+      ? problem.answer
+      : stepHistory.length > 0
+        ? stepHistory[stepHistory.length - 1]
+        : extractExpression(problem.question);
+
+    const t0 = performance.now();
+    console.log('[submitStep] entry', { input, problemType: problem.type, previousExpression });
+    console.log('[submitStep] normalized input:', JSON.stringify(normalize(input)));
+
+    let equiv;
+    if (input.includes(',')) {
+      console.log('[submitStep] comma answer — skipping step check, treating as final answer');
+      equiv = checkIsFinal(input, problem.answer, problem.type);
+      console.log(`[submitStep] checkIsFinal (comma shortcut) in ${(performance.now()-t0).toFixed(1)}ms:`, equiv);
+    } else {
+      equiv = checkEquivalence(previousExpression, input, problem.type);
+      console.log(`[submitStep] checkEquivalence result in ${(performance.now()-t0).toFixed(1)}ms:`, equiv);
+
+      if (equiv.valid === null) {
+        showLoading('Interpreting your input...');
+        console.log('[submitStep] asking Claude to interpret input...');
+        const tI = performance.now();
+        const interpreted = await askClaudeToInterpret(input);
+        console.log(`[submitStep] Claude interpret returned in ${(performance.now()-tI).toFixed(1)}ms:`, interpreted);
+        hideLoading();
+        if (interpreted) equiv = checkEquivalence(previousExpression, interpreted, problem.type);
+        if (equiv.valid === null) {
+          showFeedback('unsure', "I couldn't understand your answer. Try rewriting it using the math buttons.");
+          reenableInput();
+          return;
+        }
+      }
+    }
+
+    if (equiv.valid === true) {
+      wrongCount = 0;
+      stepHistory.push(input);
+      addStepToHistory(input);
+      logStep(input, true);
+      document.getElementById('feedback').style.display = 'none';
+
+      const isFinal = checkIsFinal(input, problem.answer, problem.type);
+      console.log('[submitStep] checkIsFinal:', isFinal);
+      if (isFinal.valid === true) {
+        if (input.includes(',')) {
+          console.log('[submitStep] comma answer — skipping form check, marking complete');
+          markProblemComplete();
+          document.getElementById('input-area').style.display = 'none';
+          document.getElementById('completed-card').style.display = 'block';
+          document.getElementById('next-problem-btn').style.display = 'block';
+          document.getElementById('next-problem-btn').textContent =
+            currentIndex < problems.length - 1 ? 'Next Problem →' : 'Finish ✓';
+        } else {
+          const useRawMatch = !(problem.modules?.includes('formCheck'));
+          let formMatches, formFeedback;
+          if (useRawMatch) {
+            const rawA = canonicalFormForCheck(input);
+            const rawB = canonicalFormForCheck(problem.answer);
+            formMatches = rawA === rawB;
+            formFeedback = null;
+            console.log('[submitStep] canonical form match:', formMatches, { rawA, rawB });
+          } else {
+            showLoading('Checking answer form...');
+            console.log('[submitStep] calling askClaudeFormCheck...');
+            const tF = performance.now();
+            const formCheck = await askClaudeFormCheck(input, problem.answer, problem.type);
+            console.log(`[submitStep] askClaudeFormCheck returned in ${(performance.now()-tF).toFixed(1)}ms:`, formCheck);
+            hideLoading();
+            if (formCheck === null) {
+              askRonelProblems.push(problem.question);
+              showFeedback('unsure', "I couldn't verify your answer right now — save this one for Ronel to check.");
+              studentCalc.clear();
+              reenableInput();
+              return;
+            }
+            formMatches = formCheck.match === true;
+            formFeedback = formCheck.feedback;
+          }
+
+          if (formMatches) {
+            console.log('[submitStep] problem complete — updating DOM');
+            markProblemComplete();
+            document.getElementById('input-area').style.display = 'none';
+            document.getElementById('completed-card').style.display = 'block';
+            document.getElementById('next-problem-btn').style.display = 'block';
+            document.getElementById('next-problem-btn').textContent =
+              currentIndex < problems.length - 1 ? 'Next Problem →' : 'Finish ✓';
+          } else {
+            formCheckAttempts++;
+            showFeedback('nudge', formFeedback || 'Correct value, but try to simplify or factor further!');
+            studentCalc.clear();
+            reenableInput();
+          }
+        }
+      } else {
+        studentCalc.clear();
+        reenableInput();
+      }
+    } else {
+      wrongCount++;
+      logStep(input, false);
+      studentCalc.clear();
+
+      if (wrongCount >= 4) {
+        showLoading('Getting help...');
+        console.log('[submitStep] calling askClaudeForReveal...');
+        const tR = performance.now();
+        const nextStep = await askClaudeForReveal(problem, stepHistory, previousExpression);
+        console.log(`[submitStep] askClaudeForReveal returned in ${(performance.now()-tR).toFixed(1)}ms:`, nextStep);
+        hideLoading();
+        showFeedback('reveal', nextStep
+          ? `Here's a valid next step: ${nextStep}`
+          : "That step doesn't look right. Keep trying!");
+      } else if (wrongCount >= 2) {
+        showLoading('Getting a hint...');
+        console.log('[submitStep] calling askClaudeForHint...');
+        const tH = performance.now();
+        const hint = await askClaudeForHint(problem, stepHistory, previousExpression, input);
+        console.log(`[submitStep] askClaudeForHint returned in ${(performance.now()-tH).toFixed(1)}ms:`, hint);
+        hideLoading();
+        showFeedback('nudge', hint || "That step doesn't look right. Try again!");
+      } else {
+        showFeedback('wrong', "That step doesn't look right. Try again!");
+      }
+      reenableInput();
+    }
+    console.log(`[submitStep] total time: ${(performance.now()-t0).toFixed(1)}ms`);
+  }
+
+  // ── Student calculator input ──
+  // ── UI helpers ──
+  function addStepToHistory(text) {
+    const container = document.getElementById('steps-container');
+    const div = document.createElement('div');
+    div.className = 'step-entry correct';
+    div.innerHTML = `<span class="step-icon">✓</span><span class="step-text">${renderMath(text)}</span>`;
+    container.appendChild(div);
+  }
+
+  function showFeedback(type, message) {
+    const fb = document.getElementById('feedback');
+    fb.className = `feedback ${type}`;
+    fb.textContent = message;
+    fb.style.display = 'block';
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  // ── Render math expression as HTML with stacked fractions and superscripts ──
+  function renderMath(text) {
+    let s = escapeHtml(text);
+
+    // Unicode superscripts → <sup>
+    s = s.replace(/²/g, '<sup>2</sup>');
+    s = s.replace(/³/g, '<sup>3</sup>');
+    s = s.replace(/⁴/g, '<sup>4</sup>');
+    s = s.replace(/⁵/g, '<sup>5</sup>');
+    s = s.replace(/⁶/g, '<sup>6</sup>');
+    s = s.replace(/⁷/g, '<sup>7</sup>');
+    s = s.replace(/⁸/g, '<sup>8</sup>');
+    s = s.replace(/⁹/g, '<sup>9</sup>');
+    // ^N notation
+    s = s.replace(/\^(\d+)/g, '<sup>$1</sup>');
+
+    // Stacked fractions — applied in specificity order so parens are respected
+    // (A)/(B)
+    s = s.replace(/\(([^()]*)\)\/\(([^()]*)\)/g, (_, n, d) =>
+      `<span class="math-frac"><span class="math-num">${n}</span><span class="math-den">${d}</span></span>`
+    );
+    // (A)/B  — parenthesized numerator, simple denominator
+    s = s.replace(/\(([^()]*)\)\/([\w]+)/g, (_, n, d) =>
+      `<span class="math-frac"><span class="math-num">${n}</span><span class="math-den">${d}</span></span>`
+    );
+    // A/(B)  — simple numerator, parenthesized denominator
+    s = s.replace(/([\w]+)\/\(([^()]*)\)/g, (_, n, d) =>
+      `<span class="math-frac"><span class="math-num">${n}</span><span class="math-den">${d}</span></span>`
+    );
+    // A/B  — both sides are plain word-char tokens with no surrounding spaces
+    // (e.g. 1/2, x/y typed without spaces).  The ÷ button inserts " / " with
+    // spaces so it intentionally doesn't match here.
+    s = s.replace(/([\w]+)\/([\w]+)/g, (_, n, d) =>
+      `<span class="math-frac"><span class="math-num">${n}</span><span class="math-den">${d}</span></span>`
+    );
+
+    return s;
+  }
+
+  // ── Canonical form for raw form-check comparison ──
+  // Normalises variable order within additive terms so that commutativity of
+  // addition doesn't cause false "wrong form" nudges.
+  function canonicalFormForCheck(expr) {
+    let s = normalize(expr).replace(/\s/g, '').toLowerCase();
+    // Strip redundant parentheses around a single atom: (3) → 3, (x) → x
+    let prev;
+    do {
+      prev = s;
+      s = s.replace(/\(([a-z0-9]+)\)/g, '$1');
+    } while (s !== prev);
+    // Sort single-variable additive terms within parenthesised groups.
+    // Only applies when the group contains purely letters, digits and '+' (no
+    // '*', '-', '/') so that compound or subtraction terms are left alone.
+    s = s.replace(/\(([^()]+)\)/g, function (match, inner) {
+      if (inner.includes('+') && /^[a-z0-9+]+$/.test(inner)) {
+        const terms = inner.split('+').sort();
+        return '(' + terms.join('+') + ')';
+      }
+      return match;
+    });
+    return s;
+  }
+
+  function nextProblem() {
+    if (PARAM_GUEST && PARAM_MODE !== 'test') {
+      const count = parseInt(localStorage.getItem('nuvo_guest_count') || '0', 10);
+      if (count >= 5) {
+        redirectGuestToEnrollment();
+        return;
+      }
+    }
+    if (currentIndex < problems.length - 1) {
+      loadProblem(currentIndex + 1);
+      return;
+    }
+    if (PARAM_RETURN_TO) {
+      window.location.href = PARAM_RETURN_TO;
+      return;
+    }
+    if (PARAM_GUEST) {
+      if (PARAM_MODE === 'test') {
+        window.location.href = 'lesson.html?curriculum=PAA&unit=aritmetica&stage=1&guest=true&phase=complete';
+      } else {
+        redirectGuestToEnrollment();
+      }
+      return;
+    }
+    if (PARAM_CURRICULUM && PARAM_UNIT && PARAM_STAGE) {
+      // Curriculum flow (no lesson return URL): show done screen with back-to-curriculum button
+      document.getElementById('practice-screen').style.display = 'none';
+      document.getElementById('done-screen').style.display = 'block';
+      const backBtn = document.getElementById('back-to-curriculum-btn');
+      if (backBtn) backBtn.style.display = 'block';
+      return;
+    }
+    window.location.href = 'home.html';
+  }
+
+  // Enter key submits on student screen
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && document.getElementById('practice-screen').style.display !== 'none') {
+      if (!document.getElementById('calc-grid').classList.contains('disabled')) submitStep();
+    }
+  });
+
+  // ── Attach calculators ──
+  const setupCalc   = attachCalculator(null, document.getElementById('setup-calc-wrapper'));
+  const studentCalc = attachCalculator(
+    document.getElementById('step-input'),
+    document.getElementById('calc-grid'),
+    { onSubmit: submitStep }
+  );
+
+  // ── Live math preview (shows stacked fractions as student types) ──
+  (function () {
+    const input   = document.getElementById('step-input');
+    const preview = document.getElementById('step-preview');
+    input.addEventListener('input', function () {
+      const val = input.value.trim();
+      if (!val) {
+        preview.classList.remove('visible');
+        preview.innerHTML = '';
+      } else {
+        const rendered = renderMath(val);
+        // Only show the preview when fractions are present (otherwise plain text
+        // is already visible in the input field — no need for a duplicate).
+        const hasFrac = rendered.includes('math-frac') || rendered.includes('<sup>');
+        if (hasFrac) {
+          preview.innerHTML = rendered;
+          preview.classList.add('visible');
+        } else {
+          preview.classList.remove('visible');
+          preview.innerHTML = '';
+        }
+      }
+    });
+  }());
+
+  // ── Trial status check ──
+  async function checkTrialStatus() {
+    if (PARAM_GUEST) return;
+    if (!STUDENT_ID) return;
+    try {
+      const res = await fetch(`${PROXY_URL}/student/${encodeURIComponent(STUDENT_ID)}`);
+      if (!res.ok) return;
+      const student = await res.json();
+      if (!student.trialExpiry) return;
+
+      // Compare as YYYY-MM-DD strings to avoid timezone issues
+      const today = new Date();
+      const todayStr = today.getFullYear() + '-' +
+        String(today.getMonth() + 1).padStart(2, '0') + '-' +
+        String(today.getDate()).padStart(2, '0');
+
+      if (todayStr > student.trialExpiry) {
+        // Expired — hide all screens, show overlay
+        ['setup-screen', 'link-screen', 'practice-screen', 'done-screen'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.style.display = 'none';
+        });
+        const lang = Lang.detect();
+        document.getElementById('expired-practice-btn').href =
+          'trial.html?from=access_ended&lang=' + encodeURIComponent(lang);
+        document.getElementById('trial-expired').style.display = 'block';
+        Lang.apply();
+      } else {
+        // Active — compute days remaining and show banner
+        const expiry = new Date(student.trialExpiry + 'T00:00:00');
+        const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const daysLeft = Math.round((expiry - todayMidnight) / (1000 * 60 * 60 * 24));
+        const dayWord = daysLeft === 1 ? Lang.t('trial_day_singular') : Lang.t('trial_day_plural');
+        const enrollHref = 'trial.html?from=access_reminder&lang=' + encodeURIComponent(Lang.detect());
+        const banner = document.getElementById('trial-banner');
+        banner.innerHTML = Lang.t('trial_banner_active_prefix') +
+          ' <strong>' + daysLeft + ' ' + dayWord + '</strong> ' +
+          Lang.t('trial_banner_active_mid') +
+          ' <a href="' + enrollHref + '">' + Lang.t('trial_banner_active_link') + '</a>';
+        banner.style.display = 'block';
+      }
+    } catch {
+      // Silently ignore — never block the practice tool
+    }
+  }
+
+  // ── Boot ──
+  Lang.apply();
+  init();
+  checkTrialStatus();
+</script>
+
+</body>
+</html>

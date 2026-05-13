@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Curriculum — Nuvo Math</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green:        #2D6A4F;
+      --green-dark:   #1A5C45;
+      --green-light:  #D8F3DC;
+      --green-bg:     #F0FAF3;
+      --blue:         #2563EB;
+      --blue-dark:    #1E40AF;
+      --blue-light:   #DBEAFE;
+      --blue-xlight:  #EFF6FF;
+      --text:         #111827;
+      --text-mid:     #374151;
+      --text-muted:   #6B7280;
+      --border:       #E5E7EB;
+      --bg:           #F9FAFB;
+      --white:        #FFFFFF;
+      --radius:       12px;
+      --radius-lg:    20px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .nav-logo {
+      font-weight: 800;
+      font-size: 1.2rem;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.03em;
+      flex-shrink: 0;
+    }
+
+    .nav-logo span { color: var(--green); }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .nav-student {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-mid);
+    }
+
+    .nav-signout {
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .nav-signout:hover { color: var(--text); }
+
+    /* ── Main ── */
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    /* ── Welcome ── */
+    .welcome-section {
+      margin-bottom: 36px;
+    }
+
+    .welcome-heading {
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 10px;
+    }
+
+    .curriculum-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--green-bg);
+      color: var(--green-dark);
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 5px 14px;
+      border-radius: 20px;
+    }
+
+    /* ── Section heading ── */
+    .section-heading {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 20px;
+      letter-spacing: -0.01em;
+    }
+
+    .guest-banner {
+      display: none;
+      margin-bottom: 18px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1.5px solid var(--blue-light);
+      background: var(--blue-xlight);
+      color: var(--blue-dark);
+      font-size: 0.86rem;
+      font-weight: 600;
+      line-height: 1.45;
+    }
+
+    /* ── Units grid ── */
+    .units-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 16px;
+      margin-bottom: 52px;
+    }
+
+    /* ── Unit card ── */
+    .unit-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 22px 24px 20px;
+      transition: box-shadow 0.15s;
+    }
+
+    .unit-card:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
+    }
+
+    .unit-card.guest-locked {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .unit-card-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .unit-number-badge {
+      font-size: 0.68rem;
+      font-weight: 800;
+      color: var(--green);
+      background: var(--green-bg);
+      padding: 3px 9px;
+      border-radius: 6px;
+      flex-shrink: 0;
+      margin-top: 3px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .unit-name {
+      font-size: 0.96rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      line-height: 1.35;
+      color: var(--text);
+    }
+
+    /* ── Level pills ── */
+    .level-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .level-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 13px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: opacity 0.15s, transform 0.1s;
+      white-space: nowrap;
+      cursor: default;
+      user-select: none;
+    }
+
+    /* Completed */
+    .level-pill.complete {
+      background: var(--green);
+      color: #fff;
+    }
+
+    /* Available (current / unlocked) */
+    .level-pill.available {
+      background: var(--blue);
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .level-pill.available:hover {
+      opacity: 0.88;
+      transform: translateY(-1px);
+    }
+
+    /* Locked */
+    .level-pill.locked {
+      background: var(--bg);
+      color: var(--text-muted);
+      border: 1.5px solid var(--border);
+    }
+
+    /* ── Trial expired overlay ── */
+    #trial-expired {
+      display: none;
+      max-width: 540px;
+      margin: 80px auto;
+      text-align: center;
+      padding: 0 24px;
+    }
+
+    #trial-expired .expired-logo {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 28px;
+      letter-spacing: -0.02em;
+    }
+
+    #trial-expired h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      letter-spacing: -0.02em;
+    }
+
+    #trial-expired p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.55;
+      margin-bottom: 28px;
+    }
+
+    .expired-btn-row {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .expired-btn {
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: 1.5px solid var(--green);
+      transition: opacity 0.15s;
+    }
+
+    .expired-btn:hover { opacity: 0.85; }
+
+    .expired-btn-primary {
+      background: var(--green);
+      color: white;
+    }
+
+    .expired-btn-outline {
+      background: transparent;
+      color: var(--green);
+    }
+
+    .expired-note {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .expired-note a {
+      color: var(--text-muted);
+      text-decoration: underline;
+    }
+
+    /* ── Loading state ── */
+    #loading-state {
+      display: flex;
+      justify-content: center;
+      padding: 80px 24px;
+    }
+
+    .spinner-wrap {
+      text-align: center;
+    }
+
+    .spinner {
+      width: 28px;
+      height: 28px;
+      border: 3px solid var(--border);
+      border-top-color: var(--green);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto 14px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .spinner-wrap p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    /* ── Home footer ── */
+    .home-footer {
+      border-top: 1px solid var(--border);
+      padding-top: 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      text-align: center;
+    }
+
+    .help-link {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--green);
+      text-decoration: none;
+    }
+
+    .help-link:hover { text-decoration: underline; }
+
+    .session-note {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      main { padding: 32px 16px 60px; }
+      .units-grid { grid-template-columns: 1fr; }
+      .nav-student { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════ NAV ════════ -->
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">Nuvo <span>Math</span></a>
+    <div class="nav-right">
+      <span class="nav-student" id="nav-student-name"></span>
+      <a href="#" class="nav-signout" id="signout-btn" data-i18n="nav_signout">Sign out</a>
+    </div>
+  </div>
+</nav>
+
+
+<!-- ════════ TRIAL EXPIRED ════════ -->
+<div id="trial-expired">
+  <div class="expired-logo">Nuvo Math</div>
+  <h2 data-i18n="trial_expired_heading">Your access has ended</h2>
+  <p data-i18n="trial_expired_body">Submit the enrollment form to choose a plan and arrange payment.</p>
+  <div class="expired-btn-row">
+    <a id="expired-practice-btn" href="#" class="expired-btn expired-btn-outline" data-i18n="trial_practice_btn">Enrollment form →</a>
+    <a href="https://wa.me/5076014-1676" target="_blank" class="expired-btn expired-btn-primary" data-i18n="trial_tutoring_btn">WhatsApp us →</a>
+  </div>
+  <p class="expired-note" data-i18n="trial_expired_note">Questions? Email tutor@nuvostudio.club or WhatsApp 6014-1676.</p>
+</div>
+
+
+<!-- ════════ LOADING ════════ -->
+<div id="loading-state">
+  <div class="spinner-wrap">
+    <div class="spinner"></div>
+    <p data-i18n="curriculum_loading">Loading your curriculum…</p>
+  </div>
+</div>
+
+
+<!-- ════════ HOME CONTENT ════════ -->
+<main id="home-content" style="display:none;">
+  <div class="guest-banner" id="guest-banner"></div>
+  <div class="welcome-section">
+    <h1 class="welcome-heading"><span data-i18n="welcome_back">Welcome back,</span> <span id="student-name">there</span></h1>
+    <span class="curriculum-badge" id="curriculum-badge">&#x1F4D0; Loading&hellip;</span>
+  </div>
+
+  <h2 class="section-heading" data-i18n="section_your_curriculum">Your curriculum</h2>
+  <div class="units-grid" id="units-grid"></div>
+
+  <div class="home-footer">
+    <a href="https://wa.me/5076014-1676" target="_blank" class="help-link" data-i18n="home_help_link">Need help? Ask Ronel</a>
+    <p class="session-note" data-i18n="home_session_note">Your next session: check WhatsApp for scheduling</p>
+  </div>
+</main>
+
+
+<script src="lang.js?v=20260513-guest-trial-flow"></script>
+<script>
+  const WORKER = 'https://math-practice-proxy.ronelalmanza20.workers.dev';
+  const URL_PARAMS = new URLSearchParams(window.location.search);
+  const PARAM_GUEST = URL_PARAMS.get('guest') === 'true';
+  const PARAM_CURRICULUM = URL_PARAMS.get('curriculum') || '';
+
+  Lang.apply();
+
+  const UNIT_NAMES = {
+    1: 'Algebraic Foundations',
+    2: 'Expanding & Simplifying',
+    3: 'Factorising',
+    4: 'Linear Equations & Inequalities',
+    5: 'Formulae & Rearranging',
+    6: 'Sequences',
+    7: 'Simultaneous Equations',
+    8: 'Linear Functions & Graphs',
+  };
+
+  const LEVELS = [1, 2, 3, 4];
+
+  function isGuestMode() {
+    return PARAM_GUEST && !!PARAM_CURRICULUM;
+  }
+
+  // ── Sign out ──
+  document.getElementById('signout-btn').addEventListener('click', (e) => {
+    if (isGuestMode()) {
+      return;
+    }
+    e.preventDefault();
+    localStorage.removeItem('studentId');
+    window.location.href = 'login.html';
+  });
+
+  // ── Curriculum display label ──
+  function curriculumLabel(curriculum, grade) {
+    if (curriculum === 'PAA') return Lang.t('paa_curriculum_label');
+    const names = {
+      cambridge:     'Cambridge',
+      'common-core': 'Common Core',
+      'ib-myp':      'IB MYP',
+      general:       'General',
+    };
+    const prefix = names[curriculum] || curriculum;
+    if (curriculum === 'cambridge') return `${prefix} Stage ${grade}`;
+    if (curriculum === 'ib-myp')    return `${prefix} Year ${grade}`;
+    return `${prefix} Grade ${grade}`;
+  }
+
+  // ── Cross-unit prerequisite check ──
+  function crossUnitPrereqMet(unitNum, levelNum, progress) {
+    if (unitNum === 2) return (progress['1'] || {})[String(levelNum)] === 'complete';
+    if (unitNum === 3) return (progress['2'] || {})[String(levelNum)] === 'complete';
+    if (unitNum === 7) return (progress['4'] || {})[String(levelNum)] === 'complete';
+    if (unitNum === 8) return (progress['4'] || {})[String(levelNum)] === 'complete';
+    return true;
+  }
+
+  // ── Check if a level is unlocked ──
+  function isUnlocked(unitNum, levelNum, progress) {
+    // Level 1: only cross-unit prerequisite applies (no prior level needed)
+    if (levelNum === 1) return crossUnitPrereqMet(unitNum, levelNum, progress);
+
+    // Level N>1: prior level must be complete AND cross-unit prereq met
+    const prevComplete = (progress[String(unitNum)] || {})[String(levelNum - 1)] === 'complete';
+    if (!prevComplete) return false;
+    return crossUnitPrereqMet(unitNum, levelNum, progress);
+  }
+
+  // ── Determine display state for a level pill ──
+  // Returns: 'complete' | 'available' | 'locked'
+  function getLevelState(unitNum, levelNum, progress, hasProgress) {
+    if (!hasProgress) {
+      // Default: only Unit 1 Level 1 is available
+      return (unitNum === 1 && levelNum === 1) ? 'available' : 'locked';
+    }
+
+    const unitProg = progress[String(unitNum)] || {};
+    const status   = unitProg[String(levelNum)];
+
+    if (status === 'complete') return 'complete';
+    if (status === 'current')  return 'available';
+
+    // Not explicitly in progress — apply unlock logic
+    return isUnlocked(unitNum, levelNum, progress) ? 'available' : 'locked';
+  }
+
+  // ── Build lesson URL ──
+  function lessonUrl(curriculum, unitNum, levelNum, studentId) {
+    let url = `lesson.html?curriculum=${encodeURIComponent(curriculum)}&unit=${encodeURIComponent(unitNum)}&stage=${encodeURIComponent(levelNum)}`;
+    if (studentId) url += `&student=${encodeURIComponent(studentId)}`;
+    return url;
+  }
+
+  // ── PAA unlock logic (3-level, single unit) ──
+  function getPAALevelState(levelNum, unitKey, progress) {
+    if (levelNum === 1) return 'available';  // always unlocked
+    const prevStatus = (progress[unitKey] || {})[String(levelNum - 1)];
+    if (prevStatus === 'complete') return 'available';
+    if (prevStatus === 'current')  return 'available';
+    return 'locked';
+  }
+
+  // ── Render PAA curriculum (Aritmética · 3 levels) ──
+  function renderPAACurriculum(student, studentId) {
+    const progress = student.progress || {};
+    const grid = document.getElementById('units-grid');
+    grid.innerHTML = '';
+
+    const unitKey  = 'aritmetica';
+    const unitName = Lang.t('paa_unit_aritmetica');
+    const card = document.createElement('div');
+    card.className = 'unit-card';
+
+    const pillsHtml = [1, 2, 3].map(function(l) {
+      const aritState = (progress[unitKey] || {})[String(l)];
+      let state;
+      if (aritState === 'complete') {
+        state = 'complete';
+      } else if (aritState === 'current') {
+        state = 'available';
+      } else {
+        state = getPAALevelState(l, unitKey, progress);
+      }
+      const label = Lang.t('level_label') + ' ' + l;
+      if (state === 'complete') {
+        return '<span class="level-pill complete">&#x2713; ' + label + '</span>';
+      }
+      if (state === 'available') {
+        const url = 'lesson.html?curriculum=PAA&unit=' + encodeURIComponent(unitKey) +
+                    '&stage=' + l + (studentId ? '&student=' + encodeURIComponent(studentId) : '');
+        return '<a href="' + url + '" class="level-pill available">' + label + '</a>';
+      }
+      return '<span class="level-pill locked">&#x1F512; ' + label + '</span>';
+    }).join('');
+
+    card.innerHTML =
+      '<div class="unit-card-header">' +
+        '<span class="unit-number-badge">' + Lang.t('unit_label') + ' 1</span>' +
+        '<span class="unit-name">' + unitName + '</span>' +
+      '</div>' +
+      '<div class="level-pills">' + pillsHtml + '</div>';
+
+    grid.appendChild(card);
+  }
+
+  // ── Render the unit cards ──
+  function renderCurriculum(student, studentId) {
+    if (student.curriculum === 'PAA') {
+      renderPAACurriculum(student, studentId);
+      return;
+    }
+
+    const progress   = (student.progress && Object.keys(student.progress).length > 0)
+      ? student.progress
+      : null;
+    const hasProgress = !!progress;
+    const curriculum  = student.curriculum || 'cambridge';
+
+    const grid = document.getElementById('units-grid');
+    grid.innerHTML = '';
+
+    for (let u = 1; u <= 8; u++) {
+      const card = document.createElement('div');
+      card.className = 'unit-card';
+
+      const pillsHtml = LEVELS.map(l => {
+        const state = getLevelState(u, l, progress || {}, hasProgress);
+        const label = `${Lang.t('level_label')} ${l}`;
+
+        if (state === 'complete') {
+          return `<span class="level-pill complete">&#x2713; ${label}</span>`;
+        }
+        if (state === 'available') {
+          const url = lessonUrl(curriculum, u, l, studentId);
+          return `<a href="${url}" class="level-pill available">${label}</a>`;
+        }
+        // locked
+        return `<span class="level-pill locked">&#x1F512; ${label}</span>`;
+      }).join('');
+
+      card.innerHTML = `
+        <div class="unit-card-header">
+          <span class="unit-number-badge">${Lang.t('unit_label')} ${u}</span>
+          <span class="unit-name">${UNIT_NAMES[u]}</span>
+        </div>
+        <div class="level-pills">${pillsHtml}</div>
+      `;
+
+      grid.appendChild(card);
+    }
+  }
+
+  function renderGuestPAAHome() {
+    const badge = document.getElementById('curriculum-badge');
+    const guestBanner = document.getElementById('guest-banner');
+    const studentName = document.getElementById('student-name');
+    const navName = document.getElementById('nav-student-name');
+    const grid = document.getElementById('units-grid');
+    const heading = document.querySelector('.section-heading');
+    const signoutBtn = document.getElementById('signout-btn');
+
+    document.title = Lang.t('guest_paa_home_title');
+    studentName.textContent = Lang.t('guest_paa_home_header_title');
+    navName.textContent = '';
+    badge.innerHTML = `&#x1F4D0; ${Lang.t('paa_curriculum_label')}`;
+    heading.textContent = Lang.t('guest_paa_home_subtitle');
+    signoutBtn.textContent = Lang.t('guest_login_cta');
+    signoutBtn.href = 'login.html?curriculum=PAA';
+
+    guestBanner.style.display = 'block';
+    guestBanner.textContent = Lang.t('guest_paa_trial_banner');
+
+    const cards = [
+      {
+        number: '1',
+        title: Lang.t('guest_unit_arit_title'),
+        desc: Lang.t('guest_unit_arit_desc'),
+        status: Lang.t('guest_unit_available'),
+        href: 'lesson.html?curriculum=PAA&unit=aritmetica&level=1&guest=true',
+        locked: false
+      },
+      {
+        number: '2',
+        title: Lang.t('guest_unit_algebra_title'),
+        desc: Lang.t('guest_unit_algebra_desc'),
+        status: Lang.t('guest_unit_locked'),
+        locked: true
+      },
+      {
+        number: '3',
+        title: Lang.t('guest_unit_geo_title'),
+        desc: Lang.t('guest_unit_geo_desc'),
+        status: Lang.t('guest_unit_locked'),
+        locked: true
+      },
+      {
+        number: '4',
+        title: Lang.t('guest_unit_data_title'),
+        desc: Lang.t('guest_unit_data_desc'),
+        status: Lang.t('guest_unit_locked'),
+        locked: true
+      }
+    ];
+
+    grid.innerHTML = cards.map((card) => {
+      const cardClass = card.locked ? 'unit-card guest-locked' : 'unit-card';
+      const statusClass = card.locked ? 'level-pill locked' : 'level-pill available';
+      const statusPill = `<span class="${statusClass}">${card.locked ? '&#x1F512; ' : ''}${card.status}</span>`;
+      const levelsPill = `<span class="level-pill complete">${Lang.t('level_label')} 1-3</span>`;
+      const cardBody = `
+        <div class="unit-card-header">
+          <span class="unit-number-badge">${Lang.t('unit_label')} ${card.number}</span>
+          <span class="unit-name">${card.title}</span>
+        </div>
+        <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:14px;line-height:1.5;">${card.desc}</p>
+        <div class="level-pills" style="margin-bottom:8px;">${levelsPill}</div>
+        <div class="level-pills">${statusPill}</div>
+      `;
+      if (card.locked) return `<div class="${cardClass}">${cardBody}</div>`;
+      return `<a href="${card.href}" class="${cardClass}" style="display:block;text-decoration:none;color:inherit;">${cardBody}</a>`;
+    }).join('');
+  }
+
+  function renderGuestSecondaryHome() {
+    const badge = document.getElementById('curriculum-badge');
+    const guestBanner = document.getElementById('guest-banner');
+    const studentName = document.getElementById('student-name');
+    const navName = document.getElementById('nav-student-name');
+    const grid = document.getElementById('units-grid');
+    const heading = document.querySelector('.section-heading');
+    const signoutBtn = document.getElementById('signout-btn');
+
+    document.title = Lang.t('guest_secondary_home_title');
+    studentName.textContent = Lang.t('guest_secondary_home_header_title');
+    navName.textContent = '';
+    badge.innerHTML = `&#x1F4D0; ${Lang.t('guest_secondary_badge')}`;
+    heading.textContent = Lang.t('guest_secondary_home_subtitle');
+    signoutBtn.textContent = Lang.t('guest_login_cta');
+    signoutBtn.href = 'login.html?curriculum=cambridge';
+
+    guestBanner.style.display = 'block';
+    guestBanner.textContent = Lang.t('guest_secondary_trial_banner');
+
+    const cards = [1,2,3,4,5,6,7,8].map(function (u) {
+      const locked = u !== 1;
+      return {
+        number: String(u),
+        title: UNIT_NAMES[u],
+        desc: Lang.t('guest_secondary_unit_desc_generic'),
+        status: locked ? Lang.t('guest_unit_locked') : Lang.t('guest_unit_available'),
+        href: 'lesson.html?curriculum=cambridge&unit=' + u + '&level=1&guest=true',
+        locked: locked
+      };
+    });
+
+    grid.innerHTML = cards.map((card) => {
+      const cardClass = card.locked ? 'unit-card guest-locked' : 'unit-card';
+      const statusClass = card.locked ? 'level-pill locked' : 'level-pill available';
+      const statusPill = `<span class="${statusClass}">${card.locked ? '&#x1F512; ' : ''}${card.status}</span>`;
+      const levelsPill = `<span class="level-pill complete">${Lang.t('level_label')} 1-4</span>`;
+      const cardBody = `
+        <div class="unit-card-header">
+          <span class="unit-number-badge">${Lang.t('unit_label')} ${card.number}</span>
+          <span class="unit-name">${card.title}</span>
+        </div>
+        <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:14px;line-height:1.5;">${card.desc}</p>
+        <div class="level-pills" style="margin-bottom:8px;">${levelsPill}</div>
+        <div class="level-pills">${statusPill}</div>
+      `;
+      if (card.locked) return `<div class="${cardClass}">${cardBody}</div>`;
+      return `<a href="${card.href}" class="${cardClass}" style="display:block;text-decoration:none;color:inherit;">${cardBody}</a>`;
+    }).join('');
+  }
+
+  // ── Trial expiry check ──
+  function checkTrialExpiry(student) {
+    if (!student.trialExpiry) return false;
+
+    const today = new Date();
+    const todayStr = today.getFullYear() + '-' +
+      String(today.getMonth() + 1).padStart(2, '0') + '-' +
+      String(today.getDate()).padStart(2, '0');
+
+    if (todayStr > student.trialExpiry) {
+      const lang = Lang.detect();
+      document.getElementById('expired-practice-btn').href =
+        'trial.html?from=access_ended&lang=' + encodeURIComponent(lang);
+      document.getElementById('trial-expired').style.display = 'block';
+      return true;
+    }
+    return false;
+  }
+
+  // ── Boot ──
+  async function init() {
+    if (isGuestMode()) {
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('home-content').style.display = 'block';
+      if (PARAM_CURRICULUM === 'PAA') {
+        renderGuestPAAHome();
+      } else {
+        renderGuestSecondaryHome();
+      }
+      return;
+    }
+
+    const studentId = localStorage.getItem('studentId');
+    if (!studentId) {
+      window.location.href = 'login.html';
+      return;
+    }
+
+    let student;
+    try {
+      const res = await fetch(`${WORKER}/student/${encodeURIComponent(studentId)}`);
+      if (!res.ok) {
+        // Student not found — clear localStorage and redirect to login
+        localStorage.removeItem('studentId');
+        window.location.href = 'login.html';
+        return;
+      }
+      student = await res.json();
+    } catch {
+      // Network error — still show something useful
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('home-content').style.display = 'block';
+      document.getElementById('student-name').textContent = studentId;
+      document.getElementById('nav-student-name').textContent = studentId;
+      document.getElementById('curriculum-badge').textContent = Lang.t('home_offline');
+      return;
+    }
+
+    document.getElementById('loading-state').style.display = 'none';
+
+    // Trial check
+    if (checkTrialExpiry(student)) return;
+
+    // Populate nav + welcome
+    const displayName = student.name || studentId;
+    document.getElementById('student-name').textContent = displayName;
+    document.getElementById('nav-student-name').textContent = displayName;
+
+    const badgeText = curriculumLabel(student.curriculum || 'cambridge', student.grade || '');
+    document.getElementById('curriculum-badge').innerHTML = `&#x1F4D0; ${badgeText}`;
+    document.title = `${displayName} — Nuvo Math`;
+
+    // Show content and render curriculum map
+    document.getElementById('home-content').style.display = 'block';
+    renderCurriculum(student, studentId);
+  }
+
+  init();
+</script>
+
+</body>
+</html>

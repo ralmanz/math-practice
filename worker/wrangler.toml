@@ -1,0 +1,9 @@
+name = "math-practice-proxy"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+
+[[kv_namespaces]]
+binding = "STUDENTS"
+id = "bd9a4b14857d4df993a2c065d0804b41"
+
+[vars]

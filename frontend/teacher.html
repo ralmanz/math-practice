@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nuvo Studio — Teacher</title>
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.json">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #FAFAF8;
+    --card: #FFFFFF;
+    --text: #1A1A1A;
+    --text-secondary: #6B6B6B;
+    --border: #E8E8E4;
+    --accent: #2D6A4F;
+    --accent-light: #D8F3DC;
+    --accent-bg: #F0FAF3;
+    --teal: #1D9E75;
+    --teal-light: #E6F7F2;
+    --wrong: #C1453B;
+    --wrong-bg: #FDE8E6;
+    --amber: #B45309;
+    --amber-bg: #FEF3C7;
+    --sans: 'DM Sans', sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 24px 16px 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .container { max-width: 1120px; width: 100%; }
+  .container-narrow { max-width: 400px; width: 100%; margin-top: 80px; text-align: center; }
+
+  /* Page header */
+  .page-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 22px; }
+  h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.02em; }
+  .subtitle { color: var(--text-secondary); font-size: 0.85rem; }
+
+  /* ── Tabs ── */
+  .tab-bar { display: flex; gap: 8px; margin-bottom: 22px; }
+
+  .tab-btn {
+    padding: 8px 20px;
+    border-radius: 99px;
+    font-family: var(--sans);
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    border: 2px solid var(--teal);
+    background: transparent;
+    color: var(--teal);
+  }
+  .tab-btn.active { background: var(--teal); color: #fff; }
+  .tab-btn:hover:not(.active) { background: var(--teal-light); }
+
+  /* ── Two-column grid ── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--card);
+    border: 0.5px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .card:last-child { margin-bottom: 0; }
+
+  .card-title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  /* Collapsible */
+  .card-title-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+    border-radius: 6px;
+    padding: 2px 4px;
+    margin: -2px -4px 10px;
+    transition: background 0.15s;
+  }
+  .card-title-toggle:hover { background: var(--accent-bg); }
+  .toggle-chevron { font-size: 0.8rem; transition: transform 0.2s ease; display: inline-block; }
+  .toggle-chevron.collapsed { transform: rotate(-90deg); }
+  .collapsible-body { overflow: hidden; max-height: 2000px; transition: max-height 0.3s ease; }
+  .collapsible-body.collapsed { max-height: 0; }
+
+  /* ── Student list rows ── */
+  .student-list { display: flex; flex-direction: column; gap: 5px; margin-bottom: 8px; }
+
+  .student-row {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 10px;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 9px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    user-select: none;
+  }
+  .student-row:hover { border-color: var(--teal); background: var(--teal-light); }
+  .student-row.active { border-color: var(--teal); background: var(--teal); color: #fff; }
+
+  .s-avatar {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--teal);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .student-row.active .s-avatar { background: rgba(255,255,255,0.25); }
+
+  .s-info { flex: 1; min-width: 0; }
+  .s-name-row { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+  .s-name { font-size: 0.87rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .badge {
+    font-size: 0.6rem; font-weight: 700;
+    padding: 2px 6px; border-radius: 99px;
+    text-transform: uppercase; letter-spacing: 0.03em;
+    flex-shrink: 0; white-space: nowrap;
+  }
+  .badge-curriculum { background: #EFF6FF; color: #1D4ED8; }
+  .badge-trial { background: var(--amber-bg); color: var(--amber); }
+  .student-row.active .badge-curriculum { background: rgba(255,255,255,0.2); color: rgba(255,255,255,0.9); }
+  .student-row.active .badge-trial { background: rgba(255,200,50,0.25); color: #ffe8a0; }
+
+  .s-progress { display: flex; align-items: center; flex-shrink: 0; }
+  .s-progress-track { width: 60px; height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .student-row.active .s-progress-track { background: rgba(255,255,255,0.3); }
+  .s-progress-fill { display: block; height: 100%; background: var(--teal); border-radius: 3px; }
+  .student-row.active .s-progress-fill { background: #fff; }
+
+  .btn-new-student {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    width: 100%; padding: 8px;
+    border: 1.5px dashed var(--border); border-radius: 9px;
+    background: transparent; cursor: pointer;
+    color: var(--teal); font-family: var(--sans); font-size: 0.87rem; font-weight: 600;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .btn-new-student:hover { background: var(--teal-light); border-color: var(--teal); }
+
+  /* ── Form fields ── */
+  .field { margin-bottom: 10px; }
+
+  label {
+    display: block;
+    font-size: 0.72rem; font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 3px;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+
+  input[type="text"], input[type="date"], input[type="password"], select {
+    width: 100%;
+    padding: 8px 11px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-family: var(--sans); font-size: 0.9rem;
+    background: var(--bg); color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  input[type="text"]:focus, input[type="date"]:focus, input[type="password"]:focus, select:focus {
+    border-color: var(--accent);
+  }
+  input[readonly] { background: #F2F2F0; color: var(--text-secondary); cursor: default; }
+  input[readonly]:focus { border-color: var(--border); }
+
+  select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B6B6B' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 11px center;
+    padding-right: 30px; cursor: pointer;
+  }
+
+  .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 8px 15px;
+    border: none; border-radius: 8px;
+    font-family: var(--sans); font-size: 0.87rem; font-weight: 600;
+    cursor: pointer; transition: opacity 0.15s;
+    white-space: nowrap;
+  }
+  .btn:hover { opacity: 0.85; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-primary { background: var(--teal); color: #fff; }
+  .btn-secondary { background: var(--border); color: var(--text); }
+  .btn-danger { background: var(--wrong-bg); color: var(--wrong); border: 1px solid #f0b0aa; }
+  .btn-ghost { background: transparent; border: 1.5px solid var(--border); color: var(--text); }
+  .btn-sm { padding: 5px 10px; font-size: 0.77rem; }
+  .btn-full { width: 100%; justify-content: center; }
+
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 12px; }
+
+  /* ── Profile readonly ── */
+  .profile-header {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .profile-fields { display: flex; flex-direction: column; gap: 8px; }
+  .pf-row { display: flex; flex-direction: column; gap: 1px; }
+  .pf-label { font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); }
+  .pf-value { font-size: 0.9rem; font-weight: 500; }
+  .pf-value.mono { font-family: var(--mono); font-size: 0.8rem; color: var(--text-secondary); }
+
+  /* ── Homework list ── */
+  .hw-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+  .hw-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 10px;
+    background: var(--bg); border: 1.5px solid var(--border); border-radius: 8px;
+  }
+  .hw-question {
+    flex: 1; min-width: 0;
+    font-family: var(--mono); font-size: 0.8rem;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .hw-tag {
+    font-size: 0.6rem; font-weight: 700;
+    padding: 2px 6px; border-radius: 99px;
+    text-transform: uppercase; letter-spacing: 0.03em;
+    flex-shrink: 0;
+  }
+  .hw-tag-practice   { background: var(--accent-bg); color: var(--accent); }
+  .hw-tag-diagnostic { background: #FFF7ED; color: #C2410C; }
+  .hw-tag-test       { background: #EFF6FF; color: #1D4ED8; }
+  .hw-tag-oneoff     { background: #F5F3FF; color: #6D28D9; }
+
+  hr { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
+
+  .assign-row { display: flex; gap: 7px; align-items: center; }
+  .assign-row input { flex: 1; min-width: 0; }
+
+  .link-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 9px 11px;
+    background: var(--accent-bg); border: 1px solid var(--accent-light);
+    border-radius: 8px; flex-wrap: wrap;
+    margin-top: 4px;
+  }
+  .link-label { font-size: 0.75rem; font-weight: 600; color: var(--accent); flex-shrink: 0; }
+  .link-url { flex: 1; font-family: var(--mono); font-size: 0.7rem; color: var(--accent); word-break: break-all; min-width: 0; }
+
+  /* ── Problem bank ── */
+  .filter-section { margin-bottom: 16px; }
+  .filter-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 7px; }
+  .filter-group-label {
+    font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.05em; color: var(--text-secondary);
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .filter-pill {
+    padding: 4px 11px; border-radius: 99px;
+    font-family: var(--sans); font-size: 0.77rem; font-weight: 600;
+    cursor: pointer;
+    border: 1.5px solid var(--border);
+    background: var(--card); color: var(--text-secondary);
+    transition: all 0.15s;
+  }
+  .filter-pill.active { background: var(--teal); border-color: var(--teal); color: #fff; }
+  .filter-pill:hover:not(.active) { border-color: var(--teal); color: var(--teal); }
+
+  .bank-list { display: flex; flex-direction: column; gap: 7px; }
+  .bank-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 11px;
+    background: var(--bg); border: 1.5px solid var(--border); border-radius: 8px;
+  }
+  .bank-item .prob-main { flex: 1; min-width: 0; }
+  .bank-q { font-family: var(--mono); font-size: 0.8rem; margin-bottom: 5px; word-break: break-word; }
+  .prob-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+  .prob-tag {
+    font-size: 0.6rem; font-weight: 700;
+    padding: 2px 6px; border-radius: 99px;
+    text-transform: uppercase; letter-spacing: 0.03em;
+  }
+  .prob-tag--curriculum { background: #EFF6FF; color: #1D4ED8; }
+  .prob-tag--unit       { background: #F5F3FF; color: #6D28D9; }
+  .prob-tag--level      { background: #ECFDF5; color: #065F46; }
+  .prob-tag--type       { background: #FFF7ED; color: #C2410C; }
+  .prob-tag--id         { background: #F3F4F6; color: #9CA3AF; font-family: var(--mono); }
+
+  /* Hints toggle */
+  .hints-toggle {
+    font-size: 0.82rem; font-weight: 600;
+    color: var(--accent); cursor: pointer; user-select: none;
+    display: inline-block; margin-bottom: 8px; padding: 2px 0;
+  }
+  .hints-body { display: none; }
+  .hints-body.open { display: block; }
+
+  /* Save success flash */
+  .save-flash {
+    font-size: 0.82rem; color: var(--accent);
+    background: var(--accent-bg); border-radius: 6px;
+    padding: 7px 12px; margin-top: 8px;
+    opacity: 0; transition: opacity 0.3s; pointer-events: none;
+  }
+  .save-flash.show { opacity: 1; }
+
+  /* ── Status / Toast ── */
+  .status-msg { font-size: 0.82rem; margin-top: 8px; padding: 7px 11px; border-radius: 6px; }
+  .status-msg.ok  { background: var(--accent-bg); color: var(--accent); }
+  .status-msg.err { background: var(--wrong-bg); color: var(--wrong); }
+
+  .toast {
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #1A1A1A; color: #fff;
+    padding: 10px 20px; border-radius: 99px;
+    font-size: 0.88rem; font-weight: 500;
+    opacity: 0; transition: opacity 0.2s, transform 0.2s;
+    pointer-events: none; z-index: 999;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ── Auth ── */
+  #auth-screen .lock-icon { font-size: 2.5rem; margin-bottom: 12px; }
+  #auth-screen h2 { font-size: 1.2rem; font-weight: 700; margin-bottom: 6px; }
+  #auth-screen p { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px; }
+  #auth-input {
+    width: 260px; padding: 10px 14px;
+    border: 1.5px solid var(--border); border-radius: 8px;
+    font-size: 1rem; font-family: var(--mono);
+    outline: none; display: block; margin: 0 auto 12px;
+    text-align: center; letter-spacing: 0.05em;
+    background: var(--bg); color: var(--text);
+  }
+  #auth-input:focus { border-color: var(--accent); }
+  .auth-error { color: var(--wrong); font-size: 0.82rem; min-height: 1.2em; margin-bottom: 8px; }
+
+  /* ── Step log ── */
+  .step-log {
+    margin: 3px 0 5px; padding: 8px 11px;
+    background: var(--bg); border: 1.5px solid var(--border); border-radius: 8px;
+  }
+  .log-row { display: flex; align-items: baseline; gap: 10px; padding: 5px 0; border-bottom: 1px solid var(--border); }
+  .log-row:last-child { border-bottom: none; }
+  .log-icon { font-weight: 700; flex-shrink: 0; width: 14px; }
+  .log-row.log-correct .log-icon { color: var(--accent); }
+  .log-row.log-wrong   .log-icon { color: var(--wrong); }
+  .log-step { flex: 1; font-family: var(--mono); font-size: 0.8rem; min-width: 0; word-break: break-word; }
+  .log-ts { font-size: 0.72rem; color: var(--text-secondary); flex-shrink: 0; }
+  .log-empty { color: var(--text-secondary); font-size: 0.82rem; }
+
+  .placeholder-msg { color: var(--text-secondary); font-size: 0.87rem; padding: 6px 0; }
+
+  /* ── Responsive ── */
+  @media (max-width: 720px) {
+    .two-col { grid-template-columns: 1fr; }
+    .form-grid-2 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Auth ── -->
+<div id="auth-screen" class="container-narrow">
+  <div class="lock-icon">🔒</div>
+  <h2 data-i18n="teacher_login_h2">Teacher Login</h2>
+  <p data-i18n="teacher_login_p">Enter your teacher password to continue.</p>
+  <input type="password" id="auth-input" placeholder="Password" data-i18n-placeholder="teacher_password_placeholder" autocomplete="current-password">
+  <div class="auth-error" id="auth-error"></div>
+  <button class="btn btn-primary" onclick="handleAuth()" data-i18n="teacher_unlock_btn">Unlock</button>
+</div>
+
+<!-- ── Main app ── -->
+<div id="main-app" class="container" style="display:none;">
+
+  <div class="page-header">
+    <h1 data-i18n="teacher_dashboard_h1">Teacher Dashboard</h1>
+    <span class="subtitle" data-i18n="teacher_subtitle">Nuvo Studio</span>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" id="tab-btn-students" onclick="switchTab('students')" data-i18n="teacher_tab_students">Students &amp; Homework</button>
+    <button class="tab-btn" id="tab-btn-problems" onclick="switchTab('problems')" data-i18n="teacher_tab_problems">Problem Bank</button>
+  </div>
+
+  <!-- ══════════════ TAB 1: Students & Homework ══════════════ -->
+  <div id="tab-students">
+    <div class="two-col">
+
+      <!-- Left: student list -->
+      <div>
+        <div class="card">
+          <div class="card-title card-title-toggle" onclick="toggleStudentList()">
+            <span data-i18n="teacher_all_students">ALL STUDENTS</span>
+            <span class="toggle-chevron" id="student-list-chevron">▾</span>
+          </div>
+          <div class="collapsible-body" id="student-list-body">
+            <div class="student-list" id="student-list">
+              <div class="placeholder-msg" data-i18n="teacher_loading">Loading…</div>
+            </div>
+            <button class="btn-new-student" onclick="newStudent()" data-i18n="teacher_new_student_btn">+ New Student</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: student panel -->
+      <div id="student-panel">
+
+        <!-- Placeholder when nothing selected -->
+        <div class="card" id="panel-placeholder">
+          <p class="placeholder-msg" data-i18n="teacher_select_student">Select a student from the list to begin.</p>
+        </div>
+
+        <!-- ── Profile card ── -->
+        <div class="card" id="profile-card" style="display:none;">
+
+          <!-- Read-only view -->
+          <div id="profile-readonly-view">
+            <div class="profile-header">
+              <div class="card-title" style="margin-bottom:0;" data-i18n="teacher_student_profile">Student Profile</div>
+              <button class="btn btn-ghost btn-sm" onclick="startEditProfile()" data-i18n="teacher_edit_btn">Edit ✏️</button>
+            </div>
+            <div class="profile-fields" id="profile-readonly-fields"></div>
+          </div>
+
+          <!-- Edit view -->
+          <div id="profile-edit-view" style="display:none;">
+            <div class="profile-header">
+              <div class="card-title" style="margin-bottom:0;" data-i18n="teacher_edit_profile">Edit Profile</div>
+            </div>
+            <div class="field">
+              <label data-i18n="teacher_label_name">Name</label>
+              <input type="text" id="student-name" placeholder="e.g. Sofia" autocomplete="off" autocorrect="off" spellcheck="false">
+            </div>
+            <div class="field">
+              <label data-i18n="teacher_label_student_id">Student ID</label>
+              <input type="text" id="student-id" readonly>
+            </div>
+            <div class="field">
+              <label data-i18n="teacher_label_curriculum">Curriculum</label>
+              <select id="student-curriculum" onchange="updateGradeOptions(this.value)">
+                <option value="" disabled selected>Select curriculum...</option>
+                <option value="cambridge">Cambridge Lower Secondary</option>
+                <option value="common-core">Common Core (US)</option>
+                <option value="ib-myp">IB MYP</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="field">
+              <label data-i18n="teacher_label_grade">Grade / Stage</label>
+              <select id="student-grade">
+                <option value="" disabled selected>Select grade...</option>
+              </select>
+            </div>
+            <div class="field">
+              <label><span data-i18n="teacher_label_trial">Trial expiry</span> <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-secondary);" data-i18n="teacher_optional">(optional)</span></label>
+              <input type="date" id="trial-expiry">
+            </div>
+            <div class="btn-row">
+              <button class="btn btn-primary" id="save-profile-btn" onclick="saveProfile()" data-i18n="teacher_save_btn">Save</button>
+              <button class="btn btn-secondary" onclick="cancelEdit()" data-i18n="teacher_cancel_btn">Cancel</button>
+            </div>
+            <div id="profile-status" class="status-msg" style="display:none;"></div>
+          </div>
+
+          <!-- New student view -->
+          <div id="new-student-view" style="display:none;">
+            <div class="profile-header">
+              <div class="card-title" style="margin-bottom:0;" data-i18n="teacher_new_student_title">New Student</div>
+            </div>
+            <div class="field">
+              <label data-i18n="teacher_label_student_id">Student ID</label>
+              <input type="text" id="ns-id" placeholder="e.g. sofia" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            </div>
+            <div class="field">
+              <label data-i18n="teacher_label_name">Name</label>
+              <input type="text" id="ns-name" placeholder="e.g. Sofia" autocomplete="off" autocorrect="off" spellcheck="false">
+            </div>
+            <div class="field">
+              <label data-i18n="teacher_label_curriculum">Curriculum</label>
+              <select id="ns-curriculum" onchange="updateNewGradeOptions(this.value)">
+                <option value="" disabled selected>Select curriculum...</option>
+                <option value="cambridge">Cambridge Lower Secondary</option>
+                <option value="common-core">Common Core (US)</option>
+                <option value="ib-myp">IB MYP</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="field">
+              <label data-i18n="teacher_label_grade">Grade / Stage</label>
+              <select id="ns-grade">
+                <option value="" disabled selected>Select grade...</option>
+              </select>
+            </div>
+            <div class="field">
+              <label><span data-i18n="teacher_label_trial">Trial expiry</span> <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-secondary);" data-i18n="teacher_optional">(optional)</span></label>
+              <input type="date" id="ns-trial-expiry">
+            </div>
+            <div class="btn-row">
+              <button class="btn btn-primary" id="create-student-btn" onclick="createStudent()" data-i18n="teacher_create_btn">Create Student</button>
+              <button class="btn btn-secondary" onclick="cancelNewStudent()" data-i18n="teacher_cancel_btn">Cancel</button>
+            </div>
+            <div id="new-student-status" class="status-msg" style="display:none;"></div>
+          </div>
+
+        </div><!-- /profile-card -->
+
+        <!-- ── Homework card ── -->
+        <div class="card" id="homework-card" style="display:none;">
+          <div class="card-title" data-i18n="teacher_homework_title">Homework</div>
+          <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:10px;" data-i18n="teacher_homework_note">Assigned problems appear on the student's home screen under "Your homework"</p>
+
+          <div class="hw-list" id="hw-list"></div>
+          <div class="placeholder-msg" id="hw-empty" style="display:none;" data-i18n="teacher_no_homework">No homework assigned yet</div>
+
+          <hr>
+
+          <!-- Assign from bank -->
+          <div class="field" style="margin-bottom:8px;">
+            <label data-i18n="teacher_assign_label">Assign from problem bank</label>
+            <div class="assign-row">
+              <input type="text" id="assign-id-input" placeholder="Problem ID" data-i18n-placeholder="teacher_problem_id_placeholder" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+              <button class="btn btn-primary btn-sm" onclick="assignFromBank()" data-i18n="teacher_assign_btn">Assign</button>
+            </div>
+          </div>
+
+          <hr>
+
+          <!-- One-off problem -->
+          <p style="font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-secondary);margin-bottom:8px;" data-i18n="teacher_oneoff_heading">Or create a one-off problem</p>
+          <div class="field">
+            <label data-i18n="teacher_question_label">Question</label>
+            <input type="text" id="oneoff-question" placeholder="e.g. Expand 3(x + 2)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+          </div>
+          <div class="field">
+            <label data-i18n="teacher_answer_label">Answer</label>
+            <input type="text" id="oneoff-answer" placeholder="e.g. 3x + 6" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="addOneOff()" data-i18n="teacher_add_assign_btn">Add &amp; assign</button>
+
+          <hr>
+
+          <!-- Student link -->
+          <div class="link-row" id="student-link-row" style="display:none;">
+            <span class="link-label" data-i18n="teacher_student_link_label">Student link:</span>
+            <span class="link-url" id="student-link-url"></span>
+            <button class="btn btn-secondary btn-sm" onclick="copyDashboardLink()" data-i18n="teacher_copy_link_btn">Copy link</button>
+          </div>
+
+        </div><!-- /homework-card -->
+
+      </div><!-- /student-panel -->
+    </div><!-- /two-col -->
+  </div><!-- /tab-students -->
+
+  <!-- ══════════════ TAB 2: Problem Bank ══════════════ -->
+  <div id="tab-problems" style="display:none;">
+
+    <!-- Filter pills -->
+    <div class="filter-section">
+      <div class="filter-row">
+        <span class="filter-group-label">Curriculum:</span>
+        <button class="filter-pill active" onclick="setFilter('curriculum','',this)">All</button>
+        <button class="filter-pill" onclick="setFilter('curriculum','cambridge',this)">Cambridge</button>
+        <button class="filter-pill" onclick="setFilter('curriculum','common-core',this)">Common Core</button>
+        <button class="filter-pill" onclick="setFilter('curriculum','ib-myp',this)">IB MYP</button>
+      </div>
+      <div class="filter-row">
+        <span class="filter-group-label">Unit:</span>
+        <button class="filter-pill active" onclick="setFilter('unit','',this)">All</button>
+        <button class="filter-pill" onclick="setFilter('unit','1',this)" title="Algebraic Foundations">1</button>
+        <button class="filter-pill" onclick="setFilter('unit','2',this)" title="Expanding &amp; Simplifying">2</button>
+        <button class="filter-pill" onclick="setFilter('unit','3',this)" title="Factorising">3</button>
+        <button class="filter-pill" onclick="setFilter('unit','4',this)" title="Linear Equations &amp; Inequalities">4</button>
+        <button class="filter-pill" onclick="setFilter('unit','5',this)" title="Formulae &amp; Rearranging">5</button>
+        <button class="filter-pill" onclick="setFilter('unit','6',this)" title="Sequences">6</button>
+        <button class="filter-pill" onclick="setFilter('unit','7',this)" title="Simultaneous Equations">7</button>
+        <button class="filter-pill" onclick="setFilter('unit','8',this)" title="Linear Functions &amp; Graphs">8</button>
+      </div>
+      <div class="filter-row">
+        <span class="filter-group-label">Level:</span>
+        <button class="filter-pill active" onclick="setFilter('level','',this)">All</button>
+        <button class="filter-pill" onclick="setFilter('level','1',this)">Level 1</button>
+        <button class="filter-pill" onclick="setFilter('level','2',this)">Level 2</button>
+        <button class="filter-pill" onclick="setFilter('level','3',this)">Level 3</button>
+        <button class="filter-pill" onclick="setFilter('level','4',this)">Level 4</button>
+      </div>
+      <div class="filter-row">
+        <span class="filter-group-label">Type:</span>
+        <button class="filter-pill active" onclick="setFilter('ptype','',this)">All</button>
+        <button class="filter-pill" onclick="setFilter('ptype','practice',this)">Practice</button>
+        <button class="filter-pill" onclick="setFilter('ptype','diagnostic',this)">Diagnostic</button>
+        <button class="filter-pill" onclick="setFilter('ptype','test',this)">Test</button>
+      </div>
+    </div>
+
+    <div class="two-col">
+
+      <!-- Left: problem list -->
+      <div>
+        <div class="card">
+          <div class="card-title" data-i18n="teacher_problems_title">Problems</div>
+          <div class="bank-list" id="bank-list">
+            <div class="placeholder-msg" data-i18n="teacher_loading">Loading…</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: add problem form -->
+      <div>
+        <div class="card">
+          <div class="card-title" data-i18n="teacher_add_to_bank_title">Add to Bank</div>
+
+          <div class="form-grid-2">
+            <div class="field" style="margin-bottom:0;">
+              <label data-i18n="teacher_label_curriculum">Curriculum</label>
+              <select id="new-curriculum">
+                <option value="" disabled selected>Select...</option>
+                <option value="cambridge">Cambridge</option>
+                <option value="common-core">Common Core</option>
+                <option value="ib-myp">IB MYP</option>
+                <option value="general">General</option>
+              </select>
+            </div>
+            <div class="field" style="margin-bottom:0;">
+              <label data-i18n="teacher_unit_label">Unit</label>
+              <select id="new-unit">
+                <option value="" disabled selected>Select...</option>
+                <option value="1">1 — Algebraic Foundations</option>
+                <option value="2">2 — Expanding &amp; Simplifying</option>
+                <option value="3">3 — Factorising</option>
+                <option value="4">4 — Linear Equations &amp; Inequalities</option>
+                <option value="5">5 — Formulae &amp; Rearranging</option>
+                <option value="6">6 — Sequences</option>
+                <option value="7">7 — Simultaneous Equations</option>
+                <option value="8">8 — Linear Functions &amp; Graphs</option>
+              </select>
+            </div>
+            <div class="field" style="margin-bottom:0;">
+              <label data-i18n="teacher_level_label">Level</label>
+              <select id="new-stage">
+                <option value="" disabled selected>Select...</option>
+                <option value="1">Level 1</option>
+                <option value="2">Level 2</option>
+                <option value="3">Level 3</option>
+                <option value="4">Level 4</option>
+              </select>
+            </div>
+            <div class="field" style="margin-bottom:0;">
+              <label data-i18n="teacher_problem_type_label">Problem Type</label>
+              <select id="new-problem-type">
+                <option value="" disabled selected>Select...</option>
+                <option value="practice">Practice</option>
+                <option value="diagnostic">Diagnostic</option>
+                <option value="test">Test</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label data-i18n="teacher_math_type_label">Math Type</label>
+            <select id="new-type">
+              <option value="Expand">Expand</option>
+              <option value="Factorize">Factorize</option>
+              <option value="Solve">Solve</option>
+              <option value="Simplify">Simplify</option>
+              <option value="Evaluate">Evaluate</option>
+              <option value="Translate">Translate</option>
+              <option value="Rearrange">Rearrange</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label id="new-question-label" data-i18n="teacher_question_label">Question</label>
+            <input type="text" id="new-question" placeholder="e.g. 3(x + 2)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+          </div>
+          <div class="field">
+            <label id="new-answer-label" data-i18n="teacher_answer_label">Answer</label>
+            <input type="text" id="new-answer" placeholder="e.g. 3x + 6" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+          </div>
+
+          <div class="field">
+            <label><span data-i18n="teacher_calc_label">Calculator</span> <span style="font-weight:400;font-size:0.7rem;text-transform:none;letter-spacing:0;color:var(--text-secondary);" data-i18n="teacher_calc_hint">(tap Question or Answer first)</span></label>
+            <div id="teacher-calc"></div>
+          </div>
+
+          <div class="hints-toggle" id="hints-toggle" onclick="toggleHints()" data-i18n="teacher_add_hints">Add hints ▾</div>
+          <div class="hints-body" id="hints-body">
+            <div class="field">
+              <label data-i18n="teacher_hint_label_1">Hint 1</label>
+              <input type="text" id="new-hint1" placeholder="First hint…" autocomplete="off" spellcheck="false">
+            </div>
+            <div class="field">
+              <label data-i18n="teacher_hint_label_2">Hint 2</label>
+              <input type="text" id="new-hint2" placeholder="Second hint…" autocomplete="off" spellcheck="false">
+            </div>
+            <div class="field">
+              <label data-i18n="teacher_hint_label_3">Hint 3</label>
+              <input type="text" id="new-hint3" placeholder="Third hint…" autocomplete="off" spellcheck="false">
+            </div>
+          </div>
+
+          <div class="field">
+            <label><span data-i18n="teacher_pid_label">Problem ID</span> <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-secondary);" data-i18n="teacher_auto_generated">(auto-generated)</span></label>
+            <input type="text" id="new-pid" readonly>
+          </div>
+
+          <button class="btn btn-primary btn-full" id="save-to-bank-btn" onclick="saveToBankForm()" style="margin-top:4px;" data-i18n="teacher_save_to_bank_btn">Save to bank</button>
+          <div class="save-flash" id="bank-save-flash" data-i18n="teacher_saved_to_bank">Saved to bank ✓</div>
+        </div>
+      </div>
+
+    </div><!-- /two-col -->
+  </div><!-- /tab-problems -->
+
+</div><!-- /main-app -->
+
+<div class="toast" id="toast"></div>
+
+<script src="lang.js?v=20260513-spanish-default"></script>
+<script src="calculator.js"></script>
+<script>
+  Lang.apply();
+  const WORKER        = 'https://math-practice-proxy.ronelalmanza20.workers.dev';
+  const DASHBOARD_BASE = 'https://nuvostudio.club/home.html';
+  const PRACTICE_BASE  = 'https://nuvo-studio.github.io/math-practice/app.html';
+
+  // ── State ────────────────────────────────────────────────────
+  let teacherSecret       = '';
+  let selectedStudentId   = null;
+  let selectedStudentName = '';
+  let selectedCurriculum  = '';
+  let selectedGrade       = '';
+  let selectedTrialExpiry = '';
+  let currentProblems     = [];  // student's homework
+  let bankProblems        = [];  // global problem bank
+  let bankFilters         = { curriculum: '', unit: '', level: '', ptype: '' };
+  let isCreatingNewStudent = false;
+
+  // ── Calculator ───────────────────────────────────────────────
+  const teacherCalc = attachCalculator(
+    document.getElementById('new-question'),
+    document.getElementById('teacher-calc')
+  );
+
+  ['new-question', 'new-answer'].forEach(id => {
+    document.getElementById(id).addEventListener('focus', function () {
+      teacherCalc.setTarget(this);
+    });
+  });
+
+  // Translate: swap field labels
+  document.getElementById('new-type').addEventListener('change', function () {
+    const isTranslate = this.value === 'Translate';
+    document.getElementById('new-question-label').textContent = isTranslate ? Lang.t('teacher_word_desc') : Lang.t('teacher_question_label');
+    document.getElementById('new-question').placeholder = isTranslate
+      ? 'e.g. the triple of a number x, decreased by 4' : 'e.g. 3(x + 2)';
+    document.getElementById('new-answer-label').textContent = isTranslate ? Lang.t('teacher_expected_answer') : Lang.t('teacher_answer_label');
+    document.getElementById('new-answer').placeholder = isTranslate ? 'e.g. 3x - 4' : 'e.g. 3x + 6';
+  });
+
+  // ── Auth ─────────────────────────────────────────────────────
+  function handleAuth() {
+    const val = document.getElementById('auth-input').value.trim();
+    if (!val) { document.getElementById('auth-error').textContent = Lang.t('teacher_auth_error_empty'); return; }
+    teacherSecret = val;
+    sessionStorage.setItem('teacherSecret', val);
+    showApp();
+  }
+
+  document.getElementById('auth-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleAuth();
+  });
+
+  function showApp() {
+    document.getElementById('auth-screen').style.display = 'none';
+    document.getElementById('main-app').style.display = 'block';
+    generateBankPid();
+    loadStudentList();
+    loadBankProblems();
+  }
+
+  window.addEventListener('load', () => {
+    const saved = sessionStorage.getItem('teacherSecret');
+    if (saved) { teacherSecret = saved; showApp(); }
+  });
+
+  // ── Tab switching ─────────────────────────────────────────────
+  function switchTab(tab) {
+    document.getElementById('tab-students').style.display = tab === 'students' ? '' : 'none';
+    document.getElementById('tab-problems').style.display = tab === 'problems' ? '' : 'none';
+    document.getElementById('tab-btn-students').classList.toggle('active', tab === 'students');
+    document.getElementById('tab-btn-problems').classList.toggle('active', tab === 'problems');
+  }
+
+  // ── Toggle student list ───────────────────────────────────────
+  function toggleStudentList() {
+    document.getElementById('student-list-body').classList.toggle('collapsed');
+    document.getElementById('student-list-chevron').classList.toggle('collapsed');
+  }
+
+  // ── Load student list ─────────────────────────────────────────
+  async function loadStudentList() {
+    const list = document.getElementById('student-list');
+    list.innerHTML = `<div class="placeholder-msg">${Lang.t('teacher_loading')}</div>`;
+    try {
+      const res = await fetch(`${WORKER}/students`, {
+        headers: { 'Authorization': `Bearer ${teacherSecret}` }
+      });
+      if (!res.ok) throw new Error();
+      const students = await res.json();
+
+      const withProgress = await Promise.all(students.map(async s => {
+        try {
+          const r = await fetch(`${WORKER}/student/${encodeURIComponent(s.id)}`);
+          if (!r.ok) return { ...s, done: 0, total: 0, curriculum: '', grade: '', trialExpiry: null };
+          const data = await r.json();
+          const problems = data.problems || [];
+          const done = problems.filter(p => p.completed).length;
+          return { ...s, done, total: problems.length, curriculum: data.curriculum || '', grade: data.grade || '', trialExpiry: data.trialExpiry || null };
+        } catch {
+          return { ...s, done: 0, total: 0, curriculum: '', grade: '', trialExpiry: null };
+        }
+      }));
+
+      list.innerHTML = withProgress.map(s => renderStudentRow(s)).join('');
+    } catch {
+      list.innerHTML = `<div class="placeholder-msg" style="color:var(--wrong)">${Lang.t('teacher_toast_failed_students')}</div>`;
+    }
+  }
+
+  function renderStudentRow(s) {
+    const initial = (s.name || s.id || '?')[0].toUpperCase();
+    const pct     = s.total > 0 ? Math.round((s.done / s.total) * 100) : 0;
+    const active  = selectedStudentId === s.id;
+
+    let badgeHtml = '';
+    if (s.trialExpiry) {
+      const expiry = new Date(s.trialExpiry);
+      if (expiry > new Date()) {
+        const days = Math.ceil((expiry - new Date()) / 86400000);
+        badgeHtml = `<span class="badge badge-trial">Trial · ${Lang.t('teacher_trial_days_left').replace('{n}', days)}</span>`;
+      }
+    }
+    if (!badgeHtml && s.curriculum && s.grade) {
+      badgeHtml = `<span class="badge badge-curriculum">${escHtml(formatMeta(s.curriculum, s.grade))}</span>`;
+    }
+
+    return `<div class="student-row${active ? ' active' : ''}" id="srow-${escHtml(s.id)}"
+         onclick="selectStudent('${escHtml(s.id)}', '${escHtml(s.name)}')">
+      <span class="s-avatar">${escHtml(initial)}</span>
+      <span class="s-info">
+        <span class="s-name-row">
+          <span class="s-name">${escHtml(s.name)}</span>
+          ${badgeHtml}
+        </span>
+      </span>
+      <span class="s-progress">
+        <span class="s-progress-track">
+          <span class="s-progress-fill" style="width:${pct}%"></span>
+        </span>
+      </span>
+    </div>`;
+  }
+
+  // ── Select / new student ──────────────────────────────────────
+  async function selectStudent(id, name) {
+    isCreatingNewStudent = false;
+    selectedStudentId   = id;
+    selectedStudentName = name;
+    highlightRow(id);
+    await loadStudent(id);
+  }
+
+  function newStudent() {
+    isCreatingNewStudent = true;
+    highlightRow(null);
+    showNewStudentView();
+  }
+
+  function cancelNewStudent() {
+    isCreatingNewStudent = false;
+    if (selectedStudentId) {
+      highlightRow(selectedStudentId);
+      showProfileReadonly();
+      document.getElementById('homework-card').style.display = '';
+    } else {
+      showPanelPlaceholder();
+    }
+  }
+
+  function highlightRow(id) {
+    document.querySelectorAll('.student-row').forEach(el => el.classList.remove('active'));
+    if (id) {
+      const row = document.getElementById(`srow-${id}`);
+      if (row) row.classList.add('active');
+    }
+  }
+
+  // ── Panel states ──────────────────────────────────────────────
+  function showPanelPlaceholder() {
+    document.getElementById('panel-placeholder').style.display = '';
+    document.getElementById('profile-card').style.display = 'none';
+    document.getElementById('homework-card').style.display = 'none';
+  }
+
+  function showProfileReadonly() {
+    document.getElementById('panel-placeholder').style.display = 'none';
+    document.getElementById('profile-card').style.display = '';
+    document.getElementById('profile-readonly-view').style.display = '';
+    document.getElementById('profile-edit-view').style.display = 'none';
+    document.getElementById('new-student-view').style.display = 'none';
+    renderProfileReadonly();
+  }
+
+  function renderProfileReadonly() {
+    let trialHtml = '<span style="color:var(--text-secondary);">—</span>';
+    if (selectedTrialExpiry) {
+      const d = new Date(selectedTrialExpiry);
+      const now = new Date();
+      const days = Math.ceil((d - now) / 86400000);
+      const expired = d <= now;
+      const color = expired ? 'var(--wrong)' : 'var(--amber)';
+      trialHtml = `<span style="color:${color};">${escHtml(selectedTrialExpiry)} (${expired ? Lang.t('teacher_trial_expired_label') : Lang.t('teacher_trial_days_left').replace('{n}', days)})</span>`;
+    }
+
+    document.getElementById('profile-readonly-fields').innerHTML = `
+      <div class="pf-row">
+        <span class="pf-label">${Lang.t('teacher_label_name')}</span>
+        <span class="pf-value">${escHtml(selectedStudentName || '—')}</span>
+      </div>
+      <div class="pf-row">
+        <span class="pf-label">${Lang.t('teacher_label_student_id')}</span>
+        <span class="pf-value mono">${escHtml(selectedStudentId || '—')}</span>
+      </div>
+      <div class="pf-row">
+        <span class="pf-label">${Lang.t('teacher_pf_curriculum_grade')}</span>
+        <span class="pf-value">${escHtml(formatMeta(selectedCurriculum, selectedGrade) || '—')}</span>
+      </div>
+      <div class="pf-row">
+        <span class="pf-label">${Lang.t('teacher_label_trial')}</span>
+        <span class="pf-value">${trialHtml}</span>
+      </div>`;
+  }
+
+  function startEditProfile() {
+    document.getElementById('profile-readonly-view').style.display = 'none';
+    document.getElementById('profile-edit-view').style.display = '';
+    document.getElementById('new-student-view').style.display = 'none';
+    document.getElementById('student-name').value       = selectedStudentName;
+    document.getElementById('student-id').value         = selectedStudentId;
+    document.getElementById('student-curriculum').value = selectedCurriculum;
+    updateGradeOptions(selectedCurriculum);
+    document.getElementById('student-grade').value      = selectedGrade;
+    document.getElementById('trial-expiry').value       = selectedTrialExpiry;
+    document.getElementById('profile-status').style.display = 'none';
+  }
+
+  function cancelEdit() {
+    document.getElementById('profile-readonly-view').style.display = '';
+    document.getElementById('profile-edit-view').style.display = 'none';
+  }
+
+  function showNewStudentView() {
+    document.getElementById('panel-placeholder').style.display = 'none';
+    document.getElementById('profile-card').style.display = '';
+    document.getElementById('homework-card').style.display = 'none';
+    document.getElementById('profile-readonly-view').style.display = 'none';
+    document.getElementById('profile-edit-view').style.display = 'none';
+    document.getElementById('new-student-view').style.display = '';
+    document.getElementById('ns-id').value = '';
+    document.getElementById('ns-name').value = '';
+    document.getElementById('ns-curriculum').value = '';
+    updateNewGradeOptions('');
+    document.getElementById('ns-trial-expiry').value = '';
+    document.getElementById('new-student-status').style.display = 'none';
+    document.getElementById('ns-id').focus();
+  }
+
+  // ── Load student data ─────────────────────────────────────────
+  async function loadStudent(id) {
+    try {
+      const res = await fetch(`${WORKER}/student/${encodeURIComponent(id)}`);
+      if (res.status === 404) {
+        currentProblems = [];
+        renderHomework();
+        showProfileReadonly();
+        document.getElementById('homework-card').style.display = '';
+        updateStudentLink(id);
+        return;
+      }
+      if (!res.ok) throw new Error();
+      const student = await res.json();
+      selectedStudentName = student.name || id;
+      selectedCurriculum  = student.curriculum || '';
+      selectedGrade       = student.grade || '';
+      selectedTrialExpiry = student.trialExpiry || '';
+      currentProblems = (student.problems || []).map(p => ({
+        ...p,
+        url: p.url ? p.url.replace('https://credito-scorer.github.io/math-practice/', PRACTICE_BASE) : p.url
+      }));
+      renderHomework();
+      showProfileReadonly();
+      document.getElementById('homework-card').style.display = '';
+      updateStudentLink(id);
+    } catch {
+      showToast(Lang.t('teacher_toast_failed_student'));
+    }
+  }
+
+  // ── Grade options ─────────────────────────────────────────────
+  const GRADE_SETS = {
+    cambridge:     [{ v: '7', l: 'Stage 7' }, { v: '8', l: 'Stage 8' }, { v: '9', l: 'Stage 9' }],
+    'common-core': [{ v: '6', l: 'Grade 6' }, { v: '7', l: 'Grade 7' }, { v: '8', l: 'Grade 8' }, { v: '9', l: 'Grade 9' }],
+    'ib-myp':      [{ v: '1', l: 'MYP 1'  }, { v: '2', l: 'MYP 2'  }, { v: '3', l: 'MYP 3'  }, { v: '4', l: 'MYP 4'  }],
+  };
+
+  function buildGradeOpts(curriculum) {
+    const label = curriculum === 'cambridge' ? 'Select stage...' :
+                  curriculum === 'ib-myp'    ? 'Select year...'  : 'Select grade...';
+    const opts  = GRADE_SETS[curriculum] || [
+      { v: '6', l: 'Year 6 / Grade 6' }, { v: '7', l: 'Year 7 / Grade 7' },
+      { v: '8', l: 'Year 8 / Grade 8' }, { v: '9', l: 'Year 9 / Grade 9' },
+    ];
+    return `<option value="" disabled selected>${label}</option>` +
+      opts.map(o => `<option value="${o.v}">${o.l}</option>`).join('');
+  }
+
+  function updateGradeOptions(curriculum) {
+    const sel  = document.getElementById('student-grade');
+    const prev = sel.value;
+    sel.innerHTML = buildGradeOpts(curriculum);
+    const opts = GRADE_SETS[curriculum] || [];
+    if (prev && opts.find(o => o.v === prev)) sel.value = prev;
+  }
+
+  function updateNewGradeOptions(curriculum) {
+    document.getElementById('ns-grade').innerHTML = buildGradeOpts(curriculum);
+  }
+
+  function formatMeta(curriculum, grade) {
+    if (!curriculum || !grade) return '';
+    const stageMap = {
+      cambridge:     { '7': 'Stage 7', '8': 'Stage 8', '9': 'Stage 9' },
+      'common-core': { '6': 'Grade 6', '7': 'Grade 7', '8': 'Grade 8', '9': 'Grade 9' },
+      'ib-myp':      { '1': 'MYP 1',   '2': 'MYP 2',   '3': 'MYP 3',  '4': 'MYP 4'  },
+      other:         { '6': 'Year 6',  '7': 'Year 7',  '8': 'Year 8', '9': 'Year 9' },
+    };
+    const nameMap = { cambridge: 'Cambridge', 'common-core': 'Common Core', 'ib-myp': 'IB MYP', other: 'Other' };
+    const stage = (stageMap[curriculum] || {})[grade] || `Grade ${grade}`;
+    const name  = nameMap[curriculum] || curriculum;
+    return `${name} · ${stage}`;
+  }
+
+  // ── Save profile (existing student) ──────────────────────────
+  async function saveProfile() {
+    const id          = document.getElementById('student-id').value.trim();
+    const name        = document.getElementById('student-name').value.trim();
+    const curriculum  = document.getElementById('student-curriculum').value || '';
+    const grade       = document.getElementById('student-grade').value || '';
+    const trialExpiry = document.getElementById('trial-expiry').value || '';
+
+    if (!id || !name) { showStatus('profile-status', 'err', Lang.t('teacher_id_required')); return; }
+
+    const btn = document.getElementById('save-profile-btn');
+    btn.disabled = true;
+    showStatus('profile-status', 'ok', Lang.t('teacher_saving'));
+
+    try {
+      const res = await fetch(`${WORKER}/student/${encodeURIComponent(id)}/profile`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${teacherSecret}` },
+        body: JSON.stringify({ name, curriculum, grade, trialExpiry })
+      });
+      if (res.status === 401) { showStatus('profile-status', 'err', Lang.t('teacher_toast_wrong_password')); return; }
+      if (!res.ok) throw new Error();
+
+      selectedStudentId   = id;
+      selectedStudentName = name;
+      selectedCurriculum  = curriculum;
+      selectedGrade       = grade;
+      selectedTrialExpiry = trialExpiry;
+      cancelEdit();
+      updateStudentLink(id);
+      loadStudentList();
+      showToast(`"${name}" saved.`);
+    } catch {
+      showStatus('profile-status', 'err', Lang.t('teacher_toast_failed_save'));
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  // ── Create new student ────────────────────────────────────────
+  async function createStudent() {
+    const id          = document.getElementById('ns-id').value.trim();
+    const name        = document.getElementById('ns-name').value.trim();
+    const curriculum  = document.getElementById('ns-curriculum').value || '';
+    const grade       = document.getElementById('ns-grade').value || '';
+    const trialExpiry = document.getElementById('ns-trial-expiry').value || '';
+
+    if (!id || !name) { showStatus('new-student-status', 'err', Lang.t('teacher_id_required')); return; }
+
+    const btn = document.getElementById('create-student-btn');
+    btn.disabled = true;
+    showStatus('new-student-status', 'ok', Lang.t('teacher_creating'));
+
+    try {
+      const res = await fetch(`${WORKER}/student/${encodeURIComponent(id)}/profile`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${teacherSecret}` },
+        body: JSON.stringify({ name, curriculum, grade, trialExpiry })
+      });
+      if (res.status === 401) { showStatus('new-student-status', 'err', Lang.t('teacher_toast_wrong_password')); return; }
+      if (!res.ok) throw new Error();
+
+      isCreatingNewStudent = false;
+      selectedStudentId    = id;
+      selectedStudentName  = name;
+      selectedCurriculum   = curriculum;
+      selectedGrade        = grade;
+      selectedTrialExpiry  = trialExpiry;
+      currentProblems      = [];
+      await loadStudentList();
+      highlightRow(id);
+      showProfileReadonly();
+      document.getElementById('homework-card').style.display = '';
+      renderHomework();
+      updateStudentLink(id);
+      showToast(`Student "${name}" created.`);
+    } catch {
+      showStatus('new-student-status', 'err', Lang.t('teacher_toast_failed_create'));
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  // ── Homework rendering ────────────────────────────────────────
+  function renderHomework() {
+    const list  = document.getElementById('hw-list');
+    const empty = document.getElementById('hw-empty');
+
+    if (!currentProblems.length) {
+      list.innerHTML = '';
+      empty.style.display = '';
+      return;
+    }
+    empty.style.display = 'none';
+
+    list.innerHTML = currentProblems.map(p => {
+      const tagClass = p.problemType === 'diagnostic' ? 'hw-tag-diagnostic' :
+                       p.problemType === 'test'       ? 'hw-tag-test'       :
+                       p.oneOff                       ? 'hw-tag-oneoff'     : 'hw-tag-practice';
+      const tagLabel = p.problemType === 'diagnostic' ? Lang.t('hw_tag_diagnostic') :
+                       p.problemType === 'test'       ? Lang.t('hw_tag_test')        :
+                       p.oneOff                       ? Lang.t('hw_tag_oneoff')      : Lang.t('hw_tag_practice');
+      const qText    = p.question || p.title || p.id;
+      return `<div>
+        <div class="hw-item">
+          <span class="hw-question" title="${escHtml(qText)}">${escHtml(qText)}</span>
+          <span class="hw-tag ${tagClass}">${tagLabel}</span>
+          <button class="btn btn-secondary btn-sm" onclick="viewStepLog('${escHtml(p.id)}', this)">${Lang.t('teacher_steps_show')}</button>
+          <button class="btn btn-danger btn-sm" onclick="removeHomework('${escHtml(p.id)}')">✕</button>
+        </div>
+        <div id="log-${escHtml(p.id)}" class="step-log" style="display:none;"></div>
+      </div>`;
+    }).join('');
+  }
+
+  async function removeHomework(pid) {
+    currentProblems = currentProblems.filter(p => p.id !== pid);
+    renderHomework();
+    await saveHomework();
+  }
+
+  async function saveHomework() {
+    if (!selectedStudentId) return;
+    try {
+      const res = await fetch(`${WORKER}/student/${encodeURIComponent(selectedStudentId)}/problems`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${teacherSecret}` },
+        body: JSON.stringify({ problems: currentProblems })
+      });
+      if (!res.ok) throw new Error();
+    } catch {
+      showToast(Lang.t('teacher_toast_failed_homework'));
+    }
+  }
+
+  // ── Assign from bank by ID ────────────────────────────────────
+  async function assignFromBank() {
+    if (!selectedStudentId) { showToast(Lang.t('teacher_toast_select_student')); return; }
+    const input = document.getElementById('assign-id-input');
+    const pid   = input.value.trim();
+    if (!pid) { showToast(Lang.t('teacher_toast_enter_pid')); return; }
+
+    const problem = bankProblems.find(p => p.id === pid);
+    if (!problem) { showToast(Lang.t('teacher_toast_problem_notfound').replace('{pid}', pid)); return; }
+    if (currentProblems.find(p => p.id === pid)) { showToast(Lang.t('teacher_toast_already_assigned')); return; }
+
+    currentProblems.push({ ...problem, completed: false });
+    renderHomework();
+    input.value = '';
+    await saveHomework();
+    showToast(Lang.t('teacher_toast_assigned'));
+  }
+
+  // ── One-off problem ───────────────────────────────────────────
+  async function addOneOff() {
+    if (!selectedStudentId) { showToast(Lang.t('teacher_toast_select_student')); return; }
+    const question = document.getElementById('oneoff-question').value.trim();
+    const answer   = document.getElementById('oneoff-answer').value.trim();
+    if (!question || !answer) { showToast(Lang.t('teacher_toast_enter_qna')); return; }
+
+    const pid     = `oneoff_${Date.now()}`;
+    const encoded = btoa(encodeURIComponent(JSON.stringify({
+      problems: [{ type: 'Expand', question, answer, modules: ['equivalence'] }]
+    })));
+    currentProblems.push({
+      id: pid, title: question, question, answer,
+      type: 'Expand', modules: ['equivalence'],
+      completed: false, oneOff: true,
+      url: `${PRACTICE_BASE}#${encoded}`
+    });
+    renderHomework();
+    document.getElementById('oneoff-question').value = '';
+    document.getElementById('oneoff-answer').value   = '';
+    await saveHomework();
+    showToast(Lang.t('teacher_toast_oneoff_assigned'));
+  }
+
+  // ── Student link ──────────────────────────────────────────────
+  function updateStudentLink(id) {
+    const url = `${DASHBOARD_BASE}?student=${encodeURIComponent(id)}`;
+    document.getElementById('student-link-url').textContent = url;
+    document.getElementById('student-link-row').style.display = '';
+  }
+
+  async function copyDashboardLink() {
+    const url = document.getElementById('student-link-url').textContent;
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      const ta = document.createElement('textarea');
+      ta.value = url;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    showToast(Lang.t('teacher_toast_link_copied'));
+  }
+
+  // ── Problem bank ──────────────────────────────────────────────
+  async function loadBankProblems() {
+    document.getElementById('bank-list').innerHTML = `<div class="placeholder-msg">${Lang.t('teacher_loading')}</div>`;
+    try {
+      const res = await fetch(`${WORKER}/problems`);
+      if (!res.ok) throw new Error();
+      bankProblems = await res.json();
+      renderBankList();
+    } catch {
+      document.getElementById('bank-list').innerHTML =
+        `<div class="placeholder-msg" style="color:var(--wrong)">${Lang.t('teacher_toast_failed_problems')}</div>`;
+    }
+  }
+
+  function setFilter(key, value, btn) {
+    bankFilters[key] = value;
+    const group = btn.closest('.filter-row');
+    if (group) group.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    renderBankList();
+  }
+
+  function renderBankList() {
+    const list = document.getElementById('bank-list');
+    const filtered = bankProblems.filter(p => {
+      if (bankFilters.curriculum && (p.curriculum || '') !== bankFilters.curriculum) return false;
+      if (bankFilters.unit       && String(p.unit   || '') !== bankFilters.unit)      return false;
+      if (bankFilters.level      && String(p.stage  || '') !== bankFilters.level)     return false;
+      if (bankFilters.ptype      && (p.problemType  || '') !== bankFilters.ptype)     return false;
+      return true;
+    });
+
+    if (!filtered.length) {
+      list.innerHTML = `<div class="placeholder-msg">${Lang.t('teacher_no_problems')}</div>`;
+      return;
+    }
+
+    const cLabel = { cambridge: 'Cambridge', 'common-core': 'Common Core', 'ib-myp': 'IB MYP', general: 'General' };
+    list.innerHTML = filtered.map(p => `
+      <div class="bank-item">
+        <div class="prob-main">
+          <div class="bank-q">${escHtml(p.question || p.id)}</div>
+          <div class="prob-tags">
+            ${p.curriculum ? `<span class="prob-tag prob-tag--curriculum">${escHtml(cLabel[p.curriculum] || p.curriculum)}</span>` : ''}
+            ${p.unit       ? `<span class="prob-tag prob-tag--unit">Unit ${escHtml(String(p.unit))}</span>` : ''}
+            ${p.stage      ? `<span class="prob-tag prob-tag--level">Level ${escHtml(String(p.stage))}</span>` : ''}
+            ${p.problemType ? `<span class="prob-tag prob-tag--type">${escHtml(p.problemType.charAt(0).toUpperCase()+p.problemType.slice(1))}</span>` : ''}
+            <span class="prob-tag prob-tag--id">${escHtml(p.id)}</span>
+          </div>
+        </div>
+        <button class="btn btn-danger btn-sm" onclick="removeBankProblem('${escHtml(p.id)}')">✕</button>
+      </div>`).join('');
+  }
+
+  function removeBankProblem(pid) {
+    bankProblems = bankProblems.filter(p => p.id !== pid);
+    renderBankList();
+  }
+
+  // ── Problem ID preview ────────────────────────────────────────
+  function generateBankPid() {
+    document.getElementById('new-pid').value =
+      `p_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+  }
+
+  // ── Hints toggle ──────────────────────────────────────────────
+  function toggleHints() {
+    const body   = document.getElementById('hints-body');
+    const toggle = document.querySelector('.hints-toggle');
+    const open   = body.classList.toggle('open');
+    toggle.textContent = open ? Lang.t('teacher_hide_hints') : Lang.t('teacher_add_hints');
+  }
+
+  // ── Save problem to bank ──────────────────────────────────────
+  async function saveToBankForm() {
+    const curriculum  = document.getElementById('new-curriculum').value;
+    const unit        = document.getElementById('new-unit').value;
+    const stage       = document.getElementById('new-stage').value;
+    const problemType = document.getElementById('new-problem-type').value;
+    const type        = document.getElementById('new-type').value;
+    const question    = document.getElementById('new-question').value.trim();
+    const answer      = document.getElementById('new-answer').value.trim();
+    const hint1       = document.getElementById('new-hint1').value.trim();
+    const hint2       = document.getElementById('new-hint2').value.trim();
+    const hint3       = document.getElementById('new-hint3').value.trim();
+
+    if (!curriculum || !unit || !stage || !problemType || !question || !answer) {
+      showToast(Lang.t('teacher_toast_fill_required'));
+      return;
+    }
+
+    const hints = [hint1, hint2, hint3].filter(Boolean);
+    const btn   = document.getElementById('save-to-bank-btn');
+    btn.disabled = true;
+
+    try {
+      const res = await fetch(`${WORKER}/problems`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${teacherSecret}` },
+        body: JSON.stringify({ curriculum, unit, stage, problemType, type, question, answer, modules: ['equivalence'], hints })
+      });
+      if (res.status === 401) { showToast(Lang.t('teacher_toast_wrong_password')); return; }
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+
+      bankProblems.push({
+        id: data.id, curriculum, unit: String(unit), stage: String(stage),
+        problemType, type, question, answer, hints, modules: ['equivalence']
+      });
+      renderBankList();
+
+      // Reset form
+      ['new-curriculum','new-unit','new-stage','new-problem-type'].forEach(id => {
+        document.getElementById(id).selectedIndex = 0;
+      });
+      document.getElementById('new-question').value = '';
+      document.getElementById('new-answer').value   = '';
+      document.getElementById('new-hint1').value    = '';
+      document.getElementById('new-hint2').value    = '';
+      document.getElementById('new-hint3').value    = '';
+      generateBankPid();
+
+      const flash = document.getElementById('bank-save-flash');
+      flash.classList.add('show');
+      setTimeout(() => flash.classList.remove('show'), 3000);
+    } catch {
+      showToast(Lang.t('teacher_toast_failed_save'));
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  // ── Step log viewer ───────────────────────────────────────────
+  async function viewStepLog(pid, btn) {
+    const logDiv = document.getElementById(`log-${pid}`);
+    if (!logDiv) return;
+    if (logDiv.style.display !== 'none') {
+      logDiv.style.display = 'none';
+      btn.textContent = Lang.t('teacher_steps_show');
+      return;
+    }
+    logDiv.style.display = '';
+    btn.textContent = Lang.t('teacher_steps_hide');
+    logDiv.innerHTML = `<div class="log-empty">${Lang.t('teacher_loading_logs')}</div>`;
+    try {
+      const res  = await fetch(`${WORKER}/get-logs?studentId=${encodeURIComponent(selectedStudentId)}&problemId=${encodeURIComponent(pid)}`);
+      const data = await res.json();
+      const logs = (data.logs || []).slice().reverse();
+      if (!logs.length) { logDiv.innerHTML = `<div class="log-empty">${Lang.t('teacher_no_attempts')}</div>`; return; }
+      logDiv.innerHTML = logs.map(entry => {
+        const ts      = new Date(entry.timestamp).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        const correct = entry.correct === true;
+        return `<div class="log-row ${correct ? 'log-correct' : 'log-wrong'}">
+          <span class="log-icon">${correct ? '✓' : '✗'}</span>
+          <span class="log-step">${escHtml(String(entry.step))}</span>
+          <span class="log-ts">${ts}</span>
+        </div>`;
+      }).join('');
+    } catch {
+      logDiv.innerHTML = `<div class="log-empty" style="color:var(--wrong)">${Lang.t('teacher_failed_logs')}</div>`;
+    }
+  }
+
+  // ── Helpers ───────────────────────────────────────────────────
+  function showStatus(id, type, msg) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.className   = `status-msg ${type}`;
+    el.style.display = '';
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+</script>
+</body>
+</html>

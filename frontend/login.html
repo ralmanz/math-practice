@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — Nuvo Math</title>
+  <meta name="description" content="Sign in to your Nuvo Math student account.">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green:       #2D6A4F;
+      --green-dark:  #1A5C45;
+      --green-light: #D8F3DC;
+      --green-bg:    #F0FAF3;
+      --text:        #111827;
+      --text-mid:    #374151;
+      --text-muted:  #6B7280;
+      --border:      #E5E7EB;
+      --bg:          #F9FAFB;
+      --white:       #FFFFFF;
+      --radius:      12px;
+      --radius-lg:   20px;
+      --red:         #C1453B;
+      --red-bg:      #FDE8E6;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .nav-logo {
+      font-weight: 800;
+      font-size: 1.2rem;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.03em;
+      flex-shrink: 0;
+    }
+
+    .nav-logo span { color: var(--green); }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-mid);
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.15s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+      background: none;
+      border: none;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--text);
+      border-radius: 2px;
+      transition: all 0.2s;
+    }
+
+    /* ── Main layout ── */
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 56px 24px;
+    }
+
+    .form-wrap {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 44px 40px;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .form-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--green);
+      margin-bottom: 10px;
+    }
+
+    .form-heading {
+      font-size: 1.75rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+
+    .form-sub {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-mid);
+      margin-bottom: 6px;
+    }
+
+    .field input {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      color: var(--text);
+      background: var(--white);
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .field input:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px var(--green-light);
+    }
+
+    .field input::placeholder { color: #9CA3AF; }
+
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--green);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.15s;
+      margin-top: 8px;
+    }
+
+    .submit-btn:hover:not(:disabled) { background: var(--green-dark); }
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .error-msg {
+      display: none;
+      background: var(--red-bg);
+      color: var(--red);
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-top: 12px;
+      line-height: 1.5;
+    }
+
+    .error-msg.show { display: block; }
+
+    .form-note {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 20px;
+      line-height: 1.5;
+    }
+
+    .form-note a {
+      color: var(--green);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .form-note a:hover { text-decoration: underline; }
+
+    /* ── Footer ── */
+    footer {
+      background: #111827;
+      color: #D1D5DB;
+      padding: 40px 24px;
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      text-align: center;
+    }
+
+    .footer-logo {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: white;
+      letter-spacing: -0.03em;
+    }
+
+    .footer-logo span { color: #93C5FD; }
+
+    .footer-contact {
+      display: flex;
+      gap: 28px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .footer-contact a {
+      color: #9CA3AF;
+      text-decoration: none;
+      font-size: 0.88rem;
+      transition: color 0.15s;
+    }
+
+    .footer-contact a:hover { color: white; }
+
+    .footer-copy {
+      font-size: 0.8rem;
+      color: #4B5563;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .nav-links.open {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        position: absolute;
+        top: 64px;
+        left: 0;
+        right: 0;
+        background: white;
+        padding: 20px 24px 24px;
+        border-bottom: 1px solid var(--border);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+      }
+      .nav-links.open a { font-size: 1rem; padding: 8px 0; }
+      .hamburger { display: flex; }
+
+      main { padding: 32px 16px 48px; align-items: flex-start; }
+      .form-wrap { padding: 32px 24px; }
+      .form-heading { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════ NAV ════════ -->
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">Nuvo <span>Math</span></a>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="index.html#how-it-works" data-i18n="nav_how_it_works">How it works</a></li>
+      <li><a href="index.html#curriculum" data-i18n="nav_curriculum">Curriculum</a></li>
+      <li><a href="index.html#pricing" data-i18n="nav_pricing">Pricing</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+
+<!-- ════════ MAIN ════════ -->
+<main>
+  <div class="form-wrap">
+    <p class="form-label" data-i18n="login_label">Student Login</p>
+    <h1 class="form-heading" data-i18n="login_heading">Welcome back</h1>
+    <p class="form-sub" data-i18n="login_sub">Enter your student ID to continue</p>
+
+    <form id="login-form" novalidate>
+      <div class="field">
+        <label for="student-id" data-i18n="login_id_label">Student ID</label>
+        <input
+          type="text"
+          id="student-id"
+          name="student_id"
+          required
+          placeholder="e.g. sofia"
+          data-i18n-placeholder="login_id_placeholder"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
+        >
+      </div>
+
+      <button type="submit" class="submit-btn" id="submit-btn" data-i18n="login_submit">Sign in →</button>
+      <div class="error-msg" id="error-msg" data-i18n="login_error_notfound">Student ID not found — check with your teacher</div>
+    </form>
+
+    <p class="form-note"><span data-i18n="login_no_account">Don't have an account?</span> <a href="trial.html" data-i18n="login_trial_link">Start your free trial →</a></p>
+  </div>
+</main>
+
+
+<!-- ════════ FOOTER ════════ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">Nuvo <span>Math</span></div>
+    <div class="footer-contact">
+      <a href="mailto:tutor@nuvostudio.club">tutor@nuvostudio.club</a>
+      <a href="https://wa.me/5076014-1676">WhatsApp: 6014-1676</a>
+    </div>
+    <p class="footer-copy" data-i18n="footer_copy">© 2026 Nuvo Math · nuvostudio.club</p>
+  </div>
+</footer>
+
+
+<script src="lang.js?v=20260513-guest-trial-flow"></script>
+<script>
+  const WORKER = 'https://math-practice-proxy.ronelalmanza20.workers.dev';
+
+  Lang.apply();
+
+  // ── Mobile nav ──
+  const hamburger = document.getElementById('hamburger');
+  const navLinks  = document.getElementById('nav-links');
+
+  hamburger.addEventListener('click', () => {
+    const open = navLinks.classList.toggle('open');
+    hamburger.setAttribute('aria-expanded', open);
+  });
+
+  navLinks.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      navLinks.classList.remove('open');
+      hamburger.setAttribute('aria-expanded', false);
+    });
+  });
+
+  // ── Login form ──
+  const form      = document.getElementById('login-form');
+  const submitBtn = document.getElementById('submit-btn');
+  const errorMsg  = document.getElementById('error-msg');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const studentId = document.getElementById('student-id').value.trim();
+    if (!studentId) return;
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = Lang.t('login_signing_in');
+    errorMsg.classList.remove('show');
+
+    try {
+      const res = await fetch(`${WORKER}/student/${encodeURIComponent(studentId)}`);
+
+      if (res.ok) {
+        localStorage.setItem('studentId', studentId);
+        const urlParams = new URLSearchParams(window.location.search);
+        const curriculum = urlParams.get('curriculum');
+        if (curriculum) {
+          localStorage.setItem('curriculum', curriculum);
+        }
+        window.location.href = 'home.html';
+      } else if (res.status === 404) {
+        errorMsg.textContent = Lang.t('login_error_notfound');
+        errorMsg.classList.add('show');
+        submitBtn.disabled = false;
+        submitBtn.textContent = Lang.t('login_submit');
+      } else {
+        errorMsg.textContent = Lang.t('login_error_generic');
+        errorMsg.classList.add('show');
+        submitBtn.disabled = false;
+        submitBtn.textContent = Lang.t('login_submit');
+      }
+    } catch {
+      errorMsg.textContent = Lang.t('login_error_network');
+      errorMsg.classList.add('show');
+      submitBtn.disabled = false;
+      submitBtn.textContent = Lang.t('login_submit');
+    }
+  });
+</script>
+
+</body>
+</html>

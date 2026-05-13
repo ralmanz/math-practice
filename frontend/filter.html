@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nuvo Math — Elige tu programa</title>
+  <meta name="description" content="Elige el programa de práctica que mejor se adapte a lo que necesitas.">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:        #2563EB;
+      --blue-dark:   #1E40AF;
+      --blue-mid:    #3B82F6;
+      --blue-light:  #DBEAFE;
+      --blue-xlight: #EFF6FF;
+      --text:        #111827;
+      --text-mid:    #374151;
+      --text-muted:  #6B7280;
+      --border:      #E5E7EB;
+      --bg:          #F9FAFB;
+      --white:       #FFFFFF;
+      --radius:      12px;
+      --radius-lg:   20px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .nav-logo {
+      font-weight: 800;
+      font-size: 1.2rem;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.03em;
+      flex-shrink: 0;
+    }
+
+    .nav-logo span { color: var(--blue); }
+
+    .nav-signin {
+      text-decoration: none;
+      color: var(--text-mid);
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.15s;
+    }
+
+    .nav-signin:hover { color: var(--text); }
+
+    /* ── Main ── */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 72px 24px 80px;
+    }
+
+    .filter-heading {
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      text-align: center;
+      line-height: 1.15;
+      margin-bottom: 14px;
+    }
+
+    .filter-sub {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      text-align: center;
+      max-width: 480px;
+      margin: 0 auto 52px;
+      line-height: 1.65;
+    }
+
+    /* ── Cards ── */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      width: 100%;
+      max-width: 720px;
+    }
+
+    .filter-card {
+      background: var(--white);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 40px 32px 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .filter-card:hover {
+      border-color: var(--blue);
+      box-shadow: 0 4px 24px rgba(37, 99, 235, 0.1);
+    }
+
+    .card-icon {
+      font-size: 2.4rem;
+      line-height: 1;
+    }
+
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.3;
+    }
+
+    .card-desc {
+      font-size: 0.93rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+      flex: 1;
+    }
+
+    .card-btn {
+      display: inline-block;
+      padding: 13px 24px;
+      background: var(--blue);
+      color: white;
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      border-radius: 10px;
+      text-decoration: none;
+      text-align: center;
+      transition: background 0.15s;
+      border: none;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    .card-btn:hover { background: var(--blue-dark); }
+
+    .card-btn.secondary {
+      background: transparent;
+      color: var(--blue);
+      border: 2px solid var(--blue);
+    }
+
+    .card-btn.secondary:hover { background: var(--blue-xlight); }
+
+    /* ── Back link ── */
+    .filter-back {
+      margin-top: 40px;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .filter-back:hover { color: var(--text); }
+
+    /* ── Footer ── */
+    footer {
+      background: #111827;
+      color: #D1D5DB;
+      padding: 40px 24px;
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      text-align: center;
+    }
+
+    .footer-logo {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: white;
+      letter-spacing: -0.03em;
+    }
+
+    .footer-logo span { color: #93C5FD; }
+
+    .footer-contact {
+      display: flex;
+      gap: 28px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .footer-contact a {
+      color: #9CA3AF;
+      text-decoration: none;
+      font-size: 0.88rem;
+      transition: color 0.15s;
+    }
+
+    .footer-contact a:hover { color: white; }
+
+    .footer-copy {
+      font-size: 0.8rem;
+      color: #4B5563;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      .cards-grid { grid-template-columns: 1fr; max-width: 440px; }
+      main { padding: 48px 20px 64px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════ NAV ════════ -->
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">Nuvo <span>Math</span></a>
+    <a href="login.html" class="nav-signin" data-i18n="nav_signin">Sign in</a>
+  </div>
+</nav>
+
+
+<!-- ════════ MAIN ════════ -->
+<main>
+  <h1 class="filter-heading" data-i18n="filter_heading">¿Qué quieres practicar?</h1>
+  <p class="filter-sub" data-i18n="filter_sub">Elige la opción que mejor se adapte a lo que necesitas.</p>
+
+  <div class="cards-grid">
+
+    <!-- Card 1: PAA / UTP -->
+    <div class="filter-card">
+      <div class="card-icon">&#x1F393;</div>
+      <h2 class="card-title" data-i18n="filter_card1_title">Prueba de Admisión — UTP</h2>
+      <p class="card-desc" data-i18n="filter_card1_desc">Prepárate para el examen de admisión con práctica guiada en Aritmética, Álgebra, Geometría y más.</p>
+      <a href="home.html?curriculum=PAA&guest=true" class="card-btn" data-i18n="filter_card1_btn">Empezar →</a>
+    </div>
+
+    <!-- Card 2: Secondary Math -->
+    <div class="filter-card">
+      <div class="card-icon">&#x1F4DA;</div>
+      <h2 class="card-title" data-i18n="filter_card2_title">Matemáticas de Secundaria</h2>
+      <p class="card-desc" data-i18n="filter_card2_desc">Refuerza álgebra y matemáticas de grados 6 a 9 con el currículo Cambridge, Common Core o IB.</p>
+      <a href="home.html?curriculum=cambridge&guest=true" class="card-btn secondary" data-i18n="filter_card2_btn">Empezar →</a>
+    </div>
+
+  </div>
+
+  <a href="index.html" class="filter-back" data-i18n="filter_back">← Volver</a>
+</main>
+
+
+<!-- ════════ FOOTER ════════ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">Nuvo <span>Math</span></div>
+    <div class="footer-contact">
+      <a href="mailto:tutor@nuvostudio.club">tutor@nuvostudio.club</a>
+      <a href="https://wa.me/5076014-1676">WhatsApp: 6014-1676</a>
+    </div>
+    <p class="footer-copy" data-i18n="footer_copy">&copy; 2026 Nuvo Math &middot; nuvostudio.club</p>
+  </div>
+</footer>
+
+
+<script src="lang.js?v=20260513-spanish-default"></script>
+<script>
+  Lang.apply();
+</script>
+
+</body>
+</html>
