@@ -11,7 +11,7 @@
       nav_signin: 'Sign in',
       nav_get_started: 'Get Started',
       footer_copy: '\u00A9 2026 Nuvo Math \u00B7 nuvostudio.club',
-      footer_tagline: 'Algebra practice that actually teaches. Guided step-by-step practice and live tutoring for grades 6\u20139.',
+      footer_tagline: 'Math practice that actually teaches. Guided step-by-step practice and live tutoring.',
       loading_just_moment: 'Just a moment!',
 
       // === login.html ===
@@ -353,7 +353,7 @@
       nav_signin: 'Iniciar sesi\u00F3n',
       nav_get_started: 'Empezar',
       footer_copy: '\u00A9 2026 Nuvo Math \u00B7 nuvostudio.club',
-      footer_tagline: 'Pr\u00E1ctica de \u00E1lgebra que realmente ense\u00F1a. Pr\u00E1ctica guiada paso a paso y tutor\u00EDas en vivo para grados 6\u20139.',
+      footer_tagline: 'Pr\u00E1ctica de Matem\u00E1ticas que realmente ense\u00F1a. Pr\u00E1ctica guiada paso a paso y tutor\u00EDas en vivo.',
       loading_just_moment: '\u00A1Un momento!',
 
       // === login.html ===
