@@ -673,6 +673,131 @@
     font-weight: 800;
   }
 
+  /* PAA / Aritmética — intuitive concept & example visuals */
+  .paa-order-flow {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: stretch;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .paa-order-step {
+    flex: 1 1 108px;
+    text-align: center;
+    padding: 10px 8px;
+    border-radius: 12px;
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+  }
+
+  .paa-order-step span {
+    display: inline-block;
+    min-width: 26px;
+    height: 26px;
+    line-height: 26px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: white;
+    font-weight: 800;
+    font-size: 0.78rem;
+    margin-bottom: 6px;
+  }
+
+  .paa-order-step strong {
+    display: block;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+  }
+
+  .paa-order-step small {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: var(--text);
+  }
+
+  .paa-mini-compare {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  .paa-meter-row { margin-bottom: 12px; }
+
+  .paa-meter-label {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .paa-meter-track {
+    height: 14px;
+    border-radius: 999px;
+    background: var(--border);
+    overflow: hidden;
+  }
+
+  .paa-meter-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--accent), #38BDF8);
+  }
+
+  .paa-meter-fill--muted {
+    background: linear-gradient(90deg, #94A3B8, #CBD5E1);
+  }
+
+  .paa-tree {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+  }
+
+  .paa-tree-row {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .paa-tree-node {
+    min-width: 46px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    font-family: var(--mono);
+    font-weight: 800;
+    background: var(--card);
+  }
+
+  .paa-tree-node--prime {
+    border-color: #F59E0B;
+    background: #FFFBEB;
+    color: #B45309;
+  }
+
+  .paa-highlight-box {
+    border: 2px solid var(--accent);
+    border-radius: 12px;
+    padding: 10px 12px;
+    background: var(--accent-bg);
+    text-align: center;
+    font-family: var(--mono);
+    font-weight: 800;
+    color: var(--accent);
+  }
+
   .voice-btn {
     margin-top: 12px;
     width: auto;
