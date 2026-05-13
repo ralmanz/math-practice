@@ -297,7 +297,7 @@
       filter_card1_btn: 'Get started \u2192',
       filter_card2_title: 'Secondary School Math',
       filter_card2_desc: 'Strengthen algebra and math for grades 6\u20139 with the Cambridge, Common Core, or IB curriculum.',
-      filter_card2_btn: 'Contact Ronel \u2192',
+      filter_card2_btn: 'Get started \u2192',
       filter_back: '\u2190 Back',
 
       // === guest paywall ===
@@ -604,7 +604,7 @@
       filter_card1_btn: 'Empezar \u2192',
       filter_card2_title: 'Matem\u00E1ticas de Secundaria',
       filter_card2_desc: 'Refuerza \u00E1lgebra y matem\u00E1ticas de grados 6 a 9 con el curr\u00EDculo Cambridge, Common Core o IB.',
-      filter_card2_btn: 'Contactar a Ronel \u2192',
+      filter_card2_btn: 'Empezar \u2192',
       filter_back: '\u2190 Volver',
 
       // === guest paywall ===
