@@ -548,6 +548,131 @@
     padding: 12px;
   }
 
+  /* ── Balance scale visualization ── */
+  .balance-board {
+    width: 100%;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 22px 18px 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .balance-sides {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    width: 100%;
+    max-width: 480px;
+    align-items: end;
+  }
+
+  .balance-side {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .balance-side-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+  }
+
+  .balance-pan {
+    min-width: 130px;
+    padding: 14px 18px;
+    border-radius: 12px;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .balance-pan.empty {
+    color: var(--text-secondary);
+    font-style: italic;
+  }
+
+  .balance-bar-wrap {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 4px;
+  }
+
+  .balance-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--text);
+    border-radius: 4px;
+    transform-origin: 50% 50%;
+    transition: transform 0.4s ease;
+  }
+
+  .balance-bar.tilt-left  { transform: rotate(-6deg); }
+  .balance-bar.tilt-right { transform: rotate(6deg); }
+
+  .balance-pivot {
+    width: 0;
+    height: 0;
+    margin-top: -2px;
+    border-left: 14px solid transparent;
+    border-right: 14px solid transparent;
+    border-bottom: 18px solid var(--text-secondary);
+  }
+
+  .balance-base {
+    width: 90px;
+    height: 6px;
+    background: var(--text-secondary);
+    border-radius: 3px;
+    margin-top: 2px;
+  }
+
+  .balance-status {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    text-align: center;
+    margin-top: 4px;
+  }
+
+  .balance-status.balanced { color: var(--accent); font-weight: 600; }
+  .balance-status.unbalanced { color: var(--amber); font-weight: 600; }
+
+  .balance-operation {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent-bg);
+    border: 1.5px dashed var(--accent-light);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-family: var(--mono);
+    font-weight: 700;
+    color: var(--accent);
+    font-size: 0.88rem;
+  }
+
+  .balance-operation .op-label {
+    text-transform: uppercase;
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+    font-weight: 800;
+  }
+
   .voice-btn {
     margin-top: 12px;
     width: auto;
