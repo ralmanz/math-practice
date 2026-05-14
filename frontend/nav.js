@@ -87,9 +87,15 @@
         '<span class="nav-student" id="nav-student-name"></span>' +
         '<a href="#" class="nav-signout" id="nav-signout-btn">Cerrar sesi\u00f3n</a>';
     } else {
+      var getStartedLabel =
+        typeof window !== 'undefined' && window.Lang
+          ? window.Lang.t('nav_get_started')
+          : 'Practicar';
       rightHtml =
         '<a href="login.html" class="nav-signin">Iniciar sesi\u00f3n</a>' +
-        '<a href="filter.html" class="nav-get-started">Practicar</a>';
+        '<a href="filter.html" class="nav-get-started">' +
+        getStartedLabel +
+        '</a>';
     }
 
     root.innerHTML =
