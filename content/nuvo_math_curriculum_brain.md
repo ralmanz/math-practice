@@ -505,6 +505,398 @@ and must be REJECTED if they appear in any proposed content:
 
 ---
 
+---
+
+## SECTION 7 — PAA (PRUEBA DE APTITUD ACADÉMICA) — MATEMÁTICAS
+**Institución:** College Board Puerto Rico y América Latina
+**Propósito:** Admisión universitaria — prueba predictiva de aptitud matemática
+**Formato:** Selección múltiple (4 opciones) + ejercicios para suplir la respuesta (fill-in)
+**Tiempo:** 2 horas y 20 minutos (junto con Lectura y Redacción)
+**Calculadora:** NO permitida
+**Áreas evaluadas:** Aritmética · Álgebra · Geometría · Análisis de datos y Probabilidad
+**Audiencia Nuvo Math:** Estudiantes panameños preparándose para el examen de admisión a la UTP y otras universidades · Idioma: Español
+**Niveles Nuvo Math:** 3 niveles por unidad (en lugar de 4) — el examen tiene una sola progresión de dificultad
+
+---
+
+### NOTA DE IDIOMA
+Todo el contenido PAA en Nuvo Math se presenta en **español**.
+Vocabulario técnico, instrucciones, tarjetas de concepto, ejemplos trabajados,
+problemas de práctica, pruebas y pistas — todo en español.
+Esta es una decisión de producto permanente para esta sección del currículo.
+
+---
+
+### PAA — UNIDAD 1: ARITMÉTICA
+**Código Nuvo Math:** curriculum: "PAA", unit: "aritmetica"
+
+#### Temas cubiertos en esta unidad:
+- Propiedades y operaciones de los números reales
+- Razón, proporción y porcentaje
+- Patrones numéricos
+- Conceptos de teoría de números: divisibilidad, factorización prima,
+  múltiplos, máximo común divisor (MCD) y mínimo común múltiplo (MCM)
+
+#### Lo que NO se cubre en Aritmética PAA:
+- Álgebra (expresiones, ecuaciones) — eso es Unidad 2
+- Geometría — Unidad 3
+- Estadística y probabilidad — Unidad 4
+- Números complejos
+- Logaritmos
+- Cálculo
+
+#### Calibración de dificultad para los 3 niveles:
+- **Nivel 1:** Operaciones directas con números reales, orden de operaciones, propiedades básicas
+- **Nivel 2:** Razón, proporción y porcentaje — incluyendo problemas de descuento, aumento y contextos del mundo real
+- **Nivel 3:** Teoría de números y patrones — factorización prima, MCD, MCM, sucesiones
+
+#### Vocabulario esperado (en español):
+número real, entero, racional, irracional, operación, suma, resta, multiplicación,
+división, exponente, potencia, orden de operaciones, paréntesis, razón, proporción,
+porcentaje, descuento, aumento, precio final, divisible, factor, múltiplo, primo,
+factorización prima, máximo común divisor, mínimo común múltiplo, sucesión, patrón,
+término, diferencia común, razón común
+
+#### Errores comunes a evitar en los problemas:
+- Confundir el orden de operaciones — especialmente mezclar × ÷ con + − sin paréntesis
+- Aplicar porcentajes de forma aditiva en lugar de multiplicativa (por ejemplo, dos descuentos consecutivos NO se suman)
+- Confundir MCD con MCM
+- Asumir que el siguiente término de una sucesión siempre es aritmético — puede ser geométrico
+
+---
+
+### PAA · Aritmética · Nivel 1
+**Tema:** Operaciones con números reales y orden de operaciones
+
+#### Tarjeta de concepto:
+Los números reales incluyen todos los números racionales e irracionales.
+Las operaciones básicas siguen propiedades específicas:
+
+- **Conmutativa:** a + b = b + a · · · a × b = b × a
+- **Asociativa:** (a + b) + c = a + (b + c)
+- **Distributiva:** a(b + c) = ab + ac
+- **Elemento neutro:** a + 0 = a · · · a × 1 = a
+- **Orden de operaciones (PEMDAS en español: PAPOMUDAS):**
+  Paréntesis → Potencias → Multiplicación y División (de izquierda a derecha) → Adición y Sustracción (de izquierda a derecha)
+
+#### Ejemplo trabajado:
+**¿Cuánto es 18 + 2³ ÷ 4 × 2?**
+
+Paso 1: Resolver la potencia → 2³ = 8
+Paso 2: Multiplicación y división de izquierda a derecha → 8 ÷ 4 = 2 → 2 × 2 = 4
+Paso 3: Suma → 18 + 4 = **22**
+
+#### Problemas de práctica (6):
+
+P1
+- Enunciado: ¿Cuánto es 5 + 3 × 4?
+- Respuesta: 17
+- Tipo: open
+- Pista 1: Recuerda el orden de operaciones — la multiplicación va antes que la suma.
+- Pista 2: Primero calcula 3 × 4, luego suma 5.
+- Pista 3: 3 × 4 = 12. Ahora suma: 5 + 12 = ?
+
+P2
+- Enunciado: ¿Cuánto es (5 + 3) × 4?
+- Respuesta: 32
+- Tipo: open
+- Pista 1: Los paréntesis cambian el orden — resuelve primero lo que está adentro.
+- Pista 2: Primero calcula 5 + 3, luego multiplica por 4.
+- Pista 3: 5 + 3 = 8. Ahora multiplica: 8 × 4 = ?
+
+P3
+- Enunciado: ¿Cuánto es 24 ÷ 6 + 2 × 3?
+- Respuesta: 10
+- Tipo: open
+- Pista 1: Hay dos operaciones del mismo nivel (÷ y ×) — resuélvelas de izquierda a derecha antes de sumar.
+- Pista 2: Primero calcula 24 ÷ 6 y 2 × 3 por separado, luego suma los resultados.
+- Pista 3: 24 ÷ 6 = 4 y 2 × 3 = 6. Ahora suma: 4 + 6 = ?
+
+P4
+- Enunciado: ¿Cuánto es 3² + 4 × 2 − 1?
+- Respuesta: 16
+- Tipo: open
+- Pista 1: Empieza por la potencia, luego la multiplicación, luego suma y resta.
+- Pista 2: 3² = 9 y 4 × 2 = 8. Ahora combínalos.
+- Pista 3: 9 + 8 − 1 = ?
+
+P5
+- Enunciado: ¿Cuánto es 50 − 2³ × 3 + 1?
+- Respuesta: 27
+- Tipo: open
+- Pista 1: Hay una potencia en la expresión — resuélvela primero.
+- Pista 2: 2³ = 8. Ahora multiplica: 8 × 3 = 24. Luego opera con 50 y 1.
+- Pista 3: 50 − 24 + 1 = ?
+
+P6
+- Enunciado: Simplifica: 4(3 + 2) − 2(6 − 1)
+- Respuesta: 10
+- Tipo: open
+- Pista 1: Resuelve primero cada paréntesis por separado.
+- Pista 2: 4(5) = 20 y 2(5) = 10. Ahora resta.
+- Pista 3: 20 − 10 = ?
+
+#### Problemas de prueba (3) — sin pistas:
+
+T1
+- Enunciado: ¿Cuánto es 18 + 2³ ÷ 4 × 2?
+- Respuesta: 22
+- Tipo: open
+
+T2
+- Enunciado: ¿Cuánto es 3(4 + 2) − 2(5 − 3)?
+- Respuesta: 14
+- Tipo: open
+
+T3
+- Enunciado: Si a = 3 y b = 2, ¿cuánto es a² + 2ab − b²?
+- Respuesta: 13
+- Tipo: open
+
+---
+
+### PAA · Aritmética · Nivel 2
+**Tema:** Razón, proporción y porcentaje
+
+#### Tarjeta de concepto:
+- **Razón:** comparación entre dos cantidades → a:b o a/b
+- **Proporción:** dos razones iguales → a/b = c/d, por lo tanto ad = bc (productos cruzados)
+- **Porcentaje:** parte de 100 → x% de n = (x ÷ 100) × n
+- **Descuento:** precio final = precio original × (1 − descuento expresado como decimal)
+  Ejemplo: 20% de descuento → precio final = original × 0.80
+- **Aumento:** precio final = precio original × (1 + aumento expresado como decimal)
+  Ejemplo: 15% de aumento → precio final = original × 1.15
+- **Cuidado:** dos descuentos consecutivos NO se suman — se aplican uno tras otro
+
+#### Ejemplo trabajado:
+**Un artículo cuesta $48.00 y tiene 20% de descuento. Los clientes con tarjeta reciben 10% adicional. ¿Cuánto más paga quien NO usa la tarjeta?**
+
+Paso 1: Precio con 20% de descuento → 48 × 0.80 = $38.40
+Paso 2: Precio con descuento adicional de 10% → 38.40 × 0.90 = $34.56
+Paso 3: Diferencia → 38.40 − 34.56 = **$3.84**
+
+Nota: El descuento total NO es 30% — es dos descuentos aplicados en secuencia.
+
+#### Problemas de práctica (6):
+
+P1
+- Enunciado: ¿Cuánto es el 25% de 200?
+- Respuesta: 50
+- Tipo: open
+- Pista 1: Para calcular un porcentaje, convierte el porcentaje a decimal y multiplica.
+- Pista 2: 25% = 0.25. Ahora multiplica por 200.
+- Pista 3: 0.25 × 200 = ?
+
+P2
+- Enunciado: Un producto cuesta $80.00 con 15% de descuento. ¿Cuál es el precio final?
+- Respuesta: 68
+- Tipo: open
+- Pista 1: Un descuento del 15% significa que pagas el 85% del precio original.
+- Pista 2: Multiplica el precio original por 0.85.
+- Pista 3: 80 × 0.85 = ?
+
+P3
+- Enunciado: Si 3 lápices cuestan $1.50, ¿cuánto cuestan 8 lápices?
+- Respuesta: 4
+- Tipo: open
+- Pista 1: Establece una proporción: 3 lápices es a $1.50 como 8 lápices es a $x.
+- Pista 2: Usa productos cruzados: 3x = 1.50 × 8.
+- Pista 3: 3x = 12. Divide: x = ?
+
+P4
+- Enunciado: En una clase hay 12 niñas y 18 niños. ¿Cuál es la razón de niñas al total de estudiantes?
+- Respuesta: A
+- Tipo: mcq
+- Opciones:
+  - A) 2:5
+  - B) 2:3
+  - C) 3:5
+  - D) 1:3
+- Pista 1: El total de estudiantes es 12 + 18 = 30. La razón es niñas:total.
+- Pista 2: La razón es 12:30. Simplifica dividiendo ambos por el MCD.
+- Pista 3: El MCD de 12 y 30 es 6. Entonces 12÷6 : 30÷6 = ?
+
+P5
+- Enunciado: Un conductor viajó 115 km el primer día y 85 km el segundo. Si recorrió el 80% de la distancia total, ¿cuántos km le faltan por recorrer?
+- Respuesta: 50
+- Tipo: open
+- Pista 1: Primero calcula la distancia recorrida hasta ahora.
+- Pista 2: 115 + 85 = 200 km. Eso representa el 80%. ¿Cuál es el 100%?
+- Pista 3: Si 200 es el 80%, el total es 200 ÷ 0.80 = 250. Los km que faltan son 250 − 200 = ?
+
+P6
+- Enunciado: ¿Qué porcentaje de 150 es 45?
+- Respuesta: 30
+- Tipo: open
+- Pista 1: Para encontrar qué porcentaje es una parte del total, divide la parte entre el total y multiplica por 100.
+- Pista 2: (45 ÷ 150) × 100 = ?
+- Pista 3: 45 ÷ 150 = 0.30. Ahora multiplica por 100.
+
+#### Problemas de prueba (3) — sin pistas:
+
+T1
+- Enunciado: Un artículo de $120.00 tiene 25% de descuento. ¿Cuál es el precio final?
+- Respuesta: 90
+- Tipo: open
+
+T2
+- Enunciado: Si 5/8 de la distancia total son 300 km, ¿cuál es la distancia total en km?
+- Respuesta: 480
+- Tipo: open
+
+T3
+- Enunciado: Un joven retira el 25% de sus ahorros y gasta el 33⅓% de eso en adornos que costaron $250.00. ¿Cuántos dólares tenía en el banco?
+- Respuesta: 3000
+- Tipo: open
+
+---
+
+### PAA · Aritmética · Nivel 3
+**Tema:** Patrones numéricos y teoría de números
+
+#### Tarjeta de concepto:
+- **Divisibilidad:** un número es divisible por otro si el residuo de la división es 0
+  - Divisible por 2: termina en número par
+  - Divisible por 3: la suma de sus dígitos es divisible por 3
+  - Divisible por 5: termina en 0 o 5
+- **Factorización prima:** expresar un número como producto de números primos
+  Ejemplo: 60 = 2² × 3 × 5
+- **MCD (Máximo Común Divisor):** el mayor número que divide exactamente a dos o más números
+  Método: factoriza ambos → toma los factores comunes con el menor exponente
+- **MCM (Mínimo Común Múltiplo):** el menor número que es múltiplo de dos o más números
+  Método: factoriza ambos → toma todos los factores con el mayor exponente
+- **Sucesiones aritméticas:** diferencia constante entre términos → 3, 7, 11, 15... (+4)
+- **Sucesiones geométricas:** razón constante entre términos → 2, 6, 18, 54... (×3)
+
+#### Ejemplo trabajado:
+**Halla el MCD y el MCM de 12 y 18.**
+
+Paso 1: Factoriza cada número
+- 12 = 2² × 3
+- 18 = 2 × 3²
+
+Paso 2: MCD → factores comunes con el menor exponente
+- Factor 2: menor exponente es 2¹
+- Factor 3: menor exponente es 3¹
+- MCD = 2 × 3 = **6**
+
+Paso 3: MCM → todos los factores con el mayor exponente
+- Factor 2: mayor exponente es 2²
+- Factor 3: mayor exponente es 3²
+- MCM = 4 × 9 = **36**
+
+#### Problemas de práctica (6):
+
+P1
+- Enunciado: ¿Cuál es la factorización prima de 60?
+- Respuesta: B
+- Tipo: mcq
+- Opciones:
+  - A) 2 × 5 × 6
+  - B) 2² × 3 × 5
+  - C) 2 × 30
+  - D) 4 × 15
+- Pista 1: La factorización prima usa SOLO números primos. ¿Cuáles de las opciones contienen solo primos?
+- Pista 2: Divide 60 entre 2 repetidamente: 60 ÷ 2 = 30 ÷ 2 = 15. Ahora factoriza 15.
+- Pista 3: 15 = 3 × 5. Entonces 60 = 2 × 2 × 3 × 5 = ?
+
+P2
+- Enunciado: ¿Cuál es el MCD de 24 y 36?
+- Respuesta: 12
+- Tipo: open
+- Pista 1: Factoriza ambos números en factores primos.
+- Pista 2: 24 = 2³ × 3 y 36 = 2² × 3². Busca los factores comunes con el menor exponente.
+- Pista 3: Los factores comunes son 2² y 3. Multiplica: 4 × 3 = ?
+
+P3
+- Enunciado: ¿Cuál es el MCM de 4 y 6?
+- Respuesta: 12
+- Tipo: open
+- Pista 1: Factoriza ambos números y toma todos los factores con el mayor exponente.
+- Pista 2: 4 = 2² y 6 = 2 × 3. El mayor exponente de 2 es 2², y el de 3 es 3¹.
+- Pista 3: MCM = 2² × 3 = 4 × 3 = ?
+
+P4
+- Enunciado: En la sucesión 3, 7, 11, 15... ¿cuál es el siguiente número?
+- Respuesta: 19
+- Tipo: open
+- Pista 1: Identifica el patrón — ¿cuánto aumenta cada término?
+- Pista 2: La diferencia entre términos consecutivos es siempre la misma. Calcula 7 − 3.
+- Pista 3: La diferencia es 4. Suma 4 al último término: 15 + 4 = ?
+
+P5
+- Enunciado: ¿Cuántos múltiplos de 7 hay entre 1 y 50?
+- Respuesta: 7
+- Tipo: open
+- Pista 1: Los múltiplos de 7 son: 7, 14, 21... Lista los que están entre 1 y 50.
+- Pista 2: El mayor múltiplo de 7 que no supera 50 es 49. ¿Cuántos múltiplos hay desde 7 hasta 49?
+- Pista 3: 7, 14, 21, 28, 35, 42, 49. Cuenta cuántos hay.
+
+P6
+- Enunciado: ¿Cuál es el MCD de 45 y 60?
+- Respuesta: 15
+- Tipo: open
+- Pista 1: Factoriza ambos números en factores primos.
+- Pista 2: 45 = 3² × 5 y 60 = 2² × 3 × 5. Busca los factores comunes.
+- Pista 3: Los factores comunes son 3 y 5. Multiplica: 3 × 5 = ?
+
+#### Problemas de prueba (3) — sin pistas:
+
+T1
+- Enunciado: Dos autobuses salen juntos de la terminal. Uno pasa cada 12 minutos y otro cada 18 minutos. ¿En cuántos minutos volverán a salir juntos?
+- Respuesta: 36
+- Tipo: open
+
+T2
+- Enunciado: ¿Cuál es el siguiente término en la sucesión 2, 6, 18, 54...?
+- Respuesta: 162
+- Tipo: open
+
+T3
+- Enunciado: ¿Cuál es la factorización prima de 84?
+- Respuesta: C
+- Tipo: mcq
+- Opciones:
+  - A) 2 × 42
+  - B) 4 × 21
+  - C) 2² × 3 × 7
+  - D) 2 × 3 × 14
+
+---
+
+### REGLAS DE VALIDACIÓN ADICIONALES — PAA
+
+#### Regla PAA-1 — Formato del examen
+Los problemas PAA en Nuvo Math pueden ser:
+- **open:** el estudiante escribe la respuesta numérica (validado por Algebrite o comparación exacta)
+- **mcq:** selección múltiple con 4 opciones (A, B, C, D) — validado por coincidencia de letra
+
+Los problemas de prueba (test) no tienen pistas.
+Los problemas de práctica siempre tienen 3 pistas escaladas.
+
+#### Regla PAA-2 — Idioma
+Todo el contenido de la sección PAA está en español sin excepción.
+Esto incluye enunciados, pistas, tarjetas de concepto, ejemplos trabajados y mensajes de retroalimentación.
+
+#### Regla PAA-3 — Sin calculadora
+Todos los problemas PAA deben ser resolubles sin calculadora.
+Evitar números que requieran divisiones largas o decimales complejos.
+Los números en problemas de porcentaje deben ser "amigables" (múltiplos de 5, 10, 25, etc.)
+
+#### Regla PAA-4 — Contexto real
+Al menos el 40% de los problemas de práctica deben tener contexto del mundo real
+(precios, distancias, grupos de personas, situaciones cotidianas panameñas cuando sea posible).
+
+#### Regla PAA-5 — Dificultad progresiva dentro del nivel
+Dentro de cada nivel, los 6 problemas de práctica deben progresar de más fácil a más difícil.
+P1-P2: aplicación directa del concepto
+P3-P4: una operación adicional o contexto
+P5-P6: problema de dos pasos o contexto más elaborado
+
+---
+
+*Sección PAA agregada por Ronel Almanza | Mayo 2026*
+*Fuente: PAA Guía de Estudio 2021 — College Board Puerto Rico y América Latina*
 *Document maintained by Ronel Almanza | Last updated: May 2026*
 *Sources: Cambridge Lower Secondary Mathematics Framework 0862 (2020), Framework 1112 (2018),*
 *Common Core State Standards for Mathematics (2010), IB MYP Mathematics Guide (2020)*
