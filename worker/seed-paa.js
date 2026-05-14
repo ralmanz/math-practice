@@ -491,21 +491,7 @@ const PAA_LESSONS = [
         '10% descuento adicional → multiplicar por 0.90 sobre el precio actual',
         '0.80 × 0.90 = 0.72 (72% del original, no 70%)',
       ],
-      conceptVisual:
-        '<div class="lesson-visual-board">' +
-        '<div class="visual-group-box">' +
-        '<div class="visual-group-title">Dos rebajas seguidas</div>' +
-        '<p style="font-size:0.88rem;color:var(--text-secondary);line-height:1.55;">Cada descuento recorta el precio que ya tienes en pantalla. Por eso las barras bajan en dos pasos, no en un solo salto.</p>' +
-        '</div>' +
-        '<div class="visual-group-box">' +
-        '<div class="visual-group-title">Cuánto del precio sigues pagando</div>' +
-        '<div class="paa-meter-row"><div class="paa-meter-label"><span>Precio original</span><span>100%</span></div>' +
-        '<div class="paa-meter-track"><div class="paa-meter-fill" style="width:100%"></div></div></div>' +
-        '<div class="paa-meter-row"><div class="paa-meter-label"><span>Tras 20% off</span><span>80%</span></div>' +
-        '<div class="paa-meter-track"><div class="paa-meter-fill" style="width:80%"></div></div></div>' +
-        '<div class="paa-meter-row"><div class="paa-meter-label"><span>Tras 10% más</span><span>72%</span></div>' +
-        '<div class="paa-meter-track"><div class="paa-meter-fill--muted" style="width:72%"></div></div></div>' +
-        '<div class="tile-equation" style="margin-top:8px;">0.80 × 0.90 = 0.72</div></div></div>',
+      conceptVisual: fs.readFileSync('./visual_nivel2.html', 'utf8'),
       rules: [
         'Razón: comparación entre dos cantidades → a:b o a/b',
         'Proporción: dos razones iguales → a/b = c/d, por lo tanto ad = bc (productos cruzados)',
@@ -587,26 +573,7 @@ const PAA_LESSONS = [
         'MCD = 2^min × 3^min = 2 × 3 = 6',
         'MCM = 2^max × 3^max = 4 × 9 = 36',
       ],
-      conceptVisual:
-        '<div class="lesson-visual-board">' +
-        '<div class="visual-group-grid">' +
-        '<div class="visual-group-box"><div class="visual-group-title">Árbol para 12</div>' +
-        '<div class="paa-tree">' +
-        '<div class="paa-tree-row"><div class="paa-tree-node">12</div></div>' +
-        '<div class="paa-tree-row"><div class="paa-tree-node">4</div><div class="paa-tree-node">3</div></div>' +
-        '<div class="paa-tree-row"><div class="paa-tree-node">2</div><div class="paa-tree-node">2</div><div class="paa-tree-node paa-tree-node--prime">3</div></div>' +
-        '<div class="tile-equation" style="margin-top:6px;">12 = 2² × 3</div></div></div>' +
-        '<div class="visual-group-box"><div class="visual-group-title">Árbol para 18</div>' +
-        '<div class="paa-tree">' +
-        '<div class="paa-tree-row"><div class="paa-tree-node">18</div></div>' +
-        '<div class="paa-tree-row"><div class="paa-tree-node">6</div><div class="paa-tree-node">3</div></div>' +
-        '<div class="paa-tree-row"><div class="paa-tree-node">2</div><div class="paa-tree-node">3</div><div class="paa-tree-node paa-tree-node--prime">3</div></div>' +
-        '<div class="tile-equation" style="margin-top:6px;">18 = 2 × 3²</div></div></div>' +
-        '</div>' +
-        '<div class="visual-group-box" style="margin-top:10px">' +
-        '<div class="visual-group-title">Idea visual MCD vs MCM</div>' +
-        '<p style="font-size:0.88rem;color:var(--text-secondary);line-height:1.55;">MCD: solo lo que comparten ambos (exponente mínimo). MCM: cubre todo lo que aparece en cualquiera (exponente máximo).</p>' +
-        '</div></div>',
+      conceptVisual: fs.readFileSync('./visual_nivel3.html', 'utf8'),
       rules: [
         'Divisibilidad: divisible por 2 → termina en par · por 3 → suma de dígitos divisible por 3 · por 5 → termina en 0 o 5',
         'Factorización prima: expresar un número como producto de números primos. Ejemplo: 60 = 2² × 3 × 5',
