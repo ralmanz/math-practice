@@ -377,7 +377,9 @@
       const res = await fetch(`${WORKER}/student/${encodeURIComponent(studentId)}`);
 
       if (res.ok) {
+        const student = await res.json();
         localStorage.setItem('studentId', studentId);
+        localStorage.setItem('nuvo_student', JSON.stringify({ id: studentId, name: student.name || studentId }));
         const urlParams = new URLSearchParams(window.location.search);
         const curriculum = urlParams.get('curriculum');
         if (curriculum) {
