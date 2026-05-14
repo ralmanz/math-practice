@@ -513,6 +513,7 @@
   function getLevelState(unitNum, levelNum, progress, hasProgress) {
     if (!hasProgress) {
       // Default: only Unit 1 Level 1 is available
+      if (window.isTeacher) return 'available';
       return (unitNum === 1 && levelNum === 1) ? 'available' : 'locked';
     }
 
@@ -523,6 +524,7 @@
     if (status === 'current')  return 'available';
 
     // Not explicitly in progress — apply unlock logic
+    if (window.isTeacher) return 'available';
     return isUnlocked(unitNum, levelNum, progress) ? 'available' : 'locked';
   }
 
@@ -539,6 +541,7 @@
     const prevStatus = (progress[unitKey] || {})[String(levelNum - 1)];
     if (prevStatus === 'complete') return 'available';
     if (prevStatus === 'current')  return 'available';
+    if (window.isTeacher) return 'available';
     return 'locked';
   }
 
@@ -802,6 +805,7 @@
         return;
       }
       student = await res.json();
+      if (student.isTeacher === true) window.isTeacher = true;
     } catch {
       // Network error — still show something useful
       document.getElementById('loading-state').style.display = 'none';
