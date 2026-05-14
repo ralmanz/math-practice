@@ -629,11 +629,13 @@
 
     document.title = Lang.t('guest_paa_home_title');
     studentName.textContent = Lang.t('guest_paa_home_header_title');
-    navName.textContent = '';
+    if (navName) navName.textContent = '';
     badge.innerHTML = `&#x1F4D0; ${Lang.t('paa_curriculum_label')}`;
     heading.textContent = Lang.t('guest_paa_home_subtitle');
-    signoutBtn.textContent = Lang.t('guest_login_cta');
-    signoutBtn.href = 'login.html?curriculum=PAA';
+    if (signoutBtn) {
+      signoutBtn.textContent = Lang.t('guest_login_cta');
+      signoutBtn.href = 'login.html?curriculum=PAA';
+    }
 
     guestBanner.style.display = 'block';
     guestBanner.textContent = Lang.t('guest_paa_trial_banner');
@@ -700,11 +702,13 @@
 
     document.title = Lang.t('guest_secondary_home_title');
     studentName.textContent = Lang.t('guest_secondary_home_header_title');
-    navName.textContent = '';
+    if (navName) navName.textContent = '';
     badge.innerHTML = `&#x1F4D0; ${Lang.t('guest_secondary_badge')}`;
     heading.textContent = Lang.t('guest_secondary_home_subtitle');
-    signoutBtn.textContent = Lang.t('guest_login_cta');
-    signoutBtn.href = 'login.html?curriculum=cambridge';
+    if (signoutBtn) {
+      signoutBtn.textContent = Lang.t('guest_login_cta');
+      signoutBtn.href = 'login.html?curriculum=cambridge';
+    }
 
     guestBanner.style.display = 'block';
     guestBanner.textContent = Lang.t('guest_secondary_trial_banner');
