@@ -380,6 +380,7 @@
         const student = await res.json();
         localStorage.setItem('studentId', studentId);
         localStorage.setItem('nuvo_student', JSON.stringify({ id: studentId, name: student.name || studentId }));
+        // Keep both keys in sync — home/filter guest bypass checks for either.
         const urlParams = new URLSearchParams(window.location.search);
         const curriculum = urlParams.get('curriculum');
         if (curriculum) {

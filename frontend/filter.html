@@ -302,7 +302,7 @@
 <script>
   (function () {
     var isTeacher = localStorage.getItem('nuvo_teacher') === 'true';
-    var hasStudent = !!localStorage.getItem('studentId');
+    var hasStudent = !!(localStorage.getItem('studentId') || localStorage.getItem('nuvo_student'));
     if (!isTeacher && !hasStudent) return;
     document.querySelectorAll('a.card-btn[href*="guest=true"]').forEach(function (a) {
       var href = a.getAttribute('href') || '';
