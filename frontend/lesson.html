@@ -926,6 +926,40 @@
   .phase-tag-practice { background: var(--accent-bg); color: var(--accent); }
   .phase-tag-test     { background: var(--blue-light); color: var(--blue); }
 
+  /* ── Subtopic navigation ── */
+  .subtopic-progress-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .subtopic-title-label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .subtopic-counter {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+  .subtopic-dots-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+  .subtopic-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+    flex-shrink: 0;
+    transition: background 0.25s;
+  }
+  .subtopic-dot.active { background: var(--accent); }
+  .subtopic-dot.done   { background: var(--teal); }
+
   @media (max-width: 500px) {
     body { padding: 0; }
     .container { padding: 20px 12px 48px; }
@@ -970,6 +1004,7 @@
   let exampleStep      = 0;
   let activeConceptTab = 'written';
   let activeExampleTab = 'symbolic';
+  let subtopicIndex    = 0;
 
   // ── Helpers ──────────────────────────────────────────────────
   function curriculumLabel(c) {
@@ -1196,7 +1231,15 @@
 
   // ── Phase 2: Concepts ─────────────────────────────────────────
   function showConcepts() {
+    subtopicIndex    = 0;
     activeConceptTab = 'written';
+
+    if (lesson.subtopics && lesson.subtopics.length > 0) {
+      renderSubtopic();
+      return;
+    }
+
+    // Flat mode — Nivel 1 and 2 (unchanged behavior)
     const rulesHtml = (lesson.rules || []).map((rule, i) =>
       `<li>
         <span class="rule-num">${i + 1}</span>
@@ -1233,6 +1276,77 @@
     `);
   }
 
+  function renderSubtopic() {
+    const sub    = lesson.subtopics[subtopicIndex];
+    const total  = lesson.subtopics.length;
+    const isLast = subtopicIndex === total - 1;
+
+    const rulesHtml = (sub.rules || []).map((rule, i) =>
+      `<li>
+        <span class="rule-num">${i + 1}</span>
+        <span>${escHtml(rule)}</span>
+      </li>`
+    ).join('');
+
+    const conceptVoiceText = (sub.conceptVoice || (sub.rules || []).join(' ')).trim();
+    const formulas         = sub.formulas || [];
+
+    const visualHtml = sub.conceptVisual
+      ? sub.conceptVisual
+      : `<div class="concept-visual-grid">${
+          (sub.rules || []).map((rule, i) =>
+            `<div class="concept-visual-card"><strong>${Lang.t('concept_visual_step')} ${i + 1}</strong><br>${escHtml(rule)}</div>`
+          ).join('')
+        }</div>`;
+
+    const dotsHtml = lesson.subtopics.map((_, i) => {
+      let cls = 'subtopic-dot';
+      if (i < subtopicIndex)        cls += ' done';
+      else if (i === subtopicIndex) cls += ' active';
+      return `<span class="${cls}"></span>`;
+    }).join('');
+
+    const nextLabel  = isLast ? Lang.t('concepts_next_btn') : 'Siguiente concepto \u2192';
+    const nextAction = isLast ? 'showExample()' : 'advanceSubtopic()';
+
+    render(`
+      ${progressBarHtml(2)}
+      ${badgeHtml()}
+      <h1>${escHtml(lesson.title || 'Lesson')}</h1>
+      <div class="subtopic-progress-row">
+        <div class="subtopic-title-label">${escHtml(sub.title)}</div>
+        <div class="subtopic-counter">${subtopicIndex + 1} de ${total}</div>
+      </div>
+      <div class="subtopic-dots-row">${dotsHtml}</div>
+      <div class="card">
+        <div class="card-title">${Lang.t('concepts_card_title')}</div>
+        <div class="tab-row">
+          <button class="tab-btn active" id="tab-concept-written" onclick="switchConceptTab('written')">${Lang.t('concept_tab_written')}</button>
+          <button class="tab-btn" id="tab-concept-visual" onclick="switchConceptTab('visual')">${Lang.t('concept_tab_visual')}</button>
+          <button class="tab-btn" id="tab-concept-formula" onclick="switchConceptTab('formula')">${Lang.t('concept_tab_formula')}</button>
+          <button class="tab-btn" id="tab-concept-voice" onclick="switchConceptTab('voice')">${Lang.t('concept_tab_voice')}</button>
+        </div>
+        <div id="concept-written-panel">
+          <ul class="rules-list">${rulesHtml || `<li><span style="color:var(--text-secondary);font-size:0.88rem;">${Lang.t('concepts_no_rules')}</span></li>`}</ul>
+        </div>
+        <div id="concept-visual-panel" class="teaching-panel" style="display:none;">${visualHtml}</div>
+        <div id="concept-formula-panel" class="teaching-panel" style="display:none;">${formulaPanelHtml(formulas)}</div>
+        <div id="concept-voice-panel" class="teaching-panel" style="display:none;">
+          <div id="concept-voice-text">${escHtml(conceptVoiceText || Lang.t('voice_no_text'))}</div>
+          <button class="main-btn voice-btn" onclick="speakText(document.getElementById('concept-voice-text').textContent)">${Lang.t('voice_listen_btn')}</button>
+          <button class="main-btn secondary voice-btn" onclick="stopVoice()">${Lang.t('voice_stop_btn')}</button>
+        </div>
+      </div>
+      <button class="main-btn" onclick="${nextAction}">${nextLabel}</button>
+    `);
+  }
+
+  function advanceSubtopic() {
+    subtopicIndex++;
+    activeConceptTab = 'written';
+    renderSubtopic();
+  }
+
   function switchConceptTab(tab) {
     activeConceptTab = tab;
     ['written', 'visual', 'formula', 'voice'].forEach(function (name) {
@@ -1243,6 +1357,11 @@
 
   // ── Phase 3: Worked example ───────────────────────────────────
   function showExample() {
+    // For lessons with subtopics, use the MCM subtopic (index 2) as the
+    // representative worked example — it contains the full MCD+MCM brain-doc example.
+    if (lesson.subtopics && !lesson.example) {
+      lesson.example = lesson.subtopics[2].example;
+    }
     exampleStep = 0;
     activeExampleTab = 'symbolic';
     renderExamplePhase();
