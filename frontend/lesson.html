@@ -982,7 +982,7 @@
   </div>
 </div>
 
-<script src="lang.js?v=20260514-practicar"></script>
+<script src="lang.js?v=20260514-concept-nav"></script>
 <script src="calculator.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/algebrite@1.4.0/dist/algebrite.bundle-for-browser.js"></script>
 <script>
@@ -1272,7 +1272,10 @@
           <button class="main-btn secondary voice-btn" onclick="stopVoice()">${Lang.t('voice_stop_btn')}</button>
         </div>
       </div>
-      <button class="main-btn" onclick="showExample()">${Lang.t('concepts_next_btn')}</button>
+      <div class="example-nav-row">
+        <button type="button" class="main-btn secondary" onclick="retreatConcepts()">${Lang.t('concept_back_intro')}</button>
+        <button type="button" class="main-btn" onclick="showExample()">${Lang.t('concepts_next_btn')}</button>
+      </div>
     `);
   }
 
@@ -1306,8 +1309,9 @@
       return `<span class="${cls}"></span>`;
     }).join('');
 
-    const nextLabel  = isLast ? Lang.t('concepts_next_btn') : 'Siguiente concepto \u2192';
+    const nextLabel  = isLast ? Lang.t('concepts_next_btn') : Lang.t('concepts_next_subtopic');
     const nextAction = isLast ? 'showExample()' : 'advanceSubtopic()';
+    const backLabel  = subtopicIndex === 0 ? Lang.t('concept_back_intro') : Lang.t('concept_back_prev');
 
     render(`
       ${progressBarHtml(2)}
@@ -1337,8 +1341,25 @@
           <button class="main-btn secondary voice-btn" onclick="stopVoice()">${Lang.t('voice_stop_btn')}</button>
         </div>
       </div>
-      <button class="main-btn" onclick="${nextAction}">${nextLabel}</button>
+      <div class="example-nav-row">
+        <button type="button" class="main-btn secondary" onclick="retreatConcepts()">${backLabel}</button>
+        <button type="button" class="main-btn" onclick="${nextAction}">${nextLabel}</button>
+      </div>
     `);
+  }
+
+  function retreatConcepts() {
+    if (lesson.subtopics && lesson.subtopics.length > 0) {
+      if (subtopicIndex <= 0) {
+        showCover();
+        return;
+      }
+      subtopicIndex--;
+      activeConceptTab = 'written';
+      renderSubtopic();
+      return;
+    }
+    showCover();
   }
 
   function advanceSubtopic() {
