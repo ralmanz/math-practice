@@ -1069,6 +1069,161 @@
   }
   .st-summary-list li:last-child { border-bottom: none; }
   .st-check { color: var(--teal); font-weight: 700; flex-shrink: 0; }
+
+  /* ── Walkthrough board ────────────────────────────────────── */
+  .walkthrough-board {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .wt-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    gap: 8px;
+  }
+  .wt-ctrl-btn {
+    background: transparent;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 5px 11px;
+    font-family: var(--sans);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .wt-ctrl-btn:hover { background: var(--bg); }
+  .wt-columns {
+    display: grid;
+    grid-template-columns: 3fr 5fr 4fr;
+    min-height: 300px;
+  }
+  .wt-col { position: relative; min-width: 0; overflow: hidden; }
+  .col-theory { background: #f5f4f0; border-right: 1px solid var(--border); }
+  .col-prob   { border-right: 1px solid var(--border); }
+  .wt-grid-svg {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+  }
+  .wt-col-label {
+    font-size: 0.6rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+    padding: 8px 10px 4px;
+    position: relative;
+    z-index: 1;
+  }
+  .wt-col-content {
+    padding: 2px 10px 14px;
+    position: relative;
+    z-index: 1;
+    font-family: var(--mono);
+    font-size: 0.79rem;
+    line-height: 1.6;
+    word-break: break-word;
+  }
+  @keyframes wt-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .theory-line {
+    animation: wt-in 0.4s ease forwards;
+    margin-bottom: 3px;
+    color: var(--text);
+    line-height: 1.5;
+  }
+  .theory-line.rule { font-weight: 700; color: var(--accent); }
+  .prob-line {
+    animation: wt-in 0.4s ease forwards;
+    margin-bottom: 3px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text);
+    transition: color 0.35s, font-weight 0.35s;
+  }
+  .prob-line.dimmed { color: #C8C6BC; font-weight: 400; }
+  .prob-line.final  { color: #1D9E75; }
+  .prob-arrow { color: #D3D1C7; font-size: 0.75rem; margin-right: 2px; }
+  .calc-line { animation: wt-in 0.4s ease forwards; margin-bottom: 2px; line-height: 1.5; }
+  .calc-sep  { height: 1px; background: var(--border); margin: 6px 0; animation: wt-in 0.4s ease forwards; }
+  .hl  { color: #1D9E75; font-weight: 700; }
+  .red { color: #C1453B; font-weight: 700; }
+  .blu { color: #1D4ED8; font-weight: 700; }
+  .amb { color: #B45309; font-weight: 700; }
+  .wt-q-bubble {
+    border: 1.5px solid var(--teal);
+    border-radius: 10px;
+    padding: 9px;
+    background: var(--teal-light);
+    animation: wt-in 0.4s ease forwards;
+    margin-top: 4px;
+  }
+  .wt-q-text { font-size: 0.79rem; font-weight: 600; color: var(--teal); margin-bottom: 3px; font-family: var(--sans); }
+  .wt-q-hint { font-size: 0.72rem; color: var(--text-secondary); margin-bottom: 6px; font-family: var(--sans); }
+  .wt-q-row  { display: flex; gap: 5px; }
+  .wt-q-input {
+    flex: 1; min-width: 0;
+    padding: 5px 7px;
+    border: 1.5px solid var(--teal);
+    border-radius: 7px;
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    background: white;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .wt-q-input:focus { border-color: var(--accent); }
+  .wt-q-input.wrong { border-color: var(--wrong); animation: wt-shake 0.3s ease; }
+  @keyframes wt-shake {
+    0%,100% { transform: translateX(0); }
+    25%      { transform: translateX(-3px); }
+    75%      { transform: translateX(3px); }
+  }
+  .wt-q-btn {
+    padding: 5px 9px;
+    background: var(--teal); color: white;
+    border: none; border-radius: 7px;
+    font-family: var(--sans); font-size: 0.79rem; font-weight: 600;
+    cursor: pointer; white-space: nowrap;
+  }
+  .wt-q-trytext { font-size: 0.7rem; color: var(--text-secondary); margin-top: 4px; font-family: var(--sans); }
+  .wt-bottombar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 14px;
+    border-top: 1px solid var(--border);
+  }
+  @keyframes wt-dots-anim {
+    0%,80%,100% { opacity: 0.2; }
+    40%          { opacity: 1; }
+  }
+  .wt-writing-dots { display: inline-flex; gap: 3px; align-items: center; }
+  .wt-writing-dots span {
+    width: 4px; height: 4px; border-radius: 50%;
+    background: var(--accent);
+    animation: wt-dots-anim 1.2s ease-in-out infinite;
+  }
+  .wt-writing-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .wt-writing-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes wt-pulse-anim {
+    0%,100% { opacity: 1; } 50% { opacity: 0.3; }
+  }
+  .wt-wait-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--amber);
+    animation: wt-pulse-anim 1s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+  .wt-progress-bar  { flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .wt-progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.4s ease; }
 </style>
 </head>
 <body>
@@ -1741,6 +1896,12 @@
     const subs = lesson.subtopics;
     if (idx >= subs.length) { showStCompletion(); return; }
     const sub = subs[idx];
+
+    if (sub.walkthrough && sub.walkthrough.length > 0) {
+      renderWalkthrough(sub.walkthrough);
+      return;
+    }
+
     const container = document.getElementById('st-container');
     if (!container) return;
 
@@ -2097,8 +2258,225 @@
     if (el) el.scrollIntoView({ behavior:'smooth', block:'start' });
   }
 
+  // ── Walkthrough engine ────────────────────────────────────────
+  function renderWalkthrough(steps) {
+    function gridSvg(colId) {
+      return `<svg class="wt-grid-svg" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="gp-${colId}" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M 28 0 L 0 0 0 28" fill="none" stroke="#E8E6E0" stroke-width="0.5"/></pattern></defs><rect width="100%" height="100%" fill="url(#gp-${colId})"/></svg>`;
+    }
+
+    render(`
+      ${progressBarHtml(2)}
+      ${badgeHtml()}
+      <h1>${escHtml(lesson.title || '')}</h1>
+      <div class="walkthrough-board" id="wt-board">
+        <div class="wt-topbar" id="wt-topbar">
+          <div style="display:flex;gap:8px">
+            <button class="wt-ctrl-btn" id="wt-pause-btn" onclick="wtTogglePause()">⏸ Pausar</button>
+            <button class="wt-ctrl-btn" onclick="wtRestart()">↺ Reiniciar</button>
+          </div>
+          <span id="wt-step-info" style="font-size:0.72rem;color:var(--text-secondary)"></span>
+        </div>
+        <div class="wt-columns">
+          <div class="wt-col col-theory">
+            <div class="wt-col-label">teoría</div>
+            <div class="wt-col-content" id="wt-col-theory"></div>
+          </div>
+          <div class="wt-col col-prob">
+            ${gridSvg('prob')}
+            <div class="wt-col-label">problema</div>
+            <div class="wt-col-content" id="wt-col-prob"></div>
+          </div>
+          <div class="wt-col col-calc">
+            ${gridSvg('calc')}
+            <div class="wt-col-label">cálculos</div>
+            <div class="wt-col-content" id="wt-col-calc"></div>
+          </div>
+        </div>
+        <div class="wt-bottombar">
+          <div id="wt-status"></div>
+          <div class="wt-progress-bar">
+            <div class="wt-progress-fill" id="wt-pfill" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+    `);
+
+    // ── Closure state ──────────────────────────────────────────
+    const _s = { idx: 0, paused: false, waiting: false, tries: 0, timer: null };
+
+    function _setStatus(mode) {
+      const el = document.getElementById('wt-status');
+      if (!el) return;
+      if (mode === 'writing') {
+        el.innerHTML = '<div class="wt-writing-dots"><span></span><span></span><span></span></div>';
+      } else if (mode === 'waiting') {
+        el.innerHTML = '<div class="wt-wait-dot"></div>';
+      } else {
+        el.innerHTML = '';
+      }
+    }
+
+    function _updateBar() {
+      const fill = document.getElementById('wt-pfill');
+      const info = document.getElementById('wt-step-info');
+      const pct  = _s.idx >= steps.length ? 100 : Math.round((_s.idx / steps.length) * 100);
+      if (fill) fill.style.width = pct + '%';
+      if (info) info.textContent = _s.idx < steps.length
+        ? `Paso ${_s.idx + 1} / ${steps.length}`
+        : 'Completado';
+    }
+
+    function _appendWrite(step) {
+      const col = document.getElementById('wt-col-' + step.col);
+      if (!col) return;
+      if (step.col === 'theory' || step.col === 'calc') {
+        col.insertAdjacentHTML('beforeend', step.html);
+      } else if (step.col === 'prob') {
+        const existing = col.querySelectorAll('.prob-line');
+        existing.forEach(el => { el.classList.add('dimmed'); el.classList.remove('final'); });
+        const line = document.createElement('div');
+        line.className = 'prob-line' + (step.final ? ' final' : '');
+        const needsArrow = existing.length > 0 && !step.final;
+        line.innerHTML = (needsArrow ? '<span class="prob-arrow">= </span>' : '') + step.html;
+        col.appendChild(line);
+      }
+    }
+
+    function _appendQuestion(step) {
+      const col = document.getElementById('wt-col-calc');
+      if (!col) return;
+      const bub = document.createElement('div');
+      bub.id = 'wt-qbub';
+      bub.className = 'wt-q-bubble';
+      bub.innerHTML = `
+        <div class="wt-q-text">${escHtml(step.question)}</div>
+        <div class="wt-q-hint">${escHtml(step.hint)}</div>
+        <div class="wt-q-row">
+          <input class="wt-q-input" id="wt-qinp" type="text" placeholder="?"
+            onkeydown="if(event.key==='Enter')wtSubmitAnswer()">
+          <button class="wt-q-btn" onclick="wtSubmitAnswer()">Listo</button>
+        </div>
+        <div class="wt-q-trytext" id="wt-qtry"></div>
+      `;
+      col.appendChild(bub);
+      setTimeout(() => { const inp = document.getElementById('wt-qinp'); if (inp) inp.focus(); }, 100);
+    }
+
+    function _resume() {
+      if (_s.paused || _s.waiting) return;
+      if (_s.idx >= steps.length) { _onComplete(); return; }
+      const step = steps[_s.idx];
+      _setStatus('writing');
+      _updateBar();
+      if (step.type === 'write') {
+        _appendWrite(step);
+        _s.idx++;
+        _s.timer = setTimeout(_resume, step.pause != null ? step.pause : 0);
+      } else if (step.type === 'question') {
+        _appendQuestion(step);
+        _s.idx++;
+        _s.tries = 0;
+        _s.waiting = true;
+        _setStatus('waiting');
+      }
+    }
+
+    function _onComplete() {
+      _setStatus('');
+      const fill = document.getElementById('wt-pfill');
+      if (fill) fill.style.width = '100%';
+      const info = document.getElementById('wt-step-info');
+      if (info) info.textContent = 'Completado';
+      const topbar = document.getElementById('wt-topbar');
+      if (topbar) topbar.style.display = 'none';
+      const board = document.getElementById('wt-board');
+      if (board) {
+        const btn = document.createElement('button');
+        btn.className = 'main-btn';
+        btn.style.marginTop = '16px';
+        btn.textContent = 'Practicar \u2192';
+        btn.onclick = () => showPractice();
+        board.insertAdjacentElement('afterend', btn);
+      }
+    }
+
+    // ── Global handlers (fresh closure each renderWalkthrough call) ──
+    window.wtTogglePause = function() {
+      if (_s.waiting) return;
+      _s.paused = !_s.paused;
+      const btn = document.getElementById('wt-pause-btn');
+      if (btn) btn.textContent = _s.paused ? '\u25B6 Reanudar' : '\u23F8 Pausar';
+      if (!_s.paused) _resume();
+    };
+
+    window.wtRestart = function() {
+      if (_s.timer) clearTimeout(_s.timer);
+      Object.assign(_s, { idx: 0, paused: false, waiting: false, tries: 0, timer: null });
+      ['wt-col-theory', 'wt-col-prob', 'wt-col-calc'].forEach(id => {
+        const el = document.getElementById(id); if (el) el.innerHTML = '';
+      });
+      const btn = document.getElementById('wt-pause-btn');
+      if (btn) btn.textContent = '\u23F8 Pausar';
+      _setStatus('writing');
+      _updateBar();
+      _resume();
+    };
+
+    window.wtSubmitAnswer = function() {
+      if (!_s.waiting) return;
+      const inp = document.getElementById('wt-qinp');
+      if (!inp || inp.disabled) return;
+      const raw = inp.value.trim();
+      if (!raw) return;
+      const norm = raw.replace(/\u00D7/g, '*').replace(/\u00F7/g, '/').replace(/,/g, '.');
+      const step = steps[_s.idx - 1];
+      const ans  = String(step.answer);
+      let correct = false;
+      const nIn = parseFloat(norm), nAns = parseFloat(ans);
+      if (!isNaN(nIn) && !isNaN(nAns) && Math.abs(nIn - nAns) < 1e-9) correct = true;
+      if (!correct && norm === ans.trim()) correct = true;
+      if (!correct) {
+        try {
+          if (typeof Algebrite !== 'undefined') {
+            if (Algebrite.run('simplify((' + norm + ')-(' + ans + '))') === '0') correct = true;
+          }
+        } catch(e) {}
+      }
+      _s.tries++;
+      const col = document.getElementById('wt-col-calc');
+      if (correct) {
+        inp.disabled = true;
+        const bub = document.getElementById('wt-qbub');
+        if (bub) bub.remove();
+        if (col) col.insertAdjacentHTML('beforeend', `<div class="calc-line">${step.correct}</div>`);
+        _s.waiting = false;
+        _setStatus('writing');
+        _s.timer = setTimeout(_resume, 1200);
+      } else if (_s.tries >= 2) {
+        inp.disabled = true;
+        const bub = document.getElementById('wt-qbub');
+        if (bub) bub.remove();
+        if (col) col.insertAdjacentHTML('beforeend',
+          `<div class="calc-line" style="color:var(--text-secondary)">${step.wrong}</div>`);
+        _s.waiting = false;
+        _setStatus('writing');
+        _s.timer = setTimeout(_resume, 1600);
+      } else {
+        inp.classList.add('wrong');
+        setTimeout(() => { inp.classList.remove('wrong'); inp.value = ''; inp.focus(); }, 320);
+        const tryEl = document.getElementById('wt-qtry');
+        if (tryEl) tryEl.textContent = `intento ${_s.tries} de 2 \u2014 int\u00E9ntalo de nuevo`;
+      }
+    };
+
+    // ── Kick off ───────────────────────────────────────────────
+    _setStatus('writing');
+    _updateBar();
+    _resume();
+  }
+
   init();
 </script>
-<script src="nav.js?v=20260514-practicar"></script>
+<script src="nav.js?v=20260515-nav-blue"></script>
 </body>
 </html>
