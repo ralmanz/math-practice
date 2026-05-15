@@ -1296,9 +1296,11 @@
     lesson = await lessonRes.json();
 
     const backLink = document.querySelector('.back-link');
-    if (guestMode) {
+    if (localStorage.getItem('nuvo_teacher') === 'true') {
+      backLink.href = 'filter.html';
+    } else if (guestMode) {
       backLink.href = 'home.html?curriculum=' + encodeURIComponent(curriculum) + '&guest=true';
-    } else if (localStorage.getItem('nuvo_teacher') === 'true') {
+    } else {
       backLink.href = 'home.html?curriculum=' + encodeURIComponent(curriculum);
     }
 

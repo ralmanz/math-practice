@@ -453,6 +453,10 @@
   const IS_TEACHER = localStorage.getItem('nuvo_teacher') === 'true';
 
   function isGuestMode() {
+    // URL may include guest=true from the marketing funnel; do not downgrade
+    // teachers or enrolled students to the guest preview experience.
+    if (IS_TEACHER) return false;
+    if (localStorage.getItem('studentId')) return false;
     return PARAM_GUEST && !!PARAM_CURRICULUM;
   }
 
@@ -837,6 +841,6 @@
   init();
 </script>
 
-<script src="nav.js?v=20260515-nav-blue"></script>
+<script src="nav.js?v=20260515-teacher-filter"></script>
 </body>
 </html>
