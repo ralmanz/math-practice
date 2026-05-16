@@ -2378,9 +2378,16 @@
       _updateBar();
       if (step.type === 'write') {
         _appendWrite(step);
-        playStepAudio(step.audio);
         _s.idx++;
-        _s.timer = setTimeout(_resume, step.pause != null ? step.pause : 0);
+        const pause = step.pause != null ? step.pause : 0;
+        if (audioEnabled && step.audio) {
+          const aud = new Audio('/audio/' + step.audio);
+          aud.onended = function() { _s.timer = setTimeout(_resume, pause); };
+          aud.onerror = function() { _s.timer = setTimeout(_resume, pause); };
+          aud.play().catch(function() { _s.timer = setTimeout(_resume, pause); });
+        } else {
+          _s.timer = setTimeout(_resume, pause);
+        }
       } else if (step.type === 'question') {
         _appendQuestion(step);
         playStepAudio(step.audio);
