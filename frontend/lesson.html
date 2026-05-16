@@ -72,9 +72,9 @@
     max-width: 600px;
   }
   body.has-walkthrough .container {
-    max-width: 960px;
+    max-width: min(1400px, calc(100vw - 48px));
     width: 100%;
-    padding: 28px 16px 60px;
+    padding: 28px clamp(14px, 2.5vw, 32px) 60px;
   }
 
   /* ── Progress bar ── */
@@ -1104,14 +1104,9 @@
   .wt-ctrl-btn:hover { background: var(--bg); }
   .wt-columns {
     display: grid;
-    /* Theory min prevents “last step” squeeze when prob/calc intrinsic width drops */
-    grid-template-columns: minmax(205px, 1.1fr) 26px minmax(0, 1.85fr) minmax(0, 1.1fr);
-    height: max(300px, min(520px, 68vh));
+    grid-template-columns: minmax(168px, 1.05fr) 26px minmax(0, 1.9fr) minmax(0, 1.15fr);
+    height: max(300px, min(min(560px, 72vh), calc(100vh - 220px)));
     align-items: stretch;
-    transition: grid-template-columns 0.42s ease;
-  }
-  .wt-columns.wt-columns--theory-wide {
-    grid-template-columns: minmax(268px, 1.58fr) 26px minmax(0, 1.52fr) minmax(0, 0.92fr);
   }
   .wt-col {
     position: relative;
@@ -2402,7 +2397,7 @@
           </div>
           <span id="wt-step-info" style="font-size:0.72rem;color:var(--text-secondary)"></span>
         </div>
-        <div class="wt-columns" id="wt-columns">
+        <div class="wt-columns">
           <div id="wt-col-theory" class="wt-col col-theory">
             <div class="wt-col-label">TEOR&Iacute;A</div>
             <div class="wt-col-content" id="wt-notes"></div>
@@ -2507,14 +2502,6 @@
       }
     }
 
-    function syncTheoryColumnEmphasis(step) {
-      const cols = document.getElementById('wt-columns');
-      if (!cols) return;
-      const wide = !!(step && step.type === 'write' && step.col === 'theory');
-      cols.classList.toggle('wt-columns--theory-wide', wide);
-      scheduleSyncRailMarkers();
-    }
-
     function _appendQuestion(step) {
       const col = document.getElementById('wt-col-calc');
       if (!col) return;
@@ -2540,7 +2527,6 @@
       const step = steps[_s.idx];
       _setStatus('writing');
       _updateBar();
-      syncTheoryColumnEmphasis(step);
       if (step.type === 'write') {
         _appendWrite(step);
         renderNote(step.note);
@@ -2568,8 +2554,6 @@
       window.removeEventListener('resize', onWtRailLayout);
       const _probScrollEl = document.getElementById('wt-col-prob');
       if (_probScrollEl) _probScrollEl.removeEventListener('scroll', onWtRailLayout);
-      const _wtCols = document.getElementById('wt-columns');
-      if (_wtCols) _wtCols.classList.remove('wt-columns--theory-wide');
       document.body.classList.remove('has-walkthrough');
       document.querySelectorAll('audio').forEach(function(a) { a.pause(); a.currentTime = 0; });
       _setStatus('');
@@ -2611,8 +2595,7 @@
       if (btn) btn.textContent = '\u23F8 Pausar';
       _setStatus('writing');
       _updateBar();
-      if (steps.length) syncTheoryColumnEmphasis(steps[0]);
-      else syncTheoryColumnEmphasis(null);
+      scheduleSyncRailMarkers();
       _resume();
     };
 
@@ -2640,8 +2623,7 @@
       _s.waiting = false;
       _s.tries = 0;
       _updateBar();
-      if (targetIdx < steps.length) syncTheoryColumnEmphasis(steps[targetIdx]);
-      else syncTheoryColumnEmphasis(null);
+      scheduleSyncRailMarkers();
       _resume();
     }
 
@@ -2789,7 +2771,7 @@
     }
     _setStatus('writing');
     _updateBar();
-    syncTheoryColumnEmphasis(steps.length ? steps[0] : null);
+    scheduleSyncRailMarkers();
     _resume();
   }
 
