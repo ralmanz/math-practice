@@ -1104,9 +1104,14 @@
   .wt-ctrl-btn:hover { background: var(--bg); }
   .wt-columns {
     display: grid;
-    grid-template-columns: minmax(168px, 1.05fr) 26px minmax(0, 1.9fr) minmax(0, 1.15fr);
+    /* Theory min prevents “last step” squeeze when prob/calc intrinsic width drops */
+    grid-template-columns: minmax(205px, 1.1fr) 26px minmax(0, 1.85fr) minmax(0, 1.1fr);
     height: max(300px, min(520px, 68vh));
     align-items: stretch;
+    transition: grid-template-columns 0.42s ease;
+  }
+  .wt-columns.wt-columns--theory-wide {
+    grid-template-columns: minmax(268px, 1.58fr) 26px minmax(0, 1.52fr) minmax(0, 0.92fr);
   }
   .wt-col {
     position: relative;
@@ -1269,10 +1274,29 @@
   .wt-note-rule { background: #EEEDFE; border-left: 2px solid #534AB7; }
   .wt-note-rule .wt-note-label { color: #534AB7; }
   .wt-note-rule-title { font-size: 13px; font-weight: 500; color: #3C3489; margin-bottom: 6px; }
-  .wt-note-formula { background: #E1F5EE; border-left: 2px solid #0F6E56; }
+  /* Match visual height of rule/diagram cards (label + chip row) so formula/check feel consistent */
+  .wt-note-formula {
+    background: #E1F5EE;
+    border-left: 2px solid #0F6E56;
+    min-height: 6.35rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
   .wt-note-formula .wt-note-label { color: #0F6E56; }
   .wt-note-formula-content { font-size: 13px; color: #085041; font-family: monospace; }
-  .wt-note-check { display: flex; align-items: center; gap: 6px; padding: 5px 8px; background: #EAF3DE; border-radius: 8px; margin-bottom: 6px; }
+  .wt-note-check {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 8px;
+    background: #EAF3DE;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    min-height: 6.35rem;
+    box-sizing: border-box;
+  }
   .wt-note-check-icon { color: #3B6D11; font-size: 12px; font-weight: 500; }
   .wt-note-check-text { font-size: 12px; color: #27500A; }
   .wt-note-diagram { background: white; border: 0.5px solid #e2e0d8; border-radius: 8px; padding: 8px 10px; margin-bottom: 10px; }
@@ -2378,7 +2402,7 @@
           </div>
           <span id="wt-step-info" style="font-size:0.72rem;color:var(--text-secondary)"></span>
         </div>
-        <div class="wt-columns">
+        <div class="wt-columns" id="wt-columns">
           <div id="wt-col-theory" class="wt-col col-theory">
             <div class="wt-col-label">TEOR&Iacute;A</div>
             <div class="wt-col-content" id="wt-notes"></div>
@@ -2483,6 +2507,14 @@
       }
     }
 
+    function syncTheoryColumnEmphasis(step) {
+      const cols = document.getElementById('wt-columns');
+      if (!cols) return;
+      const wide = !!(step && step.type === 'write' && step.col === 'theory');
+      cols.classList.toggle('wt-columns--theory-wide', wide);
+      scheduleSyncRailMarkers();
+    }
+
     function _appendQuestion(step) {
       const col = document.getElementById('wt-col-calc');
       if (!col) return;
@@ -2508,6 +2540,7 @@
       const step = steps[_s.idx];
       _setStatus('writing');
       _updateBar();
+      syncTheoryColumnEmphasis(step);
       if (step.type === 'write') {
         _appendWrite(step);
         renderNote(step.note);
@@ -2535,6 +2568,8 @@
       window.removeEventListener('resize', onWtRailLayout);
       const _probScrollEl = document.getElementById('wt-col-prob');
       if (_probScrollEl) _probScrollEl.removeEventListener('scroll', onWtRailLayout);
+      const _wtCols = document.getElementById('wt-columns');
+      if (_wtCols) _wtCols.classList.remove('wt-columns--theory-wide');
       document.body.classList.remove('has-walkthrough');
       document.querySelectorAll('audio').forEach(function(a) { a.pause(); a.currentTime = 0; });
       _setStatus('');
@@ -2576,7 +2611,8 @@
       if (btn) btn.textContent = '\u23F8 Pausar';
       _setStatus('writing');
       _updateBar();
-      scheduleSyncRailMarkers();
+      if (steps.length) syncTheoryColumnEmphasis(steps[0]);
+      else syncTheoryColumnEmphasis(null);
       _resume();
     };
 
@@ -2604,7 +2640,8 @@
       _s.waiting = false;
       _s.tries = 0;
       _updateBar();
-      scheduleSyncRailMarkers();
+      if (targetIdx < steps.length) syncTheoryColumnEmphasis(steps[targetIdx]);
+      else syncTheoryColumnEmphasis(null);
       _resume();
     }
 
@@ -2752,7 +2789,7 @@
     }
     _setStatus('writing');
     _updateBar();
-    scheduleSyncRailMarkers();
+    syncTheoryColumnEmphasis(steps.length ? steps[0] : null);
     _resume();
   }
 
