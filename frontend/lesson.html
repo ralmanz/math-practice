@@ -2621,23 +2621,26 @@
     };
 
     // ── Kick off ───────────────────────────────────────────────
+    const railMarkers = [
+      { stepIdx: 0,  label: 'Introducci\u00F3n' },
+      { stepIdx: 2,  label: 'Par\u00E9ntesis' },
+      { stepIdx: 6,  label: 'Multiplicaci\u00F3n' },
+      { stepIdx: 10, label: 'Suma/Resta' },
+      { stepIdx: 12, label: 'Resultado' },
+    ];
     const rail = document.getElementById('wt-rail');
     if (rail) {
-      steps.forEach(function(step, stepIdx) {
-        if (step.col !== 'prob' && step.type !== 'question') return;
+      railMarkers.forEach(function(rm) {
         const wrap = document.createElement('div');
         wrap.style.cssText = 'position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;flex:1;justify-content:center;';
-
         const marker = document.createElement('div');
         marker.className = 'wt-rail-marker';
-        marker.dataset.stepIdx = stepIdx;
+        marker.dataset.stepIdx = rm.stepIdx;
         marker.innerHTML = '<i class="wt-rail-icon ti ti-rotate-clockwise" aria-hidden="true"></i>';
-        marker.onclick = function() { _jumpTo(stepIdx); };
-
+        marker.onclick = function() { _jumpTo(rm.stepIdx); };
         const tooltip = document.createElement('div');
         tooltip.className = 'wt-rail-tooltip';
-        tooltip.textContent = step.railLabel || ('Paso ' + (stepIdx + 1));
-
+        tooltip.textContent = rm.label;
         wrap.appendChild(marker);
         wrap.appendChild(tooltip);
         rail.appendChild(wrap);
