@@ -1224,6 +1224,31 @@
   }
   .wt-progress-bar  { flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
   .wt-progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.4s ease; }
+  .wt-note { margin-bottom: 10px; border-radius: 8px; padding: 8px 10px; }
+  .wt-note-label { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .wt-note-rule { background: #EEEDFE; border-left: 2px solid #534AB7; }
+  .wt-note-rule .wt-note-label { color: #534AB7; }
+  .wt-note-rule-title { font-size: 13px; font-weight: 500; color: #3C3489; margin-bottom: 6px; }
+  .wt-note-formula { background: #E1F5EE; border-left: 2px solid #0F6E56; }
+  .wt-note-formula .wt-note-label { color: #0F6E56; }
+  .wt-note-formula-content { font-size: 13px; color: #085041; font-family: monospace; }
+  .wt-note-check { display: flex; align-items: center; gap: 6px; padding: 5px 8px; background: #EAF3DE; border-radius: 8px; margin-bottom: 6px; }
+  .wt-note-check-icon { color: #3B6D11; font-size: 12px; font-weight: 500; }
+  .wt-note-check-text { font-size: 12px; color: #27500A; }
+  .wt-note-diagram { background: white; border: 0.5px solid #e2e0d8; border-radius: 8px; padding: 8px 10px; margin-bottom: 10px; }
+  .wt-note-diagram .wt-note-label { color: #888780; }
+  .wt-note-diagram-seq { display: flex; align-items: center; gap: 3px; flex-wrap: wrap; margin-top: 2px; }
+  .wt-note-ds-item { font-size: 11px; font-weight: 500; padding: 2px 6px; border-radius: 4px; }
+  .wt-note-ds-arrow { color: #b4b2a9; font-size: 10px; }
+  .wt-note-ds-P  { background: #EEEDFE; color: #3C3489; }
+  .wt-note-ds-A  { background: #FAEEDA; color: #633806; }
+  .wt-note-ds-MD { background: #E6F1FB; color: #0C447C; }
+  .wt-note-ds-SR { background: #EAF3DE; color: #27500A; }
+  .wt-note-ds-active { outline: 2px solid currentColor; outline-offset: 1px; }
+  .wt-scrubber { display: flex; gap: 3px; padding: 10px 14px; background: var(--wt-header-bg); border-top: 1px solid var(--wt-border); border-radius: 0 0 12px 12px; }
+  .wt-scrub-seg { flex: 1; height: 3px; border-radius: 2px; cursor: pointer; background: var(--wt-border); transition: background 0.2s; }
+  .wt-scrub-seg.done   { background: #1D9E75; }
+  .wt-scrub-seg.active { background: #534AB7; }
 </style>
 </head>
 <body>
@@ -2280,9 +2305,9 @@
           <span id="wt-step-info" style="font-size:0.72rem;color:var(--text-secondary)"></span>
         </div>
         <div class="wt-columns">
-          <div class="wt-col col-theory">
-            <div class="wt-col-label">teor&iacute;a</div>
-            <div class="wt-col-content" id="wt-col-theory"></div>
+          <div id="wt-col-theory" class="wt-col col-theory">
+            <div class="wt-col-label">TEOR&Iacute;A</div>
+            <div id="wt-notes"></div>
           </div>
           <div class="wt-col col-prob">
             ${gridSvg('prob')}
@@ -2297,10 +2322,8 @@
         </div>
         <div class="wt-bottombar">
           <div id="wt-status"></div>
-          <div class="wt-progress-bar">
-            <div class="wt-progress-fill" id="wt-pfill" style="width:0%"></div>
-          </div>
         </div>
+        <div class="wt-scrubber"></div>
       </div>
     `);
 
@@ -2311,6 +2334,29 @@
     function playStepAudio(file) {
       if (!audioEnabled || !file) return;
       new Audio('/audio/' + file).play();
+    }
+
+    function renderNote(note) {
+      if (!note) return;
+      const container = document.getElementById('wt-notes');
+      if (!container) return;
+      let html = '';
+      if (note.type === 'rule') {
+        const diagramHtml = note.diagram.map(function(item) {
+          return '<span class="wt-note-ds-item ' + (item === note.active ? 'wt-note-ds-active ' : '') + 'wt-note-ds-' + item.replace('/','') + '">' + item + '</span>';
+        }).join('<span class="wt-note-ds-arrow">\u2192</span>');
+        html = '<div class="wt-note wt-note-rule"><div class="wt-note-label">' + note.label + '</div><div class="wt-note-rule-title">' + note.content + '</div><div class="wt-note-diagram-seq">' + diagramHtml + '</div></div>';
+      } else if (note.type === 'formula') {
+        html = '<div class="wt-note wt-note-formula"><div class="wt-note-label">' + note.label + '</div><div class="wt-note-formula-content">' + note.content + '</div></div>';
+      } else if (note.type === 'check') {
+        html = '<div class="wt-note wt-note-check"><span class="wt-note-check-icon">\u2713</span><span class="wt-note-check-text">' + note.text + '</span></div>';
+      } else if (note.type === 'diagram') {
+        const diagramHtml = note.diagram.map(function(item) {
+          return '<span class="wt-note-ds-item ' + (item === note.active ? 'wt-note-ds-active ' : '') + 'wt-note-ds-' + item.replace('/','') + '">' + item + '</span>';
+        }).join('<span class="wt-note-ds-arrow">\u2192</span>');
+        html = '<div class="wt-note wt-note-diagram"><div class="wt-note-label">' + note.label + '</div><div class="wt-note-diagram-seq">' + diagramHtml + '</div></div>';
+      }
+      container.insertAdjacentHTML('beforeend', html);
     }
 
     function _setStatus(mode) {
@@ -2333,12 +2379,15 @@
       if (info) info.textContent = _s.idx < steps.length
         ? ('Paso ' + (_s.idx + 1) + ' / ' + steps.length)
         : 'Completado';
+      document.querySelectorAll('.wt-scrub-seg').forEach(function(seg, i) {
+        seg.className = 'wt-scrub-seg' + (i < _s.idx ? ' done' : i === _s.idx ? ' active' : '');
+      });
     }
 
     function _appendWrite(step) {
       const col = document.getElementById('wt-col-' + step.col);
       if (!col) return;
-      if (step.col === 'theory' || step.col === 'calc') {
+      if (step.col === 'calc') {
         col.insertAdjacentHTML('beforeend', step.html);
       } else if (step.col === 'prob') {
         const existing = col.querySelectorAll('.prob-line');
@@ -2378,6 +2427,7 @@
       _updateBar();
       if (step.type === 'write') {
         _appendWrite(step);
+        renderNote(step.note);
         _s.idx++;
         const pause = step.pause != null ? step.pause : 0;
         if (audioEnabled && step.audio) {
@@ -2430,7 +2480,9 @@
     window.wtRestart = function() {
       if (_s.timer) clearTimeout(_s.timer);
       _s.idx = 0; _s.paused = false; _s.waiting = false; _s.tries = 0; _s.timer = null;
-      ['wt-col-theory', 'wt-col-prob', 'wt-col-calc'].forEach(function(id) {
+      const theoryEl = document.getElementById('wt-col-theory');
+      if (theoryEl) theoryEl.innerHTML = '<div class="wt-col-label">TEOR\u00CDA</div><div id="wt-notes"></div>';
+      ['wt-col-prob', 'wt-col-calc'].forEach(function(id) {
         const el = document.getElementById(id); if (el) el.innerHTML = '';
       });
       const btn = document.getElementById('wt-pause-btn');
@@ -2439,6 +2491,33 @@
       _updateBar();
       _resume();
     };
+
+    function _jumpTo(targetIdx) {
+      const theoryEl = document.getElementById('wt-col-theory');
+      if (theoryEl) theoryEl.innerHTML = '<div class="wt-col-label">TEOR\u00CDA</div><div id="wt-notes"></div>';
+      ['wt-col-prob', 'wt-col-calc'].forEach(function(id) {
+        const el = document.getElementById(id); if (el) el.innerHTML = '';
+      });
+      if (_s.timer) clearTimeout(_s.timer);
+      for (var i = 0; i < targetIdx; i++) {
+        var step = steps[i];
+        if (step.type === 'write') {
+          _appendWrite(step);
+          renderNote(step.note);
+        }
+        if (step.type === 'question') {
+          var calcCol = document.getElementById('wt-col-calc');
+          if (calcCol) calcCol.insertAdjacentHTML('beforeend', '<div class="calc-line">' + step.correct + '</div>');
+          renderNote(step.note);
+        }
+      }
+      _s.idx = targetIdx;
+      _s.paused = false;
+      _s.waiting = false;
+      _s.tries = 0;
+      _updateBar();
+      _resume();
+    }
 
     window.toggleAudio = function() {
       audioEnabled = !audioEnabled;
@@ -2474,6 +2553,7 @@
         const bub = document.getElementById('wt-qbub');
         if (bub) bub.remove();
         if (col) col.insertAdjacentHTML('beforeend', '<div class="calc-line">' + step.correct + '</div>');
+        renderNote(step.note);
         _s.waiting = false;
         _setStatus('writing');
         _s.timer = setTimeout(_resume, 1200);
@@ -2483,6 +2563,7 @@
         if (bub) bub.remove();
         if (col) col.insertAdjacentHTML('beforeend',
           '<div class="calc-line" style="color:var(--text-secondary)">' + step.wrong + '</div>');
+        renderNote(step.note);
         _s.waiting = false;
         _setStatus('writing');
         _s.timer = setTimeout(_resume, 1600);
@@ -2495,6 +2576,15 @@
     };
 
     // ── Kick off ───────────────────────────────────────────────
+    const scrubBar = document.querySelector('.wt-scrubber');
+    if (scrubBar) {
+      steps.forEach(function(_, i) {
+        const seg = document.createElement('div');
+        seg.className = 'wt-scrub-seg';
+        seg.onclick = function() { _jumpTo(i); };
+        scrubBar.appendChild(seg);
+      });
+    }
     _setStatus('writing');
     _updateBar();
     _resume();
