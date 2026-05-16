@@ -70,6 +70,9 @@
   /* ── Content area ── */
   .container {
     max-width: 600px;
+  }
+  body.has-walkthrough .container {
+    max-width: 960px;
     width: 100%;
     padding: 28px 16px 60px;
   }
@@ -2324,7 +2327,7 @@
       return `<svg class="wt-grid-svg" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="gp-${colId}" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M 28 0 L 0 0 0 28" fill="none" stroke="#E8E6E0" stroke-width="0.5"/></pattern></defs><rect width="100%" height="100%" fill="url(#gp-${colId})"/></svg>`;
     }
 
-    render(`
+    document.body.classList.add("has-walkthrough"); render(`
       ${progressBarHtml(2)}
       ${badgeHtml()}
       <h1>${escHtml(lesson.title || '')}</h1>
