@@ -1101,7 +1101,7 @@
   .wt-ctrl-btn:hover { background: var(--bg); }
   .wt-columns {
     display: grid;
-    grid-template-columns: 3fr 5fr 4fr;
+    grid-template-columns: 190px 26px 1fr 1fr;
     min-height: 300px;
   }
   .wt-col { position: relative; min-width: 0; overflow: hidden; }
@@ -1249,6 +1249,39 @@
   .wt-scrub-seg { flex: 1; height: 3px; border-radius: 2px; cursor: pointer; background: var(--wt-border); transition: background 0.2s; }
   .wt-scrub-seg.done   { background: #1D9E75; }
   .wt-scrub-seg.active { background: #534AB7; }
+  .wt-rail-marker {
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 0.5px solid var(--wt-border);
+    background: var(--wt-bg);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .wt-rail-marker:hover { background: #EEEDFE; border-color: #534AB7; }
+  .wt-rail-marker:hover .wt-rail-icon { color: #534AB7; }
+  .wt-rail-marker.done { background: #EAF3DE; border-color: #3B6D11; }
+  .wt-rail-marker.done .wt-rail-icon { color: #3B6D11; }
+  .wt-rail-marker.active { background: #534AB7; border-color: #534AB7; }
+  .wt-rail-marker.active .wt-rail-icon { color: white; }
+  .wt-rail-icon { font-size: 10px; color: var(--wt-muted); }
+  .wt-rail-tooltip {
+    display: none;
+    position: absolute;
+    left: 26px; top: 50%;
+    transform: translateY(-50%);
+    background: var(--wt-bg);
+    border: 0.5px solid var(--wt-border);
+    border-radius: 8px;
+    padding: 4px 8px;
+    font-size: 11px;
+    color: var(--wt-text-muted);
+    white-space: nowrap;
+    z-index: 20;
+    pointer-events: none;
+  }
+  .wt-rail-marker:hover + .wt-rail-tooltip,
+  .wt-rail-marker-wrap:hover .wt-rail-tooltip { display: block; }
 </style>
 </head>
 <body>
@@ -2309,6 +2342,9 @@
             <div class="wt-col-label">TEOR&Iacute;A</div>
             <div id="wt-notes"></div>
           </div>
+          <div id="wt-rail" style="background:var(--wt-theory-bg);border-right:1px solid var(--wt-border);display:flex;flex-direction:column;align-items:center;padding:14px 0;position:relative;">
+            <div style="position:absolute;top:28px;bottom:28px;left:50%;width:1px;background:var(--wt-border);transform:translateX(-50%);z-index:0;"></div>
+          </div>
           <div class="wt-col col-prob">
             ${gridSvg('prob')}
             <div class="wt-col-label">problema</div>
@@ -2323,7 +2359,6 @@
         <div class="wt-bottombar">
           <div id="wt-status"></div>
         </div>
-        <div class="wt-scrubber"></div>
       </div>
     `);
 
@@ -2379,8 +2414,12 @@
       if (info) info.textContent = _s.idx < steps.length
         ? ('Paso ' + (_s.idx + 1) + ' / ' + steps.length)
         : 'Completado';
-      document.querySelectorAll('.wt-scrub-seg').forEach(function(seg, i) {
-        seg.className = 'wt-scrub-seg' + (i < _s.idx ? ' done' : i === _s.idx ? ' active' : '');
+      document.querySelectorAll('.wt-rail-marker').forEach(function(m, i) {
+        const isDone = i < _s.idx;
+        const isActive = i === _s.idx;
+        m.className = 'wt-rail-marker' + (isDone ? ' done' : isActive ? ' active' : '');
+        const ic = m.querySelector('.wt-rail-icon');
+        if (ic) ic.className = 'wt-rail-icon ti ' + (isDone ? 'ti-check' : 'ti-rotate-clockwise');
       });
     }
 
@@ -2576,13 +2615,26 @@
     };
 
     // ── Kick off ───────────────────────────────────────────────
-    const scrubBar = document.querySelector('.wt-scrubber');
-    if (scrubBar) {
-      steps.forEach(function(_, i) {
-        const seg = document.createElement('div');
-        seg.className = 'wt-scrub-seg';
-        seg.onclick = function() { _jumpTo(i); };
-        scrubBar.appendChild(seg);
+    const rail = document.getElementById('wt-rail');
+    if (rail) {
+      steps.forEach(function(step, i) {
+        const wrap = document.createElement('div');
+        wrap.className = 'wt-rail-marker-wrap';
+        wrap.style.cssText = 'position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;flex:1;justify-content:center;';
+
+        const marker = document.createElement('div');
+        marker.className = 'wt-rail-marker';
+        marker.dataset.stepIdx = i;
+        marker.innerHTML = '<i class="wt-rail-icon ti ti-rotate-clockwise" aria-hidden="true"></i>';
+        marker.onclick = function() { _jumpTo(i); };
+
+        const tooltip = document.createElement('div');
+        tooltip.className = 'wt-rail-tooltip';
+        tooltip.textContent = step.railLabel || ('Paso ' + (i + 1));
+
+        wrap.appendChild(marker);
+        wrap.appendChild(tooltip);
+        rail.appendChild(wrap);
       });
     }
     _setStatus('writing');

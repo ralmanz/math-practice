@@ -537,20 +537,20 @@ const PAA_LESSONS = [
         {
           title: 'PAPOMUDAS',
           walkthrough: [
-            { col: 'theory', type: 'write', html: '<div class="theory-line rule">PAPOMUDAS</div><div class="theory-line">Paréntesis → Potencias → Mult/Div → Suma/Resta</div>', pause: 1800, audio: 'paa-arit-n1-01.mp3', note: { type: 'rule', label: 'regla', content: 'Orden de las Operaciones', diagram: ['P','A','M/D','S/R'], active: null } },
-            { col: 'prob',   type: 'write', html: '3 + 4 × 2 − (6 ÷ 3)', pause: 2000, audio: 'paa-arit-n1-02.mp3', note: { type: 'diagram', label: 'orden de operaciones', diagram: ['P','A','M/D','S/R'], active: null } },
-            { col: 'calc',   type: 'write', html: '<div class="calc-line"><span class="red">(6 ÷ 3)</span> = ?</div>', pause: 700, audio: 'paa-arit-n1-03.mp3', note: { type: 'diagram', label: 'primero: paréntesis', diagram: ['P','A','M/D','S/R'], active: 'P' } },
-            { col: 'calc',   type: 'question', question: '¿cuánto es 6 ÷ 3?', hint: 'resuelve el paréntesis', answer: '2', correct: '✓ 6 ÷ 3 = <span class="hl">2</span>', wrong: '6 ÷ 3 = <span class="hl">2</span>', audio: null, note: null },
-            { col: 'prob',   type: 'write', html: '3 + 4 × 2 − <span class="hl">2</span>', pause: 1400, audio: 'paa-arit-n1-04.mp3', note: { type: 'formula', label: 'paréntesis', content: '(6 ÷ 3) = 2' } },
-            { col: 'theory', type: 'write', html: '<div class="theory-line">paréntesis ✓</div>', pause: 700, audio: null, note: { type: 'check', text: 'paréntesis resuelto' } },
-            { col: 'calc',   type: 'write', html: '<div class="calc-sep"></div><div class="calc-line"><span class="blu">4 × 2</span> = ?</div>', pause: 700, audio: 'paa-arit-n1-05.mp3', note: { type: 'diagram', label: 'siguiente: mult/div', diagram: ['P','A','M/D','S/R'], active: 'M/D' } },
-            { col: 'calc',   type: 'question', question: '¿cuánto es 4 × 2?', hint: 'multiplicación antes que suma', answer: '8', correct: '✓ 4 × 2 = <span class="hl">8</span>', wrong: '4 × 2 = <span class="hl">8</span>', audio: null, note: null },
-            { col: 'prob',   type: 'write', html: '3 + <span class="hl">8</span> − 2', pause: 1400, audio: 'paa-arit-n1-06.mp3', note: { type: 'formula', label: 'multiplicación', content: '4 × 2 = 8' } },
-            { col: 'theory', type: 'write', html: '<div class="theory-line">multiplicación ✓</div>', pause: 700, audio: null, note: { type: 'check', text: 'multiplicación resuelta' } },
-            { col: 'calc',   type: 'write', html: '<div class="calc-sep"></div><div class="calc-line"><span class="amb">3 + 8 − 2</span> = ?</div>', pause: 700, audio: 'paa-arit-n1-07.mp3', note: { type: 'diagram', label: 'último: suma/resta', diagram: ['P','A','M/D','S/R'], active: 'S/R' } },
-            { col: 'calc',   type: 'question', question: '¿cuánto es 3 + 8 − 2?', hint: 'de izquierda a derecha', answer: '9', correct: '✓ 3 + 8 − 2 = <span class="hl">9</span>', wrong: '3 + 8 = 11 → 11 − 2 = <span class="hl">9</span>', audio: 'paa-arit-n1-08.mp3', note: null },
-            { col: 'prob',   type: 'write', html: '<span class="hl">= 9 ✓</span>', final: true, pause: 0, audio: null, note: { type: 'formula', label: 'resultado', content: '3 + 8 − 2 = 9' } },
-            { col: 'theory', type: 'write', html: '<div class="theory-line">suma/resta ✓</div>', pause: 0, audio: 'paa-arit-n1-09.mp3', note: { type: 'check', text: 'suma/resta resuelta' } },
+            { col: 'theory', type: 'write', html: '<div class="theory-line rule">PAPOMUDAS</div><div class="theory-line">Paréntesis → Potencias → Mult/Div → Suma/Resta</div>', pause: 1800, audio: 'paa-arit-n1-01.mp3', note: { type: 'rule', label: 'regla', content: 'Orden de las Operaciones', diagram: ['P','A','M/D','S/R'], active: null }, railLabel: 'Orden de operaciones' },
+            { col: 'prob',   type: 'write', html: '3 + 4 × 2 − (6 ÷ 3)', pause: 2000, audio: 'paa-arit-n1-02.mp3', note: { type: 'diagram', label: 'orden de operaciones', diagram: ['P','A','M/D','S/R'], active: null }, railLabel: 'El problema' },
+            { col: 'calc',   type: 'write', html: '<div class="calc-line"><span class="red">(6 ÷ 3)</span> = ?</div>', pause: 700, audio: 'paa-arit-n1-03.mp3', note: { type: 'diagram', label: 'primero: paréntesis', diagram: ['P','A','M/D','S/R'], active: 'P' }, railLabel: 'Primero: paréntesis' },
+            { col: 'calc',   type: 'question', question: '¿cuánto es 6 ÷ 3?', hint: 'resuelve el paréntesis', answer: '2', correct: '✓ 6 ÷ 3 = <span class="hl">2</span>', wrong: '6 ÷ 3 = <span class="hl">2</span>', audio: null, note: null, railLabel: 'Resuelve 6 ÷ 3' },
+            { col: 'prob',   type: 'write', html: '3 + 4 × 2 − <span class="hl">2</span>', pause: 1400, audio: 'paa-arit-n1-04.mp3', note: { type: 'formula', label: 'paréntesis', content: '(6 ÷ 3) = 2' }, railLabel: 'Paréntesis = 2' },
+            { col: 'theory', type: 'write', html: '<div class="theory-line">paréntesis ✓</div>', pause: 700, audio: null, note: { type: 'check', text: 'paréntesis resuelto' }, railLabel: 'Paréntesis ✓' },
+            { col: 'calc',   type: 'write', html: '<div class="calc-sep"></div><div class="calc-line"><span class="blu">4 × 2</span> = ?</div>', pause: 700, audio: 'paa-arit-n1-05.mp3', note: { type: 'diagram', label: 'siguiente: mult/div', diagram: ['P','A','M/D','S/R'], active: 'M/D' }, railLabel: 'Siguiente: mult/div' },
+            { col: 'calc',   type: 'question', question: '¿cuánto es 4 × 2?', hint: 'multiplicación antes que suma', answer: '8', correct: '✓ 4 × 2 = <span class="hl">8</span>', wrong: '4 × 2 = <span class="hl">8</span>', audio: null, note: null, railLabel: 'Resuelve 4 × 2' },
+            { col: 'prob',   type: 'write', html: '3 + <span class="hl">8</span> − 2', pause: 1400, audio: 'paa-arit-n1-06.mp3', note: { type: 'formula', label: 'multiplicación', content: '4 × 2 = 8' }, railLabel: 'Multiplicación = 8' },
+            { col: 'theory', type: 'write', html: '<div class="theory-line">multiplicación ✓</div>', pause: 700, audio: null, note: { type: 'check', text: 'multiplicación resuelta' }, railLabel: 'Multiplicación ✓' },
+            { col: 'calc',   type: 'write', html: '<div class="calc-sep"></div><div class="calc-line"><span class="amb">3 + 8 − 2</span> = ?</div>', pause: 700, audio: 'paa-arit-n1-07.mp3', note: { type: 'diagram', label: 'último: suma/resta', diagram: ['P','A','M/D','S/R'], active: 'S/R' }, railLabel: 'Último: suma/resta' },
+            { col: 'calc',   type: 'question', question: '¿cuánto es 3 + 8 − 2?', hint: 'de izquierda a derecha', answer: '9', correct: '✓ 3 + 8 − 2 = <span class="hl">9</span>', wrong: '3 + 8 = 11 → 11 − 2 = <span class="hl">9</span>', audio: 'paa-arit-n1-08.mp3', note: null, railLabel: 'Resuelve 3 + 8 − 2' },
+            { col: 'prob',   type: 'write', html: '<span class="hl">= 9 ✓</span>', final: true, pause: 0, audio: null, note: { type: 'formula', label: 'resultado', content: '3 + 8 − 2 = 9' }, railLabel: 'Resultado = 9' },
+            { col: 'theory', type: 'write', html: '<div class="theory-line">suma/resta ✓</div>', pause: 0, audio: 'paa-arit-n1-09.mp3', note: { type: 'check', text: 'suma/resta resuelta' }, railLabel: 'Suma/resta ✓' },
           ],
         },
       ],
@@ -814,7 +814,7 @@ const PAA_LESSONS = [
             'Por ejemplo, para 12 y 18: 12 = 2² × 3 y 18 = 2 × 3². ' +
             'El factor 2 aparece con exponentes 2 y 1; el menor es 1. El factor 3 aparece con exponentes 1 y 2; el menor es 1. ' +
             'MCD = 2¹ × 3¹ = 6.',
-          conceptVisual: fs.readFileSync('./visual_nivel3.html', 'utf8'),
+          conceptVisual: '',
           example: {
             start: 'MCD de 12 y 18',
             narration_intro:
@@ -869,7 +869,7 @@ const PAA_LESSONS = [
             'Por ejemplo, para 12 y 18: 12 = 2² × 3 y 18 = 2 × 3². ' +
             'El factor 2 aparece con exponentes 2 y 1; el mayor es 2². El factor 3 aparece con exponentes 1 y 2; el mayor es 3². ' +
             'MCM = 2² × 3² = 4 × 9 = 36.',
-          conceptVisual: fs.readFileSync('./visual_nivel3.html', 'utf8'),
+          conceptVisual: '',
           // This is the representative worked example used by showExample() after all subtopics
           example: {
             start: 'MCD y MCM de 12 y 18',
