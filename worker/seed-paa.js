@@ -310,6 +310,126 @@ const PAA_PROBLEMS = [
     ],
     options: [], modules: ['equivalence'], createdAt: CREATED_AT,
   },
+  // ── NIVEL 3: Problemas adicionales de práctica (P7–P15) ────────────────────
+  {
+    id: 'paa-aritmetica-n3-p7',
+    curriculum: 'PAA', unit: 'aritmetica', stage: '3',
+    problemType: 'practice', type: 'MCQ', format: 'mcq',
+    question: '¿Cuál es la factorización prima de 72?',
+    answer: 'C',
+    options: ['2 × 36', '4 × 18', '2³ × 3²', '2² × 3 × 6'],
+    hints: [
+      'La factorización prima usa solo números primos. Elimina las opciones que contienen números compuestos.',
+      'Divide 72 entre 2 repetidamente: 72 → 36 → 18 → 9. Ahora factoriza 9.',
+      '9 = 3². Entonces 72 = 2³ × 3².',
+    ],
+    modules: ['equivalence'], createdAt: CREATED_AT,
+  },
+  {
+    id: 'paa-aritmetica-n3-p8',
+    curriculum: 'PAA', unit: 'aritmetica', stage: '3',
+    problemType: 'practice', type: '', format: 'open',
+    question: 'Un agricultor tiene 48 naranjas y 36 manzanas. Quiere hacer bolsas iguales sin que sobre ninguna fruta. ¿Cuántas bolsas puede hacer como máximo?',
+    answer: '12',
+    hints: [
+      'El número máximo de bolsas iguales es el MCD de 48 y 36.',
+      '48 = 2⁴ × 3 y 36 = 2² × 3². Los factores comunes son 2² y 3.',
+      'MCD = 2² × 3 = 4 × 3 = ?',
+    ],
+    options: [], modules: ['equivalence'], createdAt: CREATED_AT,
+  },
+  {
+    id: 'paa-aritmetica-n3-p9',
+    curriculum: 'PAA', unit: 'aritmetica', stage: '3',
+    problemType: 'practice', type: '', format: 'open',
+    question: '¿Cuál es el MCM de 8 y 12?',
+    answer: '24',
+    hints: [
+      'Factoriza ambos números y toma todos los factores con el mayor exponente.',
+      '8 = 2³ y 12 = 2² × 3. El mayor exponente de 2 es 2³ y el de 3 es 3¹.',
+      'MCM = 2³ × 3 = 8 × 3 = ?',
+    ],
+    options: [], modules: ['equivalence'], createdAt: CREATED_AT,
+  },
+  {
+    id: 'paa-aritmetica-n3-p10',
+    curriculum: 'PAA', unit: 'aritmetica', stage: '3',
+    problemType: 'practice', type: '', format: 'open',
+    question: 'En una panadería, el pan de trigo se hornea cada 6 horas y el pan de maíz cada 9 horas. Si ambos se hornean juntos ahora, ¿cuántas horas pasarán hasta que coincidan de nuevo?',
+    answer: '18',
+    hints: [
+      'El momento en que coinciden de nuevo es el MCM de 6 y 9.',
+      '6 = 2 × 3 y 9 = 3². El MCM toma todos los factores con el mayor exponente.',
+      'MCM = 2 × 3² = 2 × 9 = ?',
+    ],
+    options: [], modules: ['equivalence'], createdAt: CREATED_AT,
+  },
+  {
+    id: 'paa-aritmetica-n3-p11',
+    curriculum: 'PAA', unit: 'aritmetica', stage: '3',
+    problemType: 'practice', type: '', format: 'open',
+    question: 'En la sucesión 5, 12, 19, 26... ¿cuál es el octavo término?',
+    answer: '54',
+    hints: [
+      'Identifica la diferencia común entre términos consecutivos.',
+      'La diferencia es 7. El término n se calcula como: primer término + (n−1) × diferencia.',
+      '5 + (8−1) × 7 = 5 + 49 = ?',
+    ],
+    options: [], modules: ['equivalence'], createdAt: CREATED_AT,
+  },
+  {
+    id: 'paa-aritmetica-n3-p12',
+    curriculum: 'PAA', unit: 'aritmetica', stage: '3',
+    problemType: 'practice', type: '', format: 'open',
+    question: 'Una empresa tiene 15 empleados en enero. Cada mes contrata 4 empleados más. ¿Cuántos empleados tendrá en julio (mes 7)?',
+    answer: '39',
+    hints: [
+      'Esto es una sucesión aritmética donde el primer término es 15 y la diferencia común es 4.',
+      'El término del mes n es: 15 + (n−1) × 4. Para julio, n = 7.',
+      '15 + (7−1) × 4 = 15 + 24 = ?',
+    ],
+    options: [], modules: ['equivalence'], createdAt: CREATED_AT,
+  },
+  {
+    id: 'paa-aritmetica-n3-p13',
+    curriculum: 'PAA', unit: 'aritmetica', stage: '3',
+    problemType: 'practice', type: '', format: 'open',
+    question: 'En la sucesión 3, 6, 12, 24... ¿cuál es el siguiente término?',
+    answer: '48',
+    hints: [
+      'Identifica el patrón — ¿por qué número se multiplica cada término?',
+      'Cada término se multiplica por 2. Esto se llama razón común.',
+      'El último término es 24. Multiplica: 24 × 2 = ?',
+    ],
+    options: [], modules: ['equivalence'], createdAt: CREATED_AT,
+  },
+  {
+    id: 'paa-aritmetica-n3-p14',
+    curriculum: 'PAA', unit: 'aritmetica', stage: '3',
+    problemType: 'practice', type: '', format: 'open',
+    question: 'Una bacteria se divide en 2 cada hora. Si comenzamos con 5 bacterias, ¿cuántas habrá después de 4 horas?',
+    answer: '80',
+    hints: [
+      'Cada hora la cantidad se multiplica por 2. Esto es una sucesión geométrica con razón 2.',
+      'Después de n horas: cantidad inicial × 2ⁿ. Aquí n = 4.',
+      '5 × 2⁴ = 5 × 16 = ?',
+    ],
+    options: [], modules: ['equivalence'], createdAt: CREATED_AT,
+  },
+  {
+    id: 'paa-aritmetica-n3-p15',
+    curriculum: 'PAA', unit: 'aritmetica', stage: '3',
+    problemType: 'practice', type: '', format: 'open',
+    question: 'En la sucesión 4, 12, 36, 108... ¿cuál es el sexto término?',
+    answer: '972',
+    hints: [
+      'Identifica la razón común dividiendo un término entre el anterior.',
+      'La razón es 3. El término n es: primer término × razón^(n−1).',
+      '4 × 3^(6−1) = 4 × 3⁵ = 4 × 243 = ?',
+    ],
+    options: [], modules: ['equivalence'], createdAt: CREATED_AT,
+  },
+
   {
     id: 'paa-aritmetica-n3-t1',
     curriculum: 'PAA', unit: 'aritmetica', stage: '3',
@@ -412,6 +532,27 @@ const PAA_LESSONS = [
         'Distributiva: a(b + c) = ab + ac',
         'Elemento neutro: a + 0 = a · · · a × 1 = a',
         'Orden de operaciones (PAPOMUDAS): Paréntesis → Potencias → Multiplicación y División (izquierda a derecha) → Adición y Sustracción (izquierda a derecha)',
+      ],
+      subtopics: [
+        {
+          title: 'PAPOMUDAS',
+          walkthrough: [
+            { col: 'theory', type: 'write', html: '<div class="theory-line rule">PAPOMUDAS</div><div class="theory-line">Paréntesis → Potencias → Mult/Div → Suma/Resta</div>', pause: 1800 },
+            { col: 'prob',   type: 'write', html: '3 + 4 × 2 − (6 ÷ 3)', pause: 2000 },
+            { col: 'calc',   type: 'write', html: '<div class="calc-line"><span class="red">(6 ÷ 3)</span> = ?</div>', pause: 700 },
+            { col: 'calc',   type: 'question', question: '¿cuánto es 6 ÷ 3?', hint: 'resuelve el paréntesis', answer: '2', correct: '✓ 6 ÷ 3 = <span class="hl">2</span>', wrong: '6 ÷ 3 = <span class="hl">2</span>' },
+            { col: 'prob',   type: 'write', html: '3 + 4 × 2 − <span class="hl">2</span>', pause: 1400 },
+            { col: 'theory', type: 'write', html: '<div class="theory-line">paréntesis ✓</div>', pause: 700 },
+            { col: 'calc',   type: 'write', html: '<div class="calc-sep"></div><div class="calc-line"><span class="blu">4 × 2</span> = ?</div>', pause: 700 },
+            { col: 'calc',   type: 'question', question: '¿cuánto es 4 × 2?', hint: 'multiplicación antes que suma', answer: '8', correct: '✓ 4 × 2 = <span class="hl">8</span>', wrong: '4 × 2 = <span class="hl">8</span>' },
+            { col: 'prob',   type: 'write', html: '3 + <span class="hl">8</span> − 2', pause: 1400 },
+            { col: 'theory', type: 'write', html: '<div class="theory-line">multiplicación ✓</div>', pause: 700 },
+            { col: 'calc',   type: 'write', html: '<div class="calc-sep"></div><div class="calc-line"><span class="amb">3 + 8 − 2</span> = ?</div>', pause: 700 },
+            { col: 'calc',   type: 'question', question: '¿cuánto es 3 + 8 − 2?', hint: 'de izquierda a derecha', answer: '9', correct: '✓ 3 + 8 − 2 = <span class="hl">9</span>', wrong: '3 + 8 = 11 → 11 − 2 = <span class="hl">9</span>' },
+            { col: 'prob',   type: 'write', html: '<span class="hl">= 9 ✓</span>', final: true, pause: 0 },
+            { col: 'theory', type: 'write', html: '<div class="theory-line">suma/resta ✓</div>', pause: 0 },
+          ],
+        },
       ],
       example: {
         start: '18 + 2³ ÷ 4 × 2',
@@ -562,72 +703,346 @@ const PAA_LESSONS = [
       title: 'Patrones numéricos y teoría de números',
       subtitle:
         'Descomponer en primos hace visibles los factores comunes. Con eso calculas MCD tomando el menor exponente en cada primo, y MCM tomando el mayor exponente.',
-      conceptVoice:
-        'La factorización prima descompone un número como producto de primos. ' +
-        'El máximo común divisor reúne solo los factores que aparecen en ambos números, con el exponente más pequeño. ' +
-        'El mínimo común múltiplo usa todos los primos que aparecen en cualquiera, con el exponente más grande. ' +
-        'Las sucesiones aritméticas suman la misma diferencia cada vez; las geométricas multiplican por la misma razón.',
-      formulas: [
-        '12 = 2² × 3',
-        '18 = 2 × 3²',
-        'MCD = 2^min × 3^min = 2 × 3 = 6',
-        'MCM = 2^max × 3^max = 4 × 9 = 36',
+      subtopics: [
+        // ── Subtopic 1: Divisibilidad y factorización prima ──────────────────
+        {
+          title: 'Divisibilidad y factorización prima',
+          rules: [
+            'Divisibilidad: un número es divisible por otro si el residuo de la división es 0',
+            'Reglas rápidas: divisible por 2 → termina en par · por 3 → suma de dígitos divisible por 3 · por 5 → termina en 0 o 5',
+            'Factorización prima: expresar un número como producto de números primos. Ejemplo: 60 = 2² × 3 × 5',
+          ],
+          formulas: [
+            '60 = 2² × 3 × 5',
+            '84 = 2² × 3 × 7',
+          ],
+          conceptVoice:
+            'Un número es divisible por otro si la división no deja residuo. ' +
+            'Tres reglas útiles: si termina en número par, es divisible por 2; si la suma de sus dígitos es divisible por 3, el número también lo es; si termina en 0 o 5, es divisible por 5. ' +
+            'La factorización prima consiste en expresar un número como producto solo de números primos. ' +
+            'Por ejemplo, 60 se divide entre 2 para obtener 30, luego entre 2 para obtener 15, y 15 = 3 × 5. Entonces 60 = 2² × 3 × 5.',
+          conceptVisual: null,
+          example: {
+            start: 'Factoriza 60 en factores primos',
+            narration_intro:
+              'Vamos a descomponer 60 dividiéndolo entre el menor primo posible en cada paso.',
+            formulas: ['60 ÷ 2 = 30', '30 ÷ 2 = 15', '15 = 3 × 5', '60 = 2² × 3 × 5'],
+            steps: [
+              {
+                equation: '60 ÷ 2 = 30',
+                annotation: 'Paso 1 — Dividir entre 2 (60 termina en par)',
+                narration: '60 termina en 0, que es par. Dividimos entre el primo más pequeño: 60 ÷ 2 = 30.',
+                visual:
+                  '<div class="lesson-visual-board">' +
+                  '<div class="visual-group-title" style="text-align:center">Divisible por 2</div>' +
+                  '<div class="visual-expression-strip">' +
+                  '<span class="term-card">60</span>' +
+                  '<span style="font-weight:800;color:var(--text-secondary);margin:0 4px;">÷</span>' +
+                  '<span class="term-card">2</span>' +
+                  '<span style="font-weight:800;color:var(--text-secondary);margin:0 4px;">=</span>' +
+                  '<span class="paa-highlight-box">30</span>' +
+                  '</div>' +
+                  '<div class="tile-equation">60 termina en 0 → es par → divisible por 2</div></div>',
+              },
+              {
+                equation: '30 ÷ 2 = 15',
+                annotation: 'Paso 2 — Dividir entre 2 otra vez (30 también es par)',
+                narration: '30 es par. Dividimos entre 2 nuevamente: 30 ÷ 2 = 15.',
+                visual:
+                  '<div class="lesson-visual-board">' +
+                  '<div class="visual-group-title" style="text-align:center">Divisible por 2 de nuevo</div>' +
+                  '<div class="visual-expression-strip">' +
+                  '<span class="term-card">30</span>' +
+                  '<span style="font-weight:800;color:var(--text-secondary);margin:0 4px;">÷</span>' +
+                  '<span class="term-card">2</span>' +
+                  '<span style="font-weight:800;color:var(--text-secondary);margin:0 4px;">=</span>' +
+                  '<span class="paa-highlight-box">15</span>' +
+                  '</div>' +
+                  '<div class="tile-equation">30 termina en 0 → es par → divisible por 2</div></div>',
+              },
+              {
+                equation: '15 = 3 × 5',
+                annotation: 'Paso 3 — Factorizar 15 (suma de dígitos: 1+5=6)',
+                narration: '15 no es par. Suma de dígitos: 1 + 5 = 6, divisible por 3. Entonces 15 ÷ 3 = 5. Ambos 3 y 5 son primos.',
+                visual:
+                  '<div class="lesson-visual-board">' +
+                  '<div class="visual-group-title" style="text-align:center">Divisible por 3</div>' +
+                  '<div class="visual-expression-strip">' +
+                  '<span class="term-card">15</span>' +
+                  '<span style="font-weight:800;color:var(--text-secondary);margin:0 4px;">=</span>' +
+                  '<span class="term-card" style="border-color:#F59E0B;background:#FFFBEB;color:#B45309;">3</span>' +
+                  '<span style="font-weight:800;color:var(--text-secondary);margin:0 4px;">×</span>' +
+                  '<span class="term-card" style="border-color:#F59E0B;background:#FFFBEB;color:#B45309;">5</span>' +
+                  '</div>' +
+                  '<div class="tile-equation">Suma de dígitos: 1 + 5 = 6 → divisible por 3 · 5 es primo</div></div>',
+              },
+              {
+                equation: '60 = 2² × 3 × 5',
+                annotation: 'Resultado — Factorización prima completa',
+                narration: 'Reunimos todos los factores primos: 60 = 2 × 2 × 3 × 5 = 2² × 3 × 5.',
+                visual:
+                  '<div class="lesson-visual-board">' +
+                  '<div class="visual-group-title" style="text-align:center">Factorización prima de 60</div>' +
+                  '<div class="visual-expression-strip">' +
+                  '<span class="term-card" style="border-color:#F59E0B;background:#FFFBEB;color:#B45309;">2²</span>' +
+                  '<span style="font-weight:800;color:var(--text-secondary);margin:0 4px;">×</span>' +
+                  '<span class="term-card" style="border-color:#F59E0B;background:#FFFBEB;color:#B45309;">3</span>' +
+                  '<span style="font-weight:800;color:var(--text-secondary);margin:0 4px;">×</span>' +
+                  '<span class="term-card" style="border-color:#F59E0B;background:#FFFBEB;color:#B45309;">5</span>' +
+                  '</div>' +
+                  '<div class="tile-equation">60 = 2² × 3 × 5</div></div>',
+              },
+            ],
+          },
+          practiceProblems: ['paa-aritmetica-n3-p1', 'paa-aritmetica-n3-p5', 'paa-aritmetica-n3-p7'],
+        },
+
+        // ── Subtopic 2: MCD — Máximo Común Divisor ───────────────────────────
+        {
+          title: 'MCD — Máximo Común Divisor',
+          rules: [
+            'MCD (Máximo Común Divisor): el mayor número que divide exactamente a dos o más números',
+            'Método: factoriza ambos números → toma los factores comunes con el menor exponente',
+          ],
+          formulas: [
+            '24 = 2³ × 3   ·   36 = 2² × 3²',
+            'MCD(24, 36) = 2² × 3 = 12',
+          ],
+          conceptVoice:
+            'El Máximo Común Divisor es el mayor número que divide exactamente a dos o más números sin dejar residuo. ' +
+            'Para encontrarlo, factoriza cada número en primos. Luego identifica los factores que aparecen en ambos números y toma el exponente más pequeño de cada uno. ' +
+            'Por ejemplo, para 12 y 18: 12 = 2² × 3 y 18 = 2 × 3². ' +
+            'El factor 2 aparece con exponentes 2 y 1; el menor es 1. El factor 3 aparece con exponentes 1 y 2; el menor es 1. ' +
+            'MCD = 2¹ × 3¹ = 6.',
+          conceptVisual: fs.readFileSync('./visual_nivel3.html', 'utf8'),
+          example: {
+            start: 'MCD de 12 y 18',
+            narration_intro:
+              'Vamos a factorizar 12 y 18, luego tomar los factores comunes con el menor exponente para obtener el MCD.',
+            formulas: ['12 = 2² × 3', '18 = 2 × 3²', 'MCD = 2¹ × 3¹ = 6'],
+            steps: [
+              {
+                equation: '12 = 2² × 3  · · ·  18 = 2 × 3²',
+                annotation: 'Paso 1 — Factorización prima de cada número',
+                narration: 'Factorizamos: 12 = 2² × 3 y 18 = 2 × 3²',
+                visual:
+                  '<div class="lesson-visual-board">' +
+                  '<div class="visual-group-title" style="text-align:center">Primos que aparecen</div>' +
+                  '<div class="visual-group-grid">' +
+                  '<div class="visual-group-box"><div class="visual-group-title">12</div>' +
+                  '<div class="visual-expression-strip"><span class="term-card">2²</span><span style="font-weight:800;color:var(--text-secondary);margin:0 4px;">×</span><span class="term-card">3</span></div></div>' +
+                  '<div class="visual-group-box"><div class="visual-group-title">18</div>' +
+                  '<div class="visual-expression-strip"><span class="term-card">2</span><span style="font-weight:800;color:var(--text-secondary);margin:0 4px;">×</span><span class="term-card">3²</span></div></div>' +
+                  '</div></div>',
+              },
+              {
+                equation: 'MCD = 2¹ × 3¹ = 6',
+                annotation: 'Paso 2 — Factores comunes con el menor exponente',
+                narration: 'Factor 2: exponente mínimo = 2¹. Factor 3: exponente mínimo = 3¹. MCD = 2 × 3 = 6.',
+                visual:
+                  '<div class="lesson-visual-board">' +
+                  '<div class="visual-group-title" style="text-align:center">Solo lo compartido (exponente mínimo)</div>' +
+                  '<div class="visual-expression-strip">' +
+                  '<span class="term-card">2¹</span><span style="font-weight:800;color:var(--text-secondary);margin:0 4px;">×</span>' +
+                  '<span class="term-card">3¹</span></div>' +
+                  '<div class="tile-equation" style="margin-top:10px;">2 × 3 = 6</div></div>',
+              },
+            ],
+          },
+          practiceProblems: ['paa-aritmetica-n3-p2', 'paa-aritmetica-n3-p6', 'paa-aritmetica-n3-p8'],
+        },
+
+        // ── Subtopic 3: MCM — Mínimo Común Múltiplo ──────────────────────────
+        {
+          title: 'MCM — Mínimo Común Múltiplo',
+          rules: [
+            'MCM (Mínimo Común Múltiplo): el menor número que es múltiplo de dos o más números',
+            'Método: factoriza ambos números → toma todos los factores con el mayor exponente',
+          ],
+          formulas: [
+            '12 = 2² × 3   ·   18 = 2 × 3²',
+            'MCM(12, 18) = 2² × 3² = 4 × 9 = 36',
+          ],
+          conceptVoice:
+            'El Mínimo Común Múltiplo es el menor número que es múltiplo de dos o más números a la vez. ' +
+            'Para encontrarlo, factoriza cada número en primos. Luego toma todos los factores primos que aparecen en cualquiera de los números, usando el exponente más grande de cada uno. ' +
+            'Por ejemplo, para 12 y 18: 12 = 2² × 3 y 18 = 2 × 3². ' +
+            'El factor 2 aparece con exponentes 2 y 1; el mayor es 2². El factor 3 aparece con exponentes 1 y 2; el mayor es 3². ' +
+            'MCM = 2² × 3² = 4 × 9 = 36.',
+          conceptVisual: fs.readFileSync('./visual_nivel3.html', 'utf8'),
+          // This is the representative worked example used by showExample() after all subtopics
+          example: {
+            start: 'MCD y MCM de 12 y 18',
+            narration_intro:
+              'Vamos a factorizar 12 y 18, luego leer los exponentes para obtener el MCD y el MCM. Usa Visual para ver los árboles y Fórmulas para las expresiones compactas.',
+            formulas: ['12 = 2² × 3', '18 = 2 × 3²', 'MCD = 2 × 3 = 6', 'MCM = 2² × 3² = 36'],
+            steps: [
+              {
+                equation: '12 = 2² × 3  · · ·  18 = 2 × 3²',
+                annotation: 'Paso 1 — Factorización prima de cada número',
+                narration: 'Factorizamos: 12 = 2² × 3 y 18 = 2 × 3²',
+                visual:
+                  '<div class="lesson-visual-board">' +
+                  '<div class="visual-group-title" style="text-align:center">Primos que aparecen</div>' +
+                  '<div class="visual-group-grid">' +
+                  '<div class="visual-group-box"><div class="visual-group-title">12</div>' +
+                  '<div class="visual-expression-strip"><span class="term-card">2²</span><span style="font-weight:800;color:var(--text-secondary);margin:0 4px;">×</span><span class="term-card">3</span></div></div>' +
+                  '<div class="visual-group-box"><div class="visual-group-title">18</div>' +
+                  '<div class="visual-expression-strip"><span class="term-card">2</span><span style="font-weight:800;color:var(--text-secondary);margin:0 4px;">×</span><span class="term-card">3²</span></div></div>' +
+                  '</div></div>',
+              },
+              {
+                equation: 'MCD = 2¹ × 3¹ = 6',
+                annotation: 'Paso 2 — MCD: factores comunes con el menor exponente',
+                narration: 'Factor 2: exp mínimo = 2¹ · Factor 3: exp mínimo = 3¹ · MCD = 2 × 3 = 6',
+                visual:
+                  '<div class="lesson-visual-board">' +
+                  '<div class="visual-group-title" style="text-align:center">Solo lo compartido (exponente mínimo)</div>' +
+                  '<div class="visual-expression-strip">' +
+                  '<span class="term-card">2¹</span><span style="font-weight:800;color:var(--text-secondary);margin:0 4px;">×</span>' +
+                  '<span class="term-card">3¹</span></div>' +
+                  '<div class="tile-equation" style="margin-top:10px;">2 × 3 = 6</div></div>',
+              },
+              {
+                equation: 'MCM = 2² × 3² = 4 × 9 = 36',
+                annotation: 'Paso 3 — MCM: todos los factores con el mayor exponente',
+                narration: 'Factor 2: exp máximo = 2² · Factor 3: exp máximo = 3² · MCM = 4 × 9 = 36',
+                visual:
+                  '<div class="lesson-visual-board">' +
+                  '<div class="visual-group-title" style="text-align:center">Cubrir todo (exponente máximo)</div>' +
+                  '<div class="visual-expression-strip">' +
+                  '<span class="term-card">2²</span><span style="font-weight:800;color:var(--text-secondary);margin:0 4px;">×</span>' +
+                  '<span class="term-card">3²</span></div>' +
+                  '<div class="tile-equation" style="margin-top:10px;">4 × 9 = 36</div></div>',
+              },
+            ],
+          },
+          practiceProblems: ['paa-aritmetica-n3-p3', 'paa-aritmetica-n3-p9', 'paa-aritmetica-n3-p10'],
+        },
+
+        // ── Subtopic 4: Sucesiones aritméticas ───────────────────────────────
+        {
+          title: 'Sucesiones aritméticas',
+          rules: [
+            'Sucesión aritmética: diferencia constante entre términos consecutivos → 3, 7, 11, 15... (+4)',
+            'Para encontrar el siguiente término: identifica la diferencia d y sumala al último término',
+          ],
+          formulas: [
+            '3, 7, 11, 15... → d = 7 − 3 = 4',
+            'Siguiente término: 15 + 4 = 19',
+          ],
+          conceptVoice:
+            'Una sucesión aritmética es una lista de números donde la diferencia entre cualquier par de términos consecutivos es siempre la misma. ' +
+            'Esa diferencia se llama diferencia común. ' +
+            'Por ejemplo, en la sucesión 3, 7, 11, 15... la diferencia es siempre 4: 7−3=4, 11−7=4, 15−11=4. ' +
+            'Para encontrar el siguiente término, simplemente suma la diferencia al último término: 15 + 4 = 19.',
+          conceptVisual: null,
+          example: {
+            start: '3, 7, 11, 15... ¿cuál es el siguiente número?',
+            narration_intro:
+              'Identificamos la diferencia constante entre términos consecutivos y la usamos para encontrar el siguiente.',
+            formulas: ['d = 7 − 3 = 4', 'Siguiente: 15 + 4 = 19'],
+            steps: [
+              {
+                equation: '7 − 3 = 4   (diferencia constante)',
+                annotation: 'Paso 1 — Identificar la diferencia entre términos',
+                narration: 'Calculamos la diferencia entre términos consecutivos: 7 − 3 = 4. Verificamos: 11 − 7 = 4 y 15 − 11 = 4. La diferencia es siempre 4.',
+                visual:
+                  '<div class="lesson-visual-board">' +
+                  '<div class="visual-group-title" style="text-align:center">Diferencia constante d = 4</div>' +
+                  '<div class="visual-expression-strip">' +
+                  '<span class="term-card">3</span>' +
+                  '<span style="font-weight:800;color:var(--text-secondary);margin:0 4px;">→</span>' +
+                  '<span class="term-card">7</span>' +
+                  '<span style="font-weight:800;color:var(--text-secondary);margin:0 4px;">→</span>' +
+                  '<span class="term-card">11</span>' +
+                  '<span style="font-weight:800;color:var(--text-secondary);margin:0 4px;">→</span>' +
+                  '<span class="term-card">15</span>' +
+                  '</div>' +
+                  '<div class="tile-equation">7 − 3 = 4   ·   11 − 7 = 4   ·   15 − 11 = 4</div></div>',
+              },
+              {
+                equation: '15 + 4 = 19',
+                annotation: 'Paso 2 — Sumar la diferencia al último término',
+                narration: 'El siguiente término es el último más la diferencia: 15 + 4 = 19.',
+                visual:
+                  '<div class="lesson-visual-board">' +
+                  '<div class="visual-group-title" style="text-align:center">Siguiente término</div>' +
+                  '<div class="visual-expression-strip">' +
+                  '<span class="term-card">15</span>' +
+                  '<span style="font-weight:800;color:var(--text-secondary);margin:0 4px;">+</span>' +
+                  '<span class="term-card">4</span>' +
+                  '<span style="font-weight:800;color:var(--text-secondary);margin:0 4px;">=</span>' +
+                  '<span class="paa-highlight-box">19</span>' +
+                  '</div>' +
+                  '<div class="tile-equation">15 + 4 = 19</div></div>',
+              },
+            ],
+          },
+          practiceProblems: ['paa-aritmetica-n3-p4', 'paa-aritmetica-n3-p11', 'paa-aritmetica-n3-p12'],
+        },
+
+        // ── Subtopic 5: Sucesiones geométricas ───────────────────────────────
+        {
+          title: 'Sucesiones geométricas',
+          rules: [
+            'Sucesión geométrica: razón constante entre términos consecutivos → 2, 6, 18, 54... (×3)',
+            'Para encontrar el siguiente término: identifica la razón r y multiplica el último término por r',
+          ],
+          formulas: [
+            '2, 6, 18, 54... → r = 6 ÷ 2 = 3',
+            'Siguiente término: 54 × 3 = 162',
+          ],
+          conceptVoice:
+            'Una sucesión geométrica es una lista de números donde cada término se obtiene multiplicando el anterior por un mismo factor constante, llamado razón común. ' +
+            'Por ejemplo, en la sucesión 2, 6, 18, 54... cada término es tres veces el anterior: 6÷2=3, 18÷6=3, 54÷18=3. La razón es 3. ' +
+            'Para encontrar el siguiente término, multiplica el último por la razón: 54 × 3 = 162.',
+          conceptVisual: null,
+          example: {
+            start: '2, 6, 18, 54... ¿cuál es el siguiente número?',
+            narration_intro:
+              'Identificamos la razón constante entre términos consecutivos y la usamos para encontrar el siguiente.',
+            formulas: ['r = 6 ÷ 2 = 3', 'Siguiente: 54 × 3 = 162'],
+            steps: [
+              {
+                equation: '6 ÷ 2 = 3   (razón constante)',
+                annotation: 'Paso 1 — Identificar la razón entre términos',
+                narration: 'Calculamos la razón entre términos consecutivos: 6 ÷ 2 = 3. Verificamos: 18 ÷ 6 = 3 y 54 ÷ 18 = 3. La razón es siempre 3.',
+                visual:
+                  '<div class="lesson-visual-board">' +
+                  '<div class="visual-group-title" style="text-align:center">Razón constante r = 3</div>' +
+                  '<div class="visual-expression-strip">' +
+                  '<span class="term-card">2</span>' +
+                  '<span style="font-weight:800;color:var(--text-secondary);margin:0 4px;">→</span>' +
+                  '<span class="term-card">6</span>' +
+                  '<span style="font-weight:800;color:var(--text-secondary);margin:0 4px;">→</span>' +
+                  '<span class="term-card">18</span>' +
+                  '<span style="font-weight:800;color:var(--text-secondary);margin:0 4px;">→</span>' +
+                  '<span class="term-card">54</span>' +
+                  '</div>' +
+                  '<div class="tile-equation">6 ÷ 2 = 3   ·   18 ÷ 6 = 3   ·   54 ÷ 18 = 3</div></div>',
+              },
+              {
+                equation: '54 × 3 = 162',
+                annotation: 'Paso 2 — Multiplicar el último término por la razón',
+                narration: 'El siguiente término es el último multiplicado por la razón: 54 × 3 = 162.',
+                visual:
+                  '<div class="lesson-visual-board">' +
+                  '<div class="visual-group-title" style="text-align:center">Siguiente término</div>' +
+                  '<div class="visual-expression-strip">' +
+                  '<span class="term-card">54</span>' +
+                  '<span style="font-weight:800;color:var(--text-secondary);margin:0 4px;">×</span>' +
+                  '<span class="term-card">3</span>' +
+                  '<span style="font-weight:800;color:var(--text-secondary);margin:0 4px;">=</span>' +
+                  '<span class="paa-highlight-box">162</span>' +
+                  '</div>' +
+                  '<div class="tile-equation">54 × 3 = 162</div></div>',
+              },
+            ],
+          },
+          practiceProblems: ['paa-aritmetica-n3-p13', 'paa-aritmetica-n3-p14', 'paa-aritmetica-n3-p15'],
+        },
       ],
-      conceptVisual: fs.readFileSync('./visual_nivel3.html', 'utf8'),
-      rules: [
-        'Divisibilidad: divisible por 2 → termina en par · por 3 → suma de dígitos divisible por 3 · por 5 → termina en 0 o 5',
-        'Factorización prima: expresar un número como producto de números primos. Ejemplo: 60 = 2² × 3 × 5',
-        'MCD (Máximo Común Divisor): factoriza ambos → toma los factores comunes con el menor exponente',
-        'MCM (Mínimo Común Múltiplo): factoriza ambos → toma todos los factores con el mayor exponente',
-        'Sucesión aritmética: diferencia constante entre términos → 3, 7, 11, 15... (+4)',
-        'Sucesión geométrica: razón constante entre términos → 2, 6, 18, 54... (×3)',
-      ],
-      example: {
-        start: 'MCD y MCM de 12 y 18',
-        narration_intro:
-          'Vamos a factorizar 12 y 18, luego leer los exponentes para obtener el MCD y el MCM. Usa Visual para ver los árboles y Fórmulas para las expresiones compactas.',
-        formulas: ['12 = 2² × 3', '18 = 2 × 3²', 'MCD = 2 × 3 = 6', 'MCM = 2² × 3² = 36'],
-        steps: [
-          {
-            equation: '12 = 2² × 3  · · ·  18 = 2 × 3²',
-            annotation: 'Paso 1 — Factorización prima de cada número',
-            narration: 'Factorizamos: 12 = 2² × 3 y 18 = 2 × 3²',
-            visual:
-              '<div class="lesson-visual-board">' +
-              '<div class="visual-group-title" style="text-align:center">Primos que aparecen</div>' +
-              '<div class="visual-group-grid">' +
-              '<div class="visual-group-box"><div class="visual-group-title">12</div>' +
-              '<div class="visual-expression-strip"><span class="term-card">2²</span><span style="font-weight:800;color:var(--text-secondary);margin:0 4px;">×</span><span class="term-card">3</span></div></div>' +
-              '<div class="visual-group-box"><div class="visual-group-title">18</div>' +
-              '<div class="visual-expression-strip"><span class="term-card">2</span><span style="font-weight:800;color:var(--text-secondary);margin:0 4px;">×</span><span class="term-card">3²</span></div></div>' +
-              '</div></div>',
-          },
-          {
-            equation: 'MCD = 2¹ × 3¹ = 6',
-            annotation: 'Paso 2 — MCD: factores comunes con el menor exponente',
-            narration: 'Factor 2: exp mínimo = 2¹ · Factor 3: exp mínimo = 3¹ · MCD = 2 × 3 = 6',
-            visual:
-              '<div class="lesson-visual-board">' +
-              '<div class="visual-group-title" style="text-align:center">Solo lo compartido (exponente mínimo)</div>' +
-              '<div class="visual-expression-strip">' +
-              '<span class="term-card">2¹</span><span style="font-weight:800;color:var(--text-secondary);margin:0 4px;">×</span>' +
-              '<span class="term-card">3¹</span></div>' +
-              '<div class="tile-equation" style="margin-top:10px;">2 × 3 = 6</div></div>',
-          },
-          {
-            equation: 'MCM = 2² × 3² = 4 × 9 = 36',
-            annotation: 'Paso 3 — MCM: todos los factores con el mayor exponente',
-            narration: 'Factor 2: exp máximo = 2² · Factor 3: exp máximo = 3² · MCM = 4 × 9 = 36',
-            visual:
-              '<div class="lesson-visual-board">' +
-              '<div class="visual-group-title" style="text-align:center">Cubrir todo (exponente máximo)</div>' +
-              '<div class="visual-expression-strip">' +
-              '<span class="term-card">2²</span><span style="font-weight:800;color:var(--text-secondary);margin:0 4px;">×</span>' +
-              '<span class="term-card">3²</span></div>' +
-              '<div class="tile-equation" style="margin-top:10px;">4 × 9 = 36</div></div>',
-          },
-        ],
-      },
       practiceProblems: ['paa-aritmetica-n3-p1','paa-aritmetica-n3-p2','paa-aritmetica-n3-p3',
                          'paa-aritmetica-n3-p4','paa-aritmetica-n3-p5','paa-aritmetica-n3-p6'],
       testProblems:     ['paa-aritmetica-n3-t1','paa-aritmetica-n3-t2','paa-aritmetica-n3-t3'],
