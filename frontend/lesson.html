@@ -1156,15 +1156,20 @@
   .wt-rail {
     background: var(--wt-theory-bg);
     border-right: 1px solid var(--wt-border);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-evenly;
     padding: 14px 0;
     position: relative;
     min-width: 0;
     min-height: 0;
     align-self: stretch;
+  }
+  .wt-rail-marker-wrap {
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
   @keyframes wt-in {
     from { opacity: 0; transform: translateY(4px); }
@@ -2474,6 +2479,7 @@
         const needsArrow = existing.length > 0 && !step.final;
         line.innerHTML = (needsArrow ? '<span class="prob-arrow">= </span>' : '') + step.html;
         col.appendChild(line);
+        scheduleSyncRailMarkers();
       }
     }
 
@@ -2526,6 +2532,9 @@
     }
 
     function _onComplete() {
+      window.removeEventListener('resize', onWtRailLayout);
+      const _probScrollEl = document.getElementById('wt-col-prob');
+      if (_probScrollEl) _probScrollEl.removeEventListener('scroll', onWtRailLayout);
       document.body.classList.remove('has-walkthrough');
       document.querySelectorAll('audio').forEach(function(a) { a.pause(); a.currentTime = 0; });
       _setStatus('');
@@ -2567,6 +2576,7 @@
       if (btn) btn.textContent = '\u23F8 Pausar';
       _setStatus('writing');
       _updateBar();
+      scheduleSyncRailMarkers();
       _resume();
     };
 
@@ -2594,6 +2604,7 @@
       _s.waiting = false;
       _s.tries = 0;
       _updateBar();
+      scheduleSyncRailMarkers();
       _resume();
     }
 
@@ -2654,17 +2665,78 @@
     };
 
     // ── Kick off ───────────────────────────────────────────────
-    const railMarkers = [
-      { stepIdx: 1,  label: 'El problema' },
-      { stepIdx: 4,  label: 'Par\u00E9ntesis = 2' },
-      { stepIdx: 8,  label: 'Multiplicaci\u00F3n = 8' },
-      { stepIdx: 12, label: 'Resultado = 9' },
-    ];
+    var railMarkers = [];
+    for (var rj = 0; rj < steps.length; rj++) {
+      var stp = steps[rj];
+      if (stp.type === 'write' && stp.col === 'prob') {
+        railMarkers.push({
+          stepIdx: rj,
+          label: stp.railLabel || ('Paso ' + (railMarkers.length + 1)),
+        });
+      }
+    }
+
+    var _wtRailLayoutTimer = null;
+    function syncRailMarkersToProbLines() {
+      var rail = document.getElementById('wt-rail');
+      var probEl = document.getElementById('wt-col-prob');
+      if (!rail || !probEl) return;
+      var lines = probEl.querySelectorAll('.prob-line');
+      var wraps = rail.querySelectorAll('.wt-rail-marker-wrap');
+      if (!wraps.length) return;
+      var railRect = rail.getBoundingClientRect();
+      var lineGap = 26;
+      if (lines.length >= 2) {
+        var ra = lines[0].getBoundingClientRect();
+        var rb = lines[1].getBoundingClientRect();
+        lineGap = rb.top - ra.top;
+      } else if (lines.length === 1) {
+        var cs = getComputedStyle(lines[0]);
+        lineGap =
+          lines[0].getBoundingClientRect().height +
+          parseFloat(cs.marginBottom || '0') +
+          parseFloat(cs.marginTop || '0');
+        if (lineGap < 18) lineGap = 26;
+      }
+      for (var wi = 0; wi < wraps.length; wi++) {
+        var wrap = wraps[wi];
+        var centerY;
+        if (lines[wi]) {
+          var lr = lines[wi].getBoundingClientRect();
+          centerY = lr.top + lr.height / 2 - railRect.top;
+        } else if (lines[0]) {
+          var r0 = lines[0].getBoundingClientRect();
+          centerY = r0.top + r0.height / 2 - railRect.top + wi * lineGap;
+        } else {
+          centerY = 40 + wi * lineGap;
+        }
+        wrap.style.top = Math.round(centerY) + 'px';
+      }
+    }
+
+    function scheduleSyncRailMarkers() {
+      requestAnimationFrame(function() {
+        requestAnimationFrame(syncRailMarkersToProbLines);
+      });
+    }
+
+    function onWtRailLayout() {
+      if (_wtRailLayoutTimer) clearTimeout(_wtRailLayoutTimer);
+      _wtRailLayoutTimer = setTimeout(function() {
+        _wtRailLayoutTimer = null;
+        syncRailMarkersToProbLines();
+      }, 50);
+    }
+    window.addEventListener('resize', onWtRailLayout);
+
     const rail = document.getElementById('wt-rail');
+    const probCol = document.getElementById('wt-col-prob');
+    if (probCol) probCol.addEventListener('scroll', onWtRailLayout, { passive: true });
+
     if (rail) {
       railMarkers.forEach(function(rm) {
         const wrap = document.createElement('div');
-        wrap.style.cssText = 'position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;';
+        wrap.className = 'wt-rail-marker-wrap';
         const marker = document.createElement('div');
         marker.className = 'wt-rail-marker';
         marker.dataset.stepIdx = rm.stepIdx;
@@ -2680,6 +2752,7 @@
     }
     _setStatus('writing');
     _updateBar();
+    scheduleSyncRailMarkers();
     _resume();
   }
 
