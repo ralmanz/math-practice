@@ -406,6 +406,30 @@
     color: var(--text);
   }
 
+  .problem-work-wrap {
+    display: none;
+    margin-top: 16px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1.5px solid var(--accent-light, #D8F3DC);
+    background: var(--accent-bg, #F0FAF3);
+  }
+  .problem-work-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .problem-work-expression {
+    font-family: var(--mono);
+    font-size: 1.1rem;
+    font-weight: 600;
+    line-height: 1.55;
+    color: var(--text);
+  }
+
   /* ── Step History ── */
   .step-entry {
     display: flex;
@@ -752,7 +776,8 @@
   <div id="setup-calc-wrapper"></div>
 
   <div class="format-hint">
-    Tap a Question or Answer field, then use the calculator to insert math symbols into that field.
+    Tap Question, Answer, or Work expression, then use the calculator to insert math symbols into that field.
+    For word problems, add a <strong>Work expression</strong> (the numeric surface to simplify) so step checking stays reliable.
   </div>
   <div class="setup-error" id="setup-error"></div>
 
@@ -794,6 +819,10 @@
   <div class="problem-card">
     <div class="problem-label" id="problem-label">Problem <span id="problem-number"></span></div>
     <div class="problem-text" id="problem-text"></div>
+    <div class="problem-work-wrap" id="problem-work-wrap">
+      <div class="problem-work-label">Expresi&oacute;n</div>
+      <div class="problem-work-expression" id="problem-work-expression"></div>
+    </div>
   </div>
 
   <div id="steps-container"></div>
@@ -904,10 +933,11 @@
   }
 
   // ── Add a problem card ──
-  function addProblemCard(type, question, answer) {
+  function addProblemCard(type, question, answer, expression) {
     type = type || 'Expand';
     question = question || '';
     answer = answer || '';
+    expression = expression || '';
 
     const id = cardCounter++;
     const card = document.createElement('div');
@@ -941,12 +971,19 @@
           placeholder="e.g. 6x + 15"
           autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
       </div>
+      <div class="builder-field">
+        <label class="builder-field-label">Work expression <span style="font-weight:500;opacity:0.75;">(optional)</span></label>
+        <input type="text" class="builder-input builder-e-input"
+          placeholder="e.g. 5 + 3 × 4 — for word problems or long prompts"
+          autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+      </div>
     `;
 
     // Set values programmatically (avoids HTML escaping issues)
     card.querySelector('.builder-type-select').value = type;
     card.querySelector('.builder-q-input').value = question;
     card.querySelector('.builder-a-input').value = answer;
+    card.querySelector('.builder-e-input').value = expression;
 
     // Attach focus listener so the shared calculator targets this input
     card.querySelectorAll('.builder-input').forEach(input => {
@@ -1001,12 +1038,15 @@
       const type     = card.querySelector('.builder-type-select').value;
       const question = card.querySelector('.builder-q-input').value.trim();
       const answer   = card.querySelector('.builder-a-input').value.trim();
+      const expression = card.querySelector('.builder-e-input').value.trim();
       if (!question || !answer) {
         err.textContent = `Problem ${i + 1} is missing a ${!question ? 'question' : 'answer'}.`;
         err.style.display = 'block';
         return;
       }
-      parsed.push({ type, question, answer });
+      const row = { type, question, answer };
+      if (expression) row.expression = expression;
+      parsed.push(row);
     }
 
     const data = JSON.stringify({ problems: parsed });
@@ -1065,7 +1105,10 @@
     s = s.replace(/⁷/g, '^7');
     s = s.replace(/⁸/g, '^8');
     s = s.replace(/⁹/g, '^9');
+    s = s.replace(/\bgcd\b/gi, '\x04');
+    s = s.replace(/\blcm\b/gi, '\x05');
     s = s.replace(/×/g, '*');
+    s = s.replace(/÷/g, '/');
     s = s.replace(/−/g, '-');
     s = s.replace(/sqrt/gi, '\x01');
     s = s.replace(/√\(/g, '\x01(');
@@ -1084,6 +1127,8 @@
     s = s.replace(/\)([a-zA-Z])/g, ')*$1');
     s = s.replace(/\)(\d)/g, ')*$1');
     s = s.replace(/\x01/g, 'sqrt');
+    s = s.replace(/\x04/g, 'gcd');
+    s = s.replace(/\x05/g, 'lcm');
     return s;
   }
 
@@ -1313,9 +1358,68 @@
   }
 
   function extractExpression(questionText) {
-    return questionText
+    const raw = String(questionText || '');
+    let s = raw
       .replace(/^(expand and simplify|expand|factorise|factorize|simplify|solve|evaluate|find|calculate)\s+/i, '')
       .trim();
+    s = s.replace(/^simplifica:\s*/i, '').trim();
+
+    let m = s.match(/^¿?\s*cu[aá]nto es el\s+(\d+)\s*%\s+de\s+(\d+)\s*\??\s*$/i);
+    if (m) return `${m[1]}/100*${m[2]}`;
+
+    m = raw.match(/a\s*=\s*(\d+)\s+y\s*b\s*=\s*(\d+)/i);
+    if (m && (/a²\s*\+\s*2ab|2ab\s*(?:−|-)\s*b²/i.test(raw) || /a\^2/i.test(raw))) {
+      const a = m[1], b = m[2];
+      return `${a}^2+2*${a}*${b}-${b}^2`;
+    }
+
+    m = s.match(/^¿?\s*cu[aá]l es el MCD de\s+(\d+)\s+y\s+(\d+)\s*\??\s*$/i);
+    if (m) return `gcd(${m[1]},${m[2]})`;
+    m = s.match(/^¿?\s*cu[aá]l es el MCM de\s+(\d+)\s+y\s+(\d+)\s*\??\s*$/i);
+    if (m) return `lcm(${m[1]},${m[2]})`;
+
+    m = s.match(/^¿?\s*qu[eé]\s+porcentaje de\s+(\d+)\s+es\s+(\d+)\s*\??\s*$/i);
+    if (m) return `${m[2]}/${m[1]}*100`;
+
+    m = s.match(/^¿?\s*cu[aá]l es el siguiente t[eé]rmino en la sucesi[oó]n\s+(.+?)\.\.\.\s*\??\s*$/i);
+    if (m) {
+      const tail = m[1].replace(/\.\.\.$/, '').trim();
+      const parts = tail.split(',').map((x) => x.trim()).filter(Boolean);
+      const nums = parts.map((x) => parseFloat(x.replace(/\s+/g, ''))).filter((n) => Number.isFinite(n));
+      if (nums.length >= 3) {
+        const d1 = nums[1] - nums[0];
+        const d2 = nums[2] - nums[1];
+        if (Math.abs(d1 - d2) < 1e-9) {
+          const last = nums[nums.length - 1];
+          return `${last}+${d1}`;
+        }
+        if (nums[0] !== 0 && nums[1] !== 0) {
+          const r1 = nums[1] / nums[0];
+          const r2 = nums[2] / nums[1];
+          if (Math.abs(r1 - r2) < 1e-9) {
+            const last = nums[nums.length - 1];
+            return `${last}*${r1}`;
+          }
+        }
+      }
+      return tail;
+    }
+
+    m = s.match(/^¿?\s*cu[aá]nto es\s+(.+?)\s*\?*\s*$/i);
+    if (m) return m[1].trim();
+
+    if (/En la sucesi[oó]n\s+5,\s*12,\s*19,\s*26/i.test(raw) && /octavo\s+t[eé]rmino/i.test(raw)) {
+      return '5+(8-1)*7';
+    }
+
+    return s;
+  }
+
+  function getInitialWorkExpression(problem) {
+    if (!problem) return '';
+    const ex = problem.expression;
+    if (ex != null && String(ex).trim() !== '') return String(ex).trim();
+    return extractExpression(problem.question);
   }
 
   // ── Fetch with 10s timeout ──
@@ -1643,6 +1747,24 @@
     const typeStr = p.type ? ` · ${p.type}` : '';
     document.getElementById('problem-label').textContent = `Problem ${index + 1} of ${problems.length}${typeStr}`;
     document.getElementById('problem-text').innerHTML = renderMath(p.question);
+    const workWrap = document.getElementById('problem-work-wrap');
+    const workExpr = document.getElementById('problem-work-expression');
+    if (workWrap && workExpr) {
+      const explicit = p.expression != null && String(p.expression).trim() !== '';
+      const initialWork = getInitialWorkExpression(p);
+      const qNorm = String(p.question || '').replace(/\s+/g, ' ').trim();
+      const wNorm = String(initialWork || '').replace(/\s+/g, ' ').trim();
+      if (explicit) {
+        workWrap.style.display = 'block';
+        workExpr.innerHTML = renderMath(String(p.expression).trim());
+      } else if (wNorm && wNorm !== qNorm) {
+        workWrap.style.display = 'block';
+        workExpr.innerHTML = renderMath(initialWork);
+      } else {
+        workWrap.style.display = 'none';
+        workExpr.innerHTML = '';
+      }
+    }
     document.getElementById('steps-container').innerHTML = '';
     document.getElementById('feedback').className = 'feedback';
     document.getElementById('feedback').textContent = '';
@@ -1689,7 +1811,7 @@
       ? problem.answer
       : stepHistory.length > 0
         ? stepHistory[stepHistory.length - 1]
-        : extractExpression(problem.question);
+        : getInitialWorkExpression(problem);
 
     const t0 = performance.now();
     console.log('[submitStep] entry', { input, problemType: problem.type, previousExpression });

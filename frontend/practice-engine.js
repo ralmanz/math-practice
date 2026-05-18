@@ -59,6 +59,29 @@
     font-family: var(--mono, monospace); font-size: 1.15rem;
     font-weight: 500; line-height: 1.6; color: var(--text, #1A1A1A);
   }
+  .pe-wrap .problem-work-wrap {
+    display: none;
+    margin-top: 16px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1.5px solid var(--accent-light, #D8F3DC);
+    background: var(--accent-bg, #F0FAF3);
+  }
+  .pe-wrap .problem-work-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent, #2D6A4F);
+    margin-bottom: 6px;
+  }
+  .pe-wrap .problem-work-expression {
+    font-family: var(--mono, monospace);
+    font-size: 1.1rem;
+    font-weight: 600;
+    line-height: 1.55;
+    color: var(--text, #1A1A1A);
+  }
   .pe-wrap .step-entry {
     display: flex; align-items: flex-start; gap: 10px;
     padding: 10px 14px; border-radius: 10px; margin-bottom: 6px;
@@ -199,7 +222,10 @@
     s = s.replace(/⁷/g, '^7');
     s = s.replace(/⁸/g, '^8');
     s = s.replace(/⁹/g, '^9');
+    s = s.replace(/\bgcd\b/gi, '\x04');
+    s = s.replace(/\blcm\b/gi, '\x05');
     s = s.replace(/×/g, '*');
+    s = s.replace(/÷/g, '/');
     s = s.replace(/−/g, '-');
     s = s.replace(/sqrt/gi, '\x01');
     s = s.replace(/√\(/g, '\x01(');
@@ -218,6 +244,8 @@
     s = s.replace(/\)([a-zA-Z])/g, ')*$1');
     s = s.replace(/\)(\d)/g, ')*$1');
     s = s.replace(/\x01/g, 'sqrt');
+    s = s.replace(/\x04/g, 'gcd');
+    s = s.replace(/\x05/g, 'lcm');
     return s;
   }
 
@@ -349,9 +377,68 @@
   }
 
   function extractExpression(questionText) {
-    return questionText
+    const raw = String(questionText || '');
+    let s = raw
       .replace(/^(expand and simplify|expand|factorise|factorize|simplify|solve|evaluate|find|calculate)\s+/i, '')
       .trim();
+    s = s.replace(/^simplifica:\s*/i, '').trim();
+
+    let m = s.match(/^¿?\s*cu[aá]nto es el\s+(\d+)\s*%\s+de\s+(\d+)\s*\??\s*$/i);
+    if (m) return `${m[1]}/100*${m[2]}`;
+
+    m = raw.match(/a\s*=\s*(\d+)\s+y\s*b\s*=\s*(\d+)/i);
+    if (m && (/a²\s*\+\s*2ab|2ab\s*(?:−|-)\s*b²/i.test(raw) || /a\^2/i.test(raw))) {
+      const a = m[1], b = m[2];
+      return `${a}^2+2*${a}*${b}-${b}^2`;
+    }
+
+    m = s.match(/^¿?\s*cu[aá]l es el MCD de\s+(\d+)\s+y\s+(\d+)\s*\??\s*$/i);
+    if (m) return `gcd(${m[1]},${m[2]})`;
+    m = s.match(/^¿?\s*cu[aá]l es el MCM de\s+(\d+)\s+y\s+(\d+)\s*\??\s*$/i);
+    if (m) return `lcm(${m[1]},${m[2]})`;
+
+    m = s.match(/^¿?\s*qu[eé]\s+porcentaje de\s+(\d+)\s+es\s+(\d+)\s*\??\s*$/i);
+    if (m) return `${m[2]}/${m[1]}*100`;
+
+    m = s.match(/^¿?\s*cu[aá]l es el siguiente t[eé]rmino en la sucesi[oó]n\s+(.+?)\.\.\.\s*\??\s*$/i);
+    if (m) {
+      const tail = m[1].replace(/\.\.\.$/, '').trim();
+      const parts = tail.split(',').map((x) => x.trim()).filter(Boolean);
+      const nums = parts.map((x) => parseFloat(x.replace(/\s+/g, ''))).filter((n) => Number.isFinite(n));
+      if (nums.length >= 3) {
+        const d1 = nums[1] - nums[0];
+        const d2 = nums[2] - nums[1];
+        if (Math.abs(d1 - d2) < 1e-9) {
+          const last = nums[nums.length - 1];
+          return `${last}+${d1}`;
+        }
+        if (nums[0] !== 0 && nums[1] !== 0) {
+          const r1 = nums[1] / nums[0];
+          const r2 = nums[2] / nums[1];
+          if (Math.abs(r1 - r2) < 1e-9) {
+            const last = nums[nums.length - 1];
+            return `${last}*${r1}`;
+          }
+        }
+      }
+      return tail;
+    }
+
+    m = s.match(/^¿?\s*cu[aá]nto es\s+(.+?)\s*\?*\s*$/i);
+    if (m) return m[1].trim();
+
+    if (/En la sucesi[oó]n\s+5,\s*12,\s*19,\s*26/i.test(raw) && /octavo\s+t[eé]rmino/i.test(raw)) {
+      return '5+(8-1)*7';
+    }
+
+    return s;
+  }
+
+  function getInitialWorkExpression(problem) {
+    if (!problem) return '';
+    const ex = problem.expression;
+    if (ex != null && String(ex).trim() !== '') return String(ex).trim();
+    return extractExpression(problem.question);
   }
 
   // ── Fetch with 10s timeout ──
@@ -629,7 +716,7 @@
 
     // ── DOM element refs (set after render) ────────────────────────────────
     let elProgressFill, elProgressText;
-    let elProblemLabel, elProblemText;
+    let elProblemLabel, elProblemText, elProblemWorkWrap, elProblemWorkExpr;
     let elStepsContainer, elFeedback, elLoading;
     let elInputArea, elInput, elPreview, elCalcGrid;
     let elMcqOptions;
@@ -650,6 +737,10 @@
           <div class="problem-card">
             <div class="problem-label"></div>
             <div class="problem-text"></div>
+            <div class="problem-work-wrap">
+              <div class="problem-work-label">Expresi\u00f3n</div>
+              <div class="problem-work-expression"></div>
+            </div>
           </div>
           <div class="pe-steps-container"></div>
           <div class="feedback" style="display:none;"></div>
@@ -679,6 +770,8 @@
       elProgressText   = wrap.querySelector('.pe-progress-text');
       elProblemLabel   = wrap.querySelector('.problem-label');
       elProblemText    = wrap.querySelector('.problem-text');
+      elProblemWorkWrap = wrap.querySelector('.problem-work-wrap');
+      elProblemWorkExpr = wrap.querySelector('.problem-work-expression');
       elStepsContainer = wrap.querySelector('.pe-steps-container');
       elFeedback       = wrap.querySelector('.feedback');
       elLoading        = wrap.querySelector('.loading-indicator');
@@ -788,6 +881,22 @@
       const typeStr = p.type ? ` \u00b7 ${p.type}` : '';
       elProblemLabel.textContent    = `Problem ${index + 1} of ${problems.length}${typeStr}`;
       elProblemText.innerHTML       = renderMath(p.question);
+      if (elProblemWorkWrap && elProblemWorkExpr) {
+        const explicit = p.expression != null && String(p.expression).trim() !== '';
+        const initialWork = getInitialWorkExpression(p);
+        const qNorm = String(p.question || '').replace(/\s+/g, ' ').trim();
+        const wNorm = String(initialWork || '').replace(/\s+/g, ' ').trim();
+        if (explicit) {
+          elProblemWorkWrap.style.display = 'block';
+          elProblemWorkExpr.innerHTML = renderMath(String(p.expression).trim());
+        } else if (wNorm && wNorm !== qNorm) {
+          elProblemWorkWrap.style.display = 'block';
+          elProblemWorkExpr.innerHTML = renderMath(initialWork);
+        } else {
+          elProblemWorkWrap.style.display = 'none';
+          elProblemWorkExpr.innerHTML = '';
+        }
+      }
       elStepsContainer.innerHTML    = '';
       elFeedback.className          = 'feedback';
       elFeedback.textContent        = '';
@@ -921,11 +1030,11 @@
         return;
       }
 
-      const previousExpression = (problem.type === 'Evaluate' || problem.type === 'Rearrange' || problem.format === 'open')
+      const previousExpression = (problem.type === 'Evaluate' || problem.type === 'Rearrange')
         ? problem.answer
         : stepHistory.length > 0
           ? stepHistory[stepHistory.length - 1]
-          : extractExpression(problem.question);
+          : getInitialWorkExpression(problem);
 
       const t0 = performance.now();
       console.log('[submitStep] entry', { input, problemType: problem.type, previousExpression });

@@ -142,6 +142,7 @@ const PAA_PROBLEMS = [
     id: 'paa-aritmetica-n2-p2',
     curriculum: 'PAA', unit: 'aritmetica', stage: '2',
     problemType: 'practice', type: '', format: 'open',
+    expression: '80*0.85',
     question: 'Un producto cuesta $80.00 con 15% de descuento. ¿Cuál es el precio final?',
     answer: '68',
     hints: [
@@ -155,6 +156,7 @@ const PAA_PROBLEMS = [
     id: 'paa-aritmetica-n2-p3',
     curriculum: 'PAA', unit: 'aritmetica', stage: '2',
     problemType: 'practice', type: '', format: 'open',
+    expression: '8*(1.5/3)',
     question: 'Si 3 lápices cuestan $1.50, ¿cuánto cuestan 8 lápices?',
     answer: '4',
     hints: [
@@ -182,6 +184,7 @@ const PAA_PROBLEMS = [
     id: 'paa-aritmetica-n2-p5',
     curriculum: 'PAA', unit: 'aritmetica', stage: '2',
     problemType: 'practice', type: '', format: 'open',
+    expression: '200/0.8-200',
     question: 'Un conductor viajó 115 km el primer día y 85 km el segundo. Si recorrió el 80% de la distancia total, ¿cuántos km le faltan por recorrer?',
     answer: '50',
     hints: [
@@ -208,6 +211,7 @@ const PAA_PROBLEMS = [
     id: 'paa-aritmetica-n2-t1',
     curriculum: 'PAA', unit: 'aritmetica', stage: '2',
     problemType: 'test', type: '', format: 'open',
+    expression: '120*0.75',
     question: 'Un artículo de $120.00 tiene 25% de descuento. ¿Cuál es el precio final?',
     answer: '90',
     hints: [], options: [], modules: ['equivalence'], createdAt: CREATED_AT,
@@ -216,6 +220,7 @@ const PAA_PROBLEMS = [
     id: 'paa-aritmetica-n2-t2',
     curriculum: 'PAA', unit: 'aritmetica', stage: '2',
     problemType: 'test', type: '', format: 'open',
+    expression: '300/(5/8)',
     question: 'Si 5/8 de la distancia total son 300 km, ¿cuál es la distancia total en km?',
     answer: '480',
     hints: [], options: [], modules: ['equivalence'], createdAt: CREATED_AT,
@@ -224,6 +229,7 @@ const PAA_PROBLEMS = [
     id: 'paa-aritmetica-n2-t3',
     curriculum: 'PAA', unit: 'aritmetica', stage: '2',
     problemType: 'test', type: '', format: 'open',
+    expression: '250*3/0.25',
     question: 'Un joven retira el 25% de sus ahorros y gasta el 33⅓% de eso en adornos que costaron $250.00. ¿Cuántos dólares tenía en el banco?',
     answer: '3000',
     hints: [], options: [], modules: ['equivalence'], createdAt: CREATED_AT,
@@ -288,6 +294,7 @@ const PAA_PROBLEMS = [
     id: 'paa-aritmetica-n3-p5',
     curriculum: 'PAA', unit: 'aritmetica', stage: '3',
     problemType: 'practice', type: '', format: 'open',
+    expression: '49/7',
     question: '¿Cuántos múltiplos de 7 hay entre 1 y 50?',
     answer: '7',
     hints: [
@@ -329,6 +336,7 @@ const PAA_PROBLEMS = [
     id: 'paa-aritmetica-n3-p8',
     curriculum: 'PAA', unit: 'aritmetica', stage: '3',
     problemType: 'practice', type: '', format: 'open',
+    expression: 'gcd(48,36)',
     question: 'Un agricultor tiene 48 naranjas y 36 manzanas. Quiere hacer bolsas iguales sin que sobre ninguna fruta. ¿Cuántas bolsas puede hacer como máximo?',
     answer: '12',
     hints: [
@@ -355,6 +363,7 @@ const PAA_PROBLEMS = [
     id: 'paa-aritmetica-n3-p10',
     curriculum: 'PAA', unit: 'aritmetica', stage: '3',
     problemType: 'practice', type: '', format: 'open',
+    expression: 'lcm(6,9)',
     question: 'En una panadería, el pan de trigo se hornea cada 6 horas y el pan de maíz cada 9 horas. Si ambos se hornean juntos ahora, ¿cuántas horas pasarán hasta que coincidan de nuevo?',
     answer: '18',
     hints: [
@@ -381,6 +390,7 @@ const PAA_PROBLEMS = [
     id: 'paa-aritmetica-n3-p12',
     curriculum: 'PAA', unit: 'aritmetica', stage: '3',
     problemType: 'practice', type: '', format: 'open',
+    expression: '15+(7-1)*4',
     question: 'Una empresa tiene 15 empleados en enero. Cada mes contrata 4 empleados más. ¿Cuántos empleados tendrá en julio (mes 7)?',
     answer: '39',
     hints: [
@@ -407,6 +417,7 @@ const PAA_PROBLEMS = [
     id: 'paa-aritmetica-n3-p14',
     curriculum: 'PAA', unit: 'aritmetica', stage: '3',
     problemType: 'practice', type: '', format: 'open',
+    expression: '5*2^4',
     question: 'Una bacteria se divide en 2 cada hora. Si comenzamos con 5 bacterias, ¿cuántas habrá después de 4 horas?',
     answer: '80',
     hints: [
@@ -420,6 +431,7 @@ const PAA_PROBLEMS = [
     id: 'paa-aritmetica-n3-p15',
     curriculum: 'PAA', unit: 'aritmetica', stage: '3',
     problemType: 'practice', type: '', format: 'open',
+    expression: '4*3^5',
     question: 'En la sucesión 4, 12, 36, 108... ¿cuál es el sexto término?',
     answer: '972',
     hints: [
@@ -434,6 +446,7 @@ const PAA_PROBLEMS = [
     id: 'paa-aritmetica-n3-t1',
     curriculum: 'PAA', unit: 'aritmetica', stage: '3',
     problemType: 'test', type: '', format: 'open',
+    expression: 'lcm(12,18)',
     question: 'Dos autobuses salen juntos de la terminal. Uno pasa cada 12 minutos y otro cada 18 minutos. ¿En cuántos minutos volverán a salir juntos?',
     answer: '36',
     hints: [], options: [], modules: ['equivalence'], createdAt: CREATED_AT,

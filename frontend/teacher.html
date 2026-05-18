@@ -571,6 +571,10 @@
             <label data-i18n="teacher_answer_label">Answer</label>
             <input type="text" id="oneoff-answer" placeholder="e.g. 3x + 6" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
           </div>
+          <div class="field">
+            <label><span data-i18n="teacher_work_expression_label">Work expression</span> <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-secondary);" data-i18n="teacher_optional">(optional)</span></label>
+            <input type="text" id="oneoff-expression" data-i18n-placeholder="teacher_work_expression_placeholder" placeholder="e.g. 5 + 3 × 4 — optional" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+          </div>
           <button class="btn btn-secondary btn-sm" onclick="addOneOff()" data-i18n="teacher_add_assign_btn">Add &amp; assign</button>
 
           <hr>
@@ -713,6 +717,10 @@
             <label id="new-answer-label" data-i18n="teacher_answer_label">Answer</label>
             <input type="text" id="new-answer" placeholder="e.g. 3x + 6" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
           </div>
+          <div class="field">
+            <label><span data-i18n="teacher_work_expression_label">Work expression</span> <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-secondary);" data-i18n="teacher_optional">(optional)</span></label>
+            <input type="text" id="new-expression" data-i18n-placeholder="teacher_work_expression_placeholder" placeholder="e.g. 5 + 3 × 4 — optional" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+          </div>
 
           <div class="field">
             <label><span data-i18n="teacher_calc_label">Calculator</span> <span style="font-weight:400;font-size:0.7rem;text-transform:none;letter-spacing:0;color:var(--text-secondary);" data-i18n="teacher_calc_hint">(tap Question or Answer first)</span></label>
@@ -778,7 +786,7 @@
     document.getElementById('teacher-calc')
   );
 
-  ['new-question', 'new-answer'].forEach(id => {
+  ['new-question', 'new-answer', 'new-expression'].forEach(id => {
     document.getElementById(id).addEventListener('focus', function () {
       teacherCalc.setTarget(this);
     });
@@ -1246,21 +1254,23 @@
     if (!selectedStudentId) { showToast(Lang.t('teacher_toast_select_student')); return; }
     const question = document.getElementById('oneoff-question').value.trim();
     const answer   = document.getElementById('oneoff-answer').value.trim();
+    const expression = document.getElementById('oneoff-expression').value.trim();
     if (!question || !answer) { showToast(Lang.t('teacher_toast_enter_qna')); return; }
 
     const pid     = `oneoff_${Date.now()}`;
-    const encoded = btoa(encodeURIComponent(JSON.stringify({
-      problems: [{ type: 'Expand', question, answer, modules: ['equivalence'] }]
-    })));
+    const prob = { type: 'Expand', question, answer, modules: ['equivalence'], ...(expression ? { expression } : {}) };
+    const encoded = btoa(encodeURIComponent(JSON.stringify({ problems: [prob] })));
     currentProblems.push({
       id: pid, title: question, question, answer,
       type: 'Expand', modules: ['equivalence'],
+      ...(expression ? { expression } : {}),
       completed: false, oneOff: true,
       url: `${PRACTICE_BASE}#${encoded}`
     });
     renderHomework();
     document.getElementById('oneoff-question').value = '';
     document.getElementById('oneoff-answer').value   = '';
+    document.getElementById('oneoff-expression').value = '';
     await saveHomework();
     showToast(Lang.t('teacher_toast_oneoff_assigned'));
   }
@@ -1369,6 +1379,7 @@
     const type        = document.getElementById('new-type').value;
     const question    = document.getElementById('new-question').value.trim();
     const answer      = document.getElementById('new-answer').value.trim();
+    const expression  = document.getElementById('new-expression').value.trim();
     const hint1       = document.getElementById('new-hint1').value.trim();
     const hint2       = document.getElementById('new-hint2').value.trim();
     const hint3       = document.getElementById('new-hint3').value.trim();
@@ -1386,7 +1397,11 @@
       const res = await fetch(`${WORKER}/problems`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${teacherSecret}` },
-        body: JSON.stringify({ curriculum, unit, stage, problemType, type, question, answer, modules: ['equivalence'], hints })
+        body: JSON.stringify({
+          curriculum, unit, stage, problemType, type, question, answer,
+          modules: ['equivalence'], hints,
+          ...(expression ? { expression } : {})
+        })
       });
       if (res.status === 401) { showToast(Lang.t('teacher_toast_wrong_password')); return; }
       if (!res.ok) throw new Error();
@@ -1394,7 +1409,9 @@
 
       bankProblems.push({
         id: data.id, curriculum, unit: String(unit), stage: String(stage),
-        problemType, type, question, answer, hints, modules: ['equivalence']
+        problemType, type, question, answer,
+        ...(expression ? { expression } : {}),
+        hints, modules: ['equivalence']
       });
       renderBankList();
 
@@ -1404,6 +1421,7 @@
       });
       document.getElementById('new-question').value = '';
       document.getElementById('new-answer').value   = '';
+      document.getElementById('new-expression').value = '';
       document.getElementById('new-hint1').value    = '';
       document.getElementById('new-hint2').value    = '';
       document.getElementById('new-hint3').value    = '';

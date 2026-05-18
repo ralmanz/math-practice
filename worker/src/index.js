@@ -292,7 +292,7 @@ Rules:
       }
       let body;
       try { body = await request.json(); } catch { return jsonResponse({ error: 'Invalid JSON' }, 400); }
-      const { curriculum, unit, stage, problemType, type, question, answer, modules } = body;
+      const { curriculum, unit, stage, problemType, type, question, answer, modules, expression, hints, format } = body;
       if (!curriculum || !unit || !stage || !problemType || !type || !question || !answer) {
         return jsonResponse({ error: 'Missing required fields' }, 400);
       }
@@ -305,6 +305,10 @@ Rules:
         modules: modules || ['equivalence'],
         createdAt: new Date().toISOString()
       };
+      const exprTrim = expression != null && String(expression).trim() !== '' ? String(expression).trim() : '';
+      if (exprTrim) newProblem.expression = exprTrim;
+      if (format != null && String(format).trim() !== '') newProblem.format = String(format).trim();
+      if (Array.isArray(hints) && hints.length) newProblem.hints = hints.filter((h) => h != null && String(h).trim() !== '');
       bank.push(newProblem);
       await env.STUDENTS.put('__problem_bank__', JSON.stringify(bank));
       return jsonResponse({ ok: true, id: newProblem.id });
