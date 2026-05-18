@@ -2022,6 +2022,8 @@
       return;
     }
 
+    document.body.classList.remove('has-walkthrough');
+
     const container = document.getElementById('st-container');
     if (!container) return;
 
@@ -2554,7 +2556,7 @@
       window.removeEventListener('resize', onWtRailLayout);
       const _probScrollEl = document.getElementById('wt-col-prob');
       if (_probScrollEl) _probScrollEl.removeEventListener('scroll', onWtRailLayout);
-      document.body.classList.remove('has-walkthrough');
+      /* Keep body.has-walkthrough so .container stays wide until navigation (e.g. Practicar). */
       document.querySelectorAll('audio').forEach(function(a) { a.pause(); a.currentTime = 0; });
       _setStatus('');
       const fill = document.getElementById('wt-pfill');
