@@ -167,13 +167,16 @@
     <button class="calc-btn num" data-insert="2">2</button>
     <button class="calc-btn num" data-insert="3">3</button>
     <button class="calc-btn op"  data-insert=" × ">×</button>
-    <button class="calc-btn op"  data-insert=" / ">÷</button>
+    <button class="calc-btn op"  data-insert=" ÷ " title="Division (÷)">÷</button>
   </div>
   <div class="calc-row">
     <button class="calc-btn num" data-insert="0">0</button>
     <button class="calc-btn num" data-insert=".">.</button>
     <button class="calc-btn op"  data-insert="(">(</button>
     <button class="calc-btn op"  data-insert=")">)</button>
+    <button class="calc-btn special" data-frac title="Fraction ()/()">
+      <span class="frac-icon"><span class="fi-n">a</span><span class="fi-d">b</span></span>
+    </button>
   </div>
   <div class="calc-row">
     <button class="calc-btn var" data-insert="x">x</button>

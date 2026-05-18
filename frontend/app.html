@@ -1992,8 +1992,8 @@
       `<span class="math-frac"><span class="math-num">${n}</span><span class="math-den">${d}</span></span>`
     );
     // A/B  — both sides are plain word-char tokens with no surrounding spaces
-    // (e.g. 1/2, x/y typed without spaces).  The ÷ button inserts " / " with
-    // spaces so it intentionally doesn't match here.
+    // (e.g. 1/2, x/y typed without spaces).  The ÷ key inserts " ÷ " (normalize → /);
+    // stacked fractions use the separate fraction button ()/().
     s = s.replace(/([\w]+)\/([\w]+)/g, (_, n, d) =>
       `<span class="math-frac"><span class="math-num">${n}</span><span class="math-den">${d}</span></span>`
     );
