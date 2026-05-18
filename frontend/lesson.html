@@ -23,6 +23,8 @@
     --teal-light: #E6F7F2;
     --wrong: #C1453B;
     --wrong-bg: #FDE8E6;
+    --feedback-wrong-bg: #EDF1F5;
+    --feedback-wrong-text: #3D4F5F;
     --amber: #B45309;
     --amber-bg: #FEF3C7;
     --blue: #1D4ED8;
@@ -1057,7 +1059,7 @@
 
   .st-feedback { padding: 10px 14px; border-radius: 10px; margin-bottom: 12px; font-size: 0.88rem; line-height: 1.5; animation: slideIn 0.25s ease; }
   .st-feedback-correct { background: var(--teal-light); border: 1.5px solid var(--teal); color: var(--teal); }
-  .st-feedback-wrong   { background: var(--wrong-bg);   border: 1.5px solid var(--wrong); color: var(--wrong); }
+  .st-feedback-wrong   { background: var(--feedback-wrong-bg); border: 1.5px solid var(--border); color: var(--feedback-wrong-text); }
 
   .st-completion-card {
     background: var(--accent-bg); border: 1.5px solid var(--accent-light);

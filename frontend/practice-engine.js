@@ -15,6 +15,8 @@
     --pe-correct-bg: #D8F3DC;
     --pe-wrong:      #C1453B;
     --pe-wrong-bg:   #FDE8E6;
+    --pe-feedback-wrong-bg:   #EDF1F5;
+    --pe-feedback-wrong-text: #3D4F5F;
     --pe-nudge:      #B8860B;
     --pe-nudge-bg:   #FFF8E7;
     --pe-unsure:     #5A6B7A;
@@ -94,7 +96,7 @@
     padding: 12px 14px; border-radius: 10px; margin-bottom: 14px;
     font-size: 0.88rem; line-height: 1.5; animation: peSlideIn 0.25s ease; display: none;
   }
-  .pe-wrap .feedback.wrong  { background: var(--pe-wrong-bg);  color: var(--pe-wrong);  display: block; }
+  .pe-wrap .feedback.wrong  { background: var(--pe-feedback-wrong-bg); color: var(--pe-feedback-wrong-text); border: 1px solid var(--border, #E8E8E4); display: block; }
   .pe-wrap .feedback.nudge  { background: var(--pe-nudge-bg);  color: var(--pe-nudge);  display: block; }
   .pe-wrap .feedback.unsure { background: var(--pe-unsure-bg); color: var(--pe-unsure); display: block; }
   .pe-wrap .feedback.reveal {

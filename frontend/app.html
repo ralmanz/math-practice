@@ -23,6 +23,8 @@
     --correct-bg: #D8F3DC;
     --wrong: #C1453B;
     --wrong-bg: #FDE8E6;
+    --feedback-wrong-bg: #EDF1F5;
+    --feedback-wrong-text: #3D4F5F;
     --nudge: #B8860B;
     --nudge-bg: #FFF8E7;
     --unsure: #5A6B7A;
@@ -471,7 +473,7 @@
     display: none;
   }
 
-  .feedback.wrong  { background: var(--wrong-bg);  color: var(--wrong);  display: block; }
+  .feedback.wrong  { background: var(--feedback-wrong-bg); color: var(--feedback-wrong-text); border: 1px solid var(--border); display: block; }
   .feedback.nudge  { background: var(--nudge-bg);  color: var(--nudge);  display: block; }
   .feedback.unsure { background: var(--unsure-bg); color: var(--unsure); display: block; }
   .feedback.reveal { background: var(--accent-bg); color: var(--accent); display: block; font-family: var(--mono); }
