@@ -1314,24 +1314,13 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   }
   .wt-note-diagram-seq { display: flex; align-items: center; gap: 3px; flex-wrap: wrap; margin-top: 2px; }
-  .wt-note-diagram-progress { margin-top: 8px; }
-  .wt-note-diagram-meaning {
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-    font-size: 12px;
-    line-height: 1.38;
-    color: #2b2b28;
-  }
-  .wt-note-diagram-meaning .wt-note-ds-item { flex-shrink: 0; margin-top: 1px; }
-  .wt-note-diagram-hint {
-    margin-top: 6px;
+  .wt-note-diagram-text {
+    margin-top: 8px;
     font-size: 12px;
     line-height: 1.45;
     color: #4a4a47;
   }
-  .wt-note-diagram--done .wt-note-diagram-meaning,
-  .wt-note-diagram--done .wt-note-diagram-hint { color: #5a6b50; }
+  .wt-note-diagram--done .wt-note-diagram-text { color: #5a6b50; }
   .wt-note-legend { background: white; border: 0.5px solid #e2e0d8; border-radius: 8px; padding: 8px 10px 10px; margin-bottom: 10px; }
   .wt-note-legend .wt-note-label { color: #888780; }
   .wt-note-legend-rows { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
@@ -2552,26 +2541,18 @@
         const diagramHtml = note.diagram.map(function(item) {
           return '<span class="wt-note-ds-item ' + (item === note.active ? 'wt-note-ds-active ' : '') + 'wt-note-ds-' + item.replace('/','') + '">' + item + '</span>';
         }).join('<span class="wt-note-ds-arrow">\u2192</span>');
-        var progressParts = '';
-        if (note.meaning) {
-          const chipCls = 'wt-note-ds-' + String(note.active || '').replace('/', '');
-          progressParts += '<div class="wt-note-diagram-meaning"><span class="wt-note-ds-item ' + chipCls + '">' + escHtml(note.active) + '</span><span>' + escHtml(note.meaning) + '</span></div>';
-        }
-        if (note.hint) {
-          progressParts += '<div class="wt-note-diagram-hint">' + escHtml(note.hint) + '</div>';
-        }
-        const progressHtml = progressParts
-          ? '<div class="wt-note-diagram-progress">' + progressParts + '</div>'
+        const bodyText = note.text || note.hint || note.meaning || '';
+        const textHtml = bodyText
+          ? '<div class="wt-note-diagram-text">' + escHtml(bodyText) + '</div>'
           : '';
-        html = '<div class="wt-note wt-note-diagram"><div class="wt-note-label">' + note.label + '</div><div class="wt-note-diagram-seq">' + diagramHtml + '</div>' + progressHtml + '</div>';
-      }
-      if (!html) return;
+        html = '<div class="wt-note wt-note-diagram"><div class="wt-note-label">' + note.label + '</div><div class="wt-note-diagram-seq">' + diagramHtml + '</div>' + textHtml + '</div>';
+      }      if (!html) return;
       container.insertAdjacentHTML('beforeend', html);
       const noteEl = container.lastElementChild;
       if (!instant && noteEl) {
-        if (note.type === 'diagram' && (note.hint || note.meaning)) {
-          const progEl = noteEl.querySelector('.wt-note-diagram-progress');
-          if (progEl) typewriterReveal(progEl);
+        if (note.type === 'diagram' && (note.text || note.hint || note.meaning)) {
+          const textEl = noteEl.querySelector('.wt-note-diagram-text');
+          if (textEl) typewriterReveal(textEl);
         } else if (note.type !== 'diagram') {
           typewriterReveal(noteEl);
         }
