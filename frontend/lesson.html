@@ -1299,6 +1299,11 @@
   .wt-note-diagram { background: white; border: 0.5px solid #e2e0d8; border-radius: 8px; padding: 8px 10px; margin-bottom: 10px; }
   .wt-note-diagram .wt-note-label { color: #888780; }
   .wt-note-diagram-seq { display: flex; align-items: center; gap: 3px; flex-wrap: wrap; margin-top: 2px; }
+  .wt-note-legend { background: white; border: 0.5px solid #e2e0d8; border-radius: 8px; padding: 8px 10px 10px; margin-bottom: 10px; }
+  .wt-note-legend .wt-note-label { color: #888780; }
+  .wt-note-legend-rows { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+  .wt-note-legend-row { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; line-height: 1.38; color: #2b2b28; }
+  .wt-note-legend-row .wt-note-ds-item { flex-shrink: 0; margin-top: 1px; }
   .wt-note-ds-item { font-size: 11px; font-weight: 500; padding: 2px 6px; border-radius: 4px; }
   .wt-note-ds-arrow { color: #b4b2a9; font-size: 10px; }
   .wt-note-ds-P  { background: #EEEDFE; color: #3C3489; }
@@ -2437,7 +2442,15 @@
     }
 
     function typewriterReveal(rootEl) {
-      var walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_TEXT, null);
+      var walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_TEXT, {
+        acceptNode: function (n) {
+          var p = n.parentElement;
+          if (p && p.closest('.wt-note-diagram-seq, .wt-note-ds-item')) {
+            return NodeFilter.FILTER_REJECT;
+          }
+          return NodeFilter.FILTER_ACCEPT;
+        }
+      });
       var textNodes = [];
       var node;
       while ((node = walker.nextNode())) {
@@ -2473,6 +2486,13 @@
         html = '<div class="wt-note wt-note-formula"><div class="wt-note-label">' + note.label + '</div><div class="wt-note-formula-content">' + note.content + '</div></div>';
       } else if (note.type === 'check') {
         html = '<div class="wt-note wt-note-check"><span class="wt-note-check-icon">\u2713</span><span class="wt-note-check-text">' + note.text + '</span></div>';
+      } else if (note.type === 'legend') {
+        const rowsHtml = (note.lines || []).map(function (line) {
+          const chip = String(line.chip || '');
+          const chipCls = 'wt-note-ds-' + chip.replace('/', '');
+          return '<div class="wt-note-legend-row"><span class="wt-note-ds-item ' + chipCls + '">' + escHtml(chip) + '</span><span>' + escHtml(line.text) + '</span></div>';
+        }).join('');
+        html = '<div class="wt-note wt-note-legend"><div class="wt-note-label">' + note.label + '</div><div class="wt-note-legend-rows">' + rowsHtml + '</div></div>';
       } else if (note.type === 'diagram') {
         const diagramHtml = note.diagram.map(function(item) {
           return '<span class="wt-note-ds-item ' + (item === note.active ? 'wt-note-ds-active ' : '') + 'wt-note-ds-' + item.replace('/','') + '">' + item + '</span>';
@@ -2480,7 +2500,22 @@
         html = '<div class="wt-note wt-note-diagram"><div class="wt-note-label">' + note.label + '</div><div class="wt-note-diagram-seq">' + diagramHtml + '</div></div>';
       }
       container.insertAdjacentHTML('beforeend', html);
-      if (!instant) typewriterReveal(container.lastElementChild);
+      const noteEl = container.lastElementChild;
+      if (!instant && noteEl && note.type !== 'diagram') {
+        typewriterReveal(noteEl);
+      }
+    }
+
+    function _clearContinueTimer() {
+      if (_s.timer) {
+        clearTimeout(_s.timer);
+        _s.timer = null;
+      }
+    }
+
+    function _scheduleContinue(pause) {
+      _clearContinueTimer();
+      _s.timer = setTimeout(_resume, pause != null ? pause : 0);
     }
 
     function _setStatus(mode) {
@@ -2516,7 +2551,10 @@
     function _appendWrite(step) {
       const col = document.getElementById('wt-col-' + step.col);
       if (!col) return;
-      if (step.col === 'calc') {
+      if (step.col === 'theory') {
+        const notes = document.getElementById('wt-notes');
+        if (notes && step.html && !step.note) notes.insertAdjacentHTML('beforeend', step.html);
+      } else if (step.col === 'calc') {
         col.insertAdjacentHTML('beforeend', step.html);
       } else if (step.col === 'prob') {
         const existing = col.querySelectorAll('.prob-line');
@@ -2562,11 +2600,17 @@
         const pause = step.pause != null ? step.pause : 0;
         if (audioEnabled && step.audio) {
           const aud = new Audio('/audio/' + step.audio);
-          aud.onended = function() { _s.timer = setTimeout(_resume, pause); };
-          aud.onerror = function() { _s.timer = setTimeout(_resume, pause); };
-          aud.play().catch(function() { _s.timer = setTimeout(_resume, pause); });
+          var continued = false;
+          function continueOnce() {
+            if (continued) return;
+            continued = true;
+            _scheduleContinue(pause);
+          }
+          aud.onended = continueOnce;
+          aud.onerror = continueOnce;
+          aud.play().catch(continueOnce);
         } else {
-          _s.timer = setTimeout(_resume, pause);
+          _scheduleContinue(pause);
         }
       } else if (step.type === 'question') {
         _appendQuestion(step);
@@ -2612,7 +2656,7 @@
     };
 
     window.wtRestart = function() {
-      if (_s.timer) clearTimeout(_s.timer);
+      _clearContinueTimer();
       _s.idx = 0; _s.paused = false; _s.waiting = false; _s.tries = 0; _s.timer = null;
       const theoryEl = document.getElementById('wt-col-theory');
       if (theoryEl) theoryEl.innerHTML = '<div class="wt-col-label">TEOR\u00CDA</div><div class="wt-col-content" id="wt-notes"></div>';
@@ -2633,7 +2677,7 @@
       ['wt-col-prob', 'wt-col-calc'].forEach(function(id) {
         const el = document.getElementById(id); if (el) el.innerHTML = '';
       });
-      if (_s.timer) clearTimeout(_s.timer);
+      _clearContinueTimer();
       for (var i = 0; i < targetIdx; i++) {
         var step = steps[i];
         if (step.type === 'write') {
@@ -2692,7 +2736,7 @@
         renderNote(step.note);
         _s.waiting = false;
         _setStatus('writing');
-        _s.timer = setTimeout(_resume, 1200);
+        _scheduleContinue(1200);
       } else if (_s.tries >= 2) {
         inp.disabled = true;
         const bub = document.getElementById('wt-qbub');
@@ -2702,7 +2746,7 @@
         renderNote(step.note);
         _s.waiting = false;
         _setStatus('writing');
-        _s.timer = setTimeout(_resume, 1600);
+        _scheduleContinue(1600);
       } else {
         inp.classList.add('wrong');
         setTimeout(function() { inp.classList.remove('wrong'); inp.value = ''; inp.focus(); }, 320);
