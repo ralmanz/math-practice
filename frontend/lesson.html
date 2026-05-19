@@ -1303,15 +1303,34 @@
     font-weight: 600;
     line-height: 1;
   }
-  .wt-note-diagram--done { border-color: #c5ddb0; background: #f7fbf2; }
+  .wt-note-diagram--done {
+    border-color: #c5ddb0;
+    background: #f7fbf2;
+    padding: 6px 10px;
+    margin-bottom: 6px;
+  }
   .wt-note-diagram--done .wt-note-label { color: #27500A; }
+  .wt-note-diagram:not(.wt-note-diagram--done) {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  }
   .wt-note-diagram-seq { display: flex; align-items: center; gap: 3px; flex-wrap: wrap; margin-top: 2px; }
+  .wt-note-diagram-progress { margin-top: 8px; }
+  .wt-note-diagram-meaning {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 12px;
+    line-height: 1.38;
+    color: #2b2b28;
+  }
+  .wt-note-diagram-meaning .wt-note-ds-item { flex-shrink: 0; margin-top: 1px; }
   .wt-note-diagram-hint {
-    margin-top: 8px;
+    margin-top: 6px;
     font-size: 12px;
     line-height: 1.45;
     color: #4a4a47;
   }
+  .wt-note-diagram--done .wt-note-diagram-meaning,
   .wt-note-diagram--done .wt-note-diagram-hint { color: #5a6b50; }
   .wt-note-legend { background: white; border: 0.5px solid #e2e0d8; border-radius: 8px; padding: 8px 10px 10px; margin-bottom: 10px; }
   .wt-note-legend .wt-note-label { color: #888780; }
@@ -2486,8 +2505,11 @@
       if (textNodes.length) tick();
     }
 
-    function markDiagramStepDone() {
-      const el = document.querySelector('#wt-notes .wt-note-diagram');
+    function markDiagramStepDone(el) {
+      if (!el) {
+        const open = document.querySelectorAll('#wt-notes .wt-note-diagram:not(.wt-note-diagram--done)');
+        el = open.length ? open[open.length - 1] : null;
+      }
       if (!el || el.classList.contains('wt-note-diagram--done')) return;
       el.classList.add('wt-note-diagram--done');
       const label = el.querySelector('.wt-note-label');
@@ -2496,13 +2518,18 @@
       }
     }
 
+    function sealOpenDiagrams(container) {
+      if (!container) return;
+      container.querySelectorAll('.wt-note-diagram:not(.wt-note-diagram--done)').forEach(markDiagramStepDone);
+    }
+
     function renderNote(note, instant) {
       if (!note) return;
       const container = document.getElementById('wt-notes');
       if (!container) return;
       if (note.type === 'check' || note.type === 'formula') return;
       if (note.type === 'diagram') {
-        container.querySelectorAll('.wt-note-diagram').forEach(function (el) { el.remove(); });
+        sealOpenDiagrams(container);
       }
       let html = '';
       if (note.type === 'rule') {
@@ -2525,18 +2552,26 @@
         const diagramHtml = note.diagram.map(function(item) {
           return '<span class="wt-note-ds-item ' + (item === note.active ? 'wt-note-ds-active ' : '') + 'wt-note-ds-' + item.replace('/','') + '">' + item + '</span>';
         }).join('<span class="wt-note-ds-arrow">\u2192</span>');
-        const hintHtml = note.hint
-          ? '<div class="wt-note-diagram-hint">' + escHtml(note.hint) + '</div>'
+        var progressParts = '';
+        if (note.meaning) {
+          const chipCls = 'wt-note-ds-' + String(note.active || '').replace('/', '');
+          progressParts += '<div class="wt-note-diagram-meaning"><span class="wt-note-ds-item ' + chipCls + '">' + escHtml(note.active) + '</span><span>' + escHtml(note.meaning) + '</span></div>';
+        }
+        if (note.hint) {
+          progressParts += '<div class="wt-note-diagram-hint">' + escHtml(note.hint) + '</div>';
+        }
+        const progressHtml = progressParts
+          ? '<div class="wt-note-diagram-progress">' + progressParts + '</div>'
           : '';
-        html = '<div class="wt-note wt-note-diagram"><div class="wt-note-label">' + note.label + '</div><div class="wt-note-diagram-seq">' + diagramHtml + '</div>' + hintHtml + '</div>';
+        html = '<div class="wt-note wt-note-diagram"><div class="wt-note-label">' + note.label + '</div><div class="wt-note-diagram-seq">' + diagramHtml + '</div>' + progressHtml + '</div>';
       }
       if (!html) return;
       container.insertAdjacentHTML('beforeend', html);
       const noteEl = container.lastElementChild;
       if (!instant && noteEl) {
-        if (note.type === 'diagram' && note.hint) {
-          const hintEl = noteEl.querySelector('.wt-note-diagram-hint');
-          if (hintEl) typewriterReveal(hintEl);
+        if (note.type === 'diagram' && (note.hint || note.meaning)) {
+          const progEl = noteEl.querySelector('.wt-note-diagram-progress');
+          if (progEl) typewriterReveal(progEl);
         } else if (note.type !== 'diagram') {
           typewriterReveal(noteEl);
         }
