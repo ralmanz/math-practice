@@ -485,6 +485,9 @@ const PAA_LESSONS = [
         'Elige el orden correcto: paréntesis y potencias antes que multiplicar o dividir, y estas antes que sumar o restar. Así toda expresión tiene un valor único.',
       intro: {
         rule: 'Orden de las operaciones — Paréntesis → Potencias → Multiplicación y División → Suma → Resta (de izquierda a derecha cuando hay varias del mismo nivel).',
+        ruleTitle: 'Orden de las operaciones',
+        ruleChips: ['Paréntesis', 'Potencias', '× ÷', '+ −'],
+        ruleNote: 'Cuando hay varias del mismo nivel, resuelve de izquierda a derecha',
         goals: [
           'Aplicar el orden de operaciones paso a paso, sin saltarte ninguno.',
           'Reconocer qué operación toca resolver en cada momento.',
@@ -644,6 +647,17 @@ const PAA_LESSONS = [
       unit: 'aritmetica',
       level: 2,
       title: 'Razón, proporción y porcentaje',
+      // TODO: add intro object for nivel 2 cover screen.
+      // Suggested structure (confirm content before shipping):
+      // intro: {
+      //   rule: '...',
+      //   ruleTitle: 'Razón, Proporción y Porcentaje',
+      //   ruleChips: ['Razón', 'Proporción', 'Porcentaje'],  // TODO: confirm chips
+      //   ruleNote: '...',
+      //   goals: [...],
+      //   problems: [...],
+      //   practice: '...',
+      // },
       subtitle:
         'Razón y proporción comparan cantidades; el porcentaje expresa una parte de cien. Los descuentos encadenados se multiplican, no se suman como si fueran un solo porcentaje.',
       conceptVoice:
@@ -727,6 +741,17 @@ const PAA_LESSONS = [
       unit: 'aritmetica',
       level: 3,
       title: 'Patrones numéricos y teoría de números',
+      // TODO: add intro object for nivel 3 cover screen.
+      // Suggested structure (confirm content before shipping):
+      // intro: {
+      //   rule: '...',
+      //   ruleTitle: 'MCD y MCM',
+      //   ruleChips: ['Factores primos', 'MCD', 'MCM'],  // TODO: confirm chips
+      //   ruleNote: '...',
+      //   goals: [...],
+      //   problems: [...],
+      //   practice: '...',
+      // },
       subtitle:
         'Descomponer en primos hace visibles los factores comunes. Con eso calculas MCD tomando el menor exponente en cada primo, y MCM tomando el mayor exponente.',
       subtopics: [

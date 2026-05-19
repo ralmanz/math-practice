@@ -148,45 +148,152 @@
     margin-bottom: 24px;
   }
 
-  .cover-intro {
-    text-align: left;
+  /* ── Cover v2 ── */
+  .cover-badge-wrap {
+    text-align: center;
+    margin-bottom: 14px;
+  }
+  .cover-heading {
+    text-align: center;
     margin-bottom: 20px;
   }
-  .cover-intro-section + .cover-intro-section {
-    margin-top: 14px;
-    padding-top: 14px;
-    border-top: 1px solid var(--border);
+  .cover-card {
+    background: var(--card);
+    border: 0.5px solid var(--border);
+    border-radius: 14px;
+    padding: 1.5rem;
+    margin-bottom: 16px;
   }
-  .cover-intro-label {
-    font-size: 0.68rem;
+  .cover-section {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .cover-section:first-child { padding-top: 0; }
+  .cover-section:last-child  { border-bottom: none; padding-bottom: 0; }
+  .cover-section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .cover-section-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    color: var(--text-secondary);
+  }
+  .cover-section-heading {
+    font-size: 0.75rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: var(--accent);
-    margin-bottom: 6px;
-  }
-  .cover-intro-section p {
-    font-size: 0.88rem;
-    line-height: 1.5;
     color: var(--text);
     margin: 0;
   }
-  .cover-intro-section ul {
-    margin: 0;
-    padding-left: 1.1rem;
-    font-size: 0.88rem;
-    line-height: 1.5;
-    color: var(--text);
+  /* La regla */
+  .cover-rule-inner {
+    background: #F5F0FF;
+    border: 1px solid #DDD6FE;
+    border-radius: 10px;
+    padding: 12px 14px;
   }
-  .cover-intro-section li + li { margin-top: 4px; }
-  .cover-intro-rule {
+  .cover-rule-title {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #4C1D95;
+    margin-bottom: 10px;
+  }
+  .cover-rule-chips {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .cover-rule-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    background: #EDE9FE;
+    border: 1.5px solid #C4B5FD;
+    border-radius: 999px;
     font-family: var(--mono);
-    font-size: 0.82rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #5B21B6;
+  }
+  .cover-rule-arrow {
+    font-size: 0.78rem;
+    color: #9CA3AF;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .cover-rule-note {
+    font-size: 0.78rem;
+    color: #6B7280;
+    line-height: 1.4;
+    margin: 0;
+  }
+  /* Lo que vas a lograr */
+  .cover-goals-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .cover-goals-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: var(--text);
+  }
+  .cover-check-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: var(--teal);
+  }
+  /* Qué tipo de problemas verás */
+  .cover-problems-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .cover-problems-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+  }
+  .cover-problems-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #9CA3AF;
+    flex-shrink: 0;
+    margin-top: 7px;
+  }
+  /* Tu recorrido */
+  .cover-journey-strip {
     background: var(--bg);
-    border: 1px solid var(--border);
     border-radius: 8px;
-    padding: 8px 10px;
-    line-height: 1.45;
+    padding: 10px 12px;
+  }
+  .cover-journey-text {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin: 0;
   }
 
   /* ── Cards ── */
@@ -882,6 +989,8 @@
     border: 1.5px solid var(--accent);
   }
 
+  .main-btn--cta { background: #0F6E56; }
+
   /* ── Result cards ── */
   .result-card {
     border-radius: 14px;
@@ -1459,6 +1568,16 @@
     return { cambridge: 'Cambridge', 'common-core': 'Common Core', 'ib-myp': 'IB MYP', general: 'General' }[c] || c;
   }
 
+  function unitDisplayName(u) {
+    const names = {
+      aritmetica: 'Aritmética',
+      algebra: 'Álgebra',
+      geometria: 'Geometría',
+      'datos-y-probabilidad': 'Datos y Probabilidad',
+    };
+    return names[u] || u;
+  }
+
   function escHtml(str) {
     return String(str)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -1665,7 +1784,8 @@
   }
 
   function badgeHtml() {
-    return `<div class="lesson-badge">${escHtml(curriculumLabel(curriculum))} &middot; Unit ${escHtml(unit)} &middot; Level ${escHtml(stage)}</div>`;
+    const lvl = (lesson && lesson.level) ? lesson.level : (String(stage).match(/\d+/) || [''])[0] || stage;
+    return `<div class="lesson-badge">${escHtml(curriculumLabel(curriculum))} &middot; ${escHtml(unitDisplayName(unit))} &middot; ${escHtml(Lang.t('level_label'))} ${escHtml(String(lvl))}</div>`;
   }
 
   // ── Phase 1: Cover ────────────────────────────────────────────
@@ -1676,23 +1796,72 @@
         ? `<p class="subtitle">${escHtml(lesson.subtitle)}</p>`
         : '';
     }
-    let html = '<div class="card cover-intro">';
+
+    // Inline SVG icons (Tabler outline style)
+    const iconBulb = `<svg class="cover-section-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h1m8-9v1m8 8h1m-15.4-6.4 .7 .7m12.1-.7-.7 .7"/><path d="M9 16a5 5 0 1 1 6 0a3.5 3.5 0 0 0-1 3a2 2 0 0 1-4 0a3.5 3.5 0 0 0-1-3"/><line x1="9.7" y1="17" x2="14.3" y2="17"/></svg>`;
+    const iconTarget = `<svg class="cover-section-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="9"/></svg>`;
+    const iconPuzzle = `<svg class="cover-section-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 11v-2a2 2 0 0 0-2-2h-8a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/><path d="M13 21v-6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-6a2 2 0 0 1-2-2z"/></svg>`;
+    const iconMap = `<svg class="cover-section-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l6-3 6 3 6-3v13l-6 3-6-3-6 3v-13"/><path d="M9 4v13"/><path d="M15 7v13"/></svg>`;
+    const checkSvg = `<svg class="cover-check-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+
+    let html = '<div class="cover-card">';
+
+    // ── a. La regla ──
     if (intro.rule) {
-      html += `<div class="cover-intro-section"><div class="cover-intro-label">${Lang.t('cover_intro_rule')}</div><p class="cover-intro-rule">${escHtml(intro.rule)}</p></div>`;
+      const ruleTitle = intro.ruleTitle || (intro.rule.split(/\s*[—–]\s*/)[0] || '').trim();
+      const chips     = intro.ruleChips || [];
+      const ruleNote  = intro.ruleNote  || '';
+      const ruleBody  = chips.length
+        ? `<div class="cover-rule-chips">${chips.map(function (chip, i) {
+            return (i > 0 ? '<span class="cover-rule-arrow">→</span>' : '') +
+              '<span class="cover-rule-chip">' + escHtml(chip) + '</span>';
+          }).join('')}</div>`
+        : `<p style="font-size:0.85rem;color:#4C1D95;line-height:1.45;margin:0">${escHtml(
+            intro.rule.split(/\s*[—–]\s*/).slice(1).join(' — ')
+              .replace(/\s*\([^)]*\)\s*\.?\s*$/, '').trim() || intro.rule
+          )}</p>`;
+      html += `<div class="cover-section">
+        <div class="cover-section-header">${iconBulb}<span class="cover-section-heading">${Lang.t('cover_intro_rule')}</span></div>
+        <div class="cover-rule-inner">
+          ${ruleTitle ? `<div class="cover-rule-title">${escHtml(ruleTitle)}</div>` : ''}
+          ${ruleBody}
+          ${ruleNote ? `<p class="cover-rule-note">${escHtml(ruleNote)}</p>` : ''}
+        </div>
+      </div>`;
     }
+
+    // ── b. Lo que vas a lograr ──
     if (intro.goals && intro.goals.length) {
-      html += `<div class="cover-intro-section"><div class="cover-intro-label">${Lang.t('cover_intro_goals')}</div><ul>${intro.goals.map(function (g) { return '<li>' + escHtml(g) + '</li>'; }).join('')}</ul></div>`;
+      html += `<div class="cover-section">
+        <div class="cover-section-header">${iconTarget}<span class="cover-section-heading">${Lang.t('cover_intro_goals')}</span></div>
+        <ul class="cover-goals-list">${intro.goals.map(function (g) {
+          return `<li>${checkSvg}<span>${escHtml(g)}</span></li>`;
+        }).join('')}</ul>
+      </div>`;
     }
+
+    // ── c. Qué tipo de problemas verás ──
     if (intro.problems && intro.problems.length) {
-      html += `<div class="cover-intro-section"><div class="cover-intro-label">${Lang.t('cover_intro_problems')}</div><ul>${intro.problems.map(function (p) { return '<li>' + escHtml(p) + '</li>'; }).join('')}</ul></div>`;
+      html += `<div class="cover-section">
+        <div class="cover-section-header">${iconPuzzle}<span class="cover-section-heading">${Lang.t('cover_intro_problems')}</span></div>
+        <ul class="cover-problems-list">${intro.problems.map(function (p) {
+          return `<li><span class="cover-problems-dot"></span><span>${escHtml(p)}</span></li>`;
+        }).join('')}</ul>
+      </div>`;
     }
+
+    // ── d. Tu recorrido ──
     const practiceCount = (lesson.practiceProblems || []).length;
-    const practiceText = intro.practice || (practiceCount
-      ? Lang.t('cover_intro_practice') + ': ' + practiceCount + ' ejercicios de pr\u00E1ctica y una prueba del nivel.'
-      : '');
-    if (practiceText) {
-      html += `<div class="cover-intro-section"><div class="cover-intro-label">${Lang.t('cover_intro_practice')}</div><p>${escHtml(practiceText)}</p></div>`;
+    const journeyText = practiceCount
+      ? 'Recorrido guiado \u2192 ejemplo resuelto \u2192 ' + practiceCount + ' ejercicios de pr\u00E1ctica \u2192 prueba corta del nivel'
+      : (intro.practice || '');
+    if (journeyText) {
+      html += `<div class="cover-section">
+        <div class="cover-section-header">${iconMap}<span class="cover-section-heading">${Lang.t('cover_intro_practice')}</span></div>
+        <div class="cover-journey-strip"><p class="cover-journey-text">${escHtml(journeyText)}</p></div>
+      </div>`;
     }
+
     html += '</div>';
     return html;
   }
@@ -1700,10 +1869,10 @@
   function showCover() {
     render(`
       ${progressBarHtml(1)}
-      ${badgeHtml()}
-      <h1>${escHtml(lesson.title || 'Lesson')}</h1>
+      <div class="cover-badge-wrap">${badgeHtml()}</div>
+      <h1 class="cover-heading">${escHtml(lesson.title || 'Lesson')}</h1>
       ${coverIntroHtml()}
-      <button class="main-btn" onclick="(lesson.subtopics&&lesson.subtopics.length)?startSubtopicFlow():showConcepts()">${Lang.t('cover_begin_btn')}</button>
+      <button class="main-btn main-btn--cta" onclick="(lesson.subtopics&&lesson.subtopics.length)?startSubtopicFlow():showConcepts()">${Lang.t('cover_begin_btn')}</button>
     `);
   }
 
