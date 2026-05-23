@@ -641,6 +641,83 @@
     font-weight: 700;
   }
 
+  /* ── Unit test results ── */
+  #unit-test-results-screen {
+    max-width: 540px;
+    width: 100%;
+    margin-top: 40px;
+    display: none;
+  }
+
+  .ut-results-header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+
+  .ut-results-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .ut-results-header p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+  }
+
+  .ut-total-score {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--accent);
+    margin-bottom: 24px;
+  }
+
+  .ut-level-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+  }
+
+  .ut-level-row.pass { border-color: var(--correct); background: var(--correct-bg, #f0faf4); }
+  .ut-level-row.borderline { border-color: #e6a817; background: #fff8e7; }
+  .ut-level-row.fail { border-color: var(--wrong, #c0392b); background: #fdf0ef; }
+
+  .ut-message {
+    margin-top: 20px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    font-size: 0.92rem;
+    line-height: 1.5;
+    text-align: center;
+  }
+
+  .ut-message.success { background: var(--correct-bg, #f0faf4); color: var(--correct); }
+  .ut-message.warning { background: #fff8e7; color: #7a5c00; }
+  .ut-message.fail { background: #fdf0ef; color: #a93226; }
+
+  .ut-back-btn {
+    display: block;
+    width: 100%;
+    margin-top: 24px;
+    padding: 14px 24px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: var(--sans);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+  }
+
   @media (max-width: 500px) {
     body { padding: 14px; }
     .problem-card { padding: 20px; }
@@ -867,6 +944,18 @@
   <button id="back-to-curriculum-btn" onclick="backToCurriculum()" style="display:none;margin-top:24px;padding:14px 24px;background:var(--accent);color:white;border:none;border-radius:10px;font-family:var(--sans);font-size:1rem;font-weight:600;cursor:pointer;width:100%;">Back to curriculum</button>
 </div>
 
+<!-- ════════ UNIT TEST RESULTS ════════ -->
+<div id="unit-test-results-screen">
+  <div class="ut-results-header">
+    <h2 id="ut-results-title">Resultados de la prueba</h2>
+    <p id="ut-results-subtitle"></p>
+  </div>
+  <div class="ut-total-score" id="ut-total-score"></div>
+  <div id="ut-level-rows"></div>
+  <div class="ut-message" id="ut-results-message"></div>
+  <a class="ut-back-btn" id="ut-back-btn" href="home.html">Volver al currículo</a>
+</div>
+
 <script>
   // ══════════════════════════════════════════════════
   const PROXY_URL = 'https://math-practice-proxy.ronelalmanza20.workers.dev';
@@ -892,6 +981,15 @@
   const PARAM_LEVEL      = _urlParams.get('level') || null;
   const PARAM_MODE       = _urlParams.get('mode') || '';
   const PARAM_RETURN_TO  = _urlParams.get('returnTo') || '';
+  const IS_UNIT_TEST     = PARAM_MODE === 'unit-test';
+  const UNIT_TEST_REJECTION_LIMIT = 5;
+
+  const UNIT_LABELS = { aritmetica: 'Aritmética' };
+
+  let unitTestRejections = 0;
+  let unitTestQuestionRecorded = false;
+  let unitTestResults = [];
+  let unitTestTakenAt = null;
 
   function currentProblemRowId() {
     if (PROBLEM_ID) return PROBLEM_ID;
@@ -904,6 +1002,7 @@
   }
 
   function markProblemComplete() {
+    if (IS_UNIT_TEST) return;
     const pid = currentProblemRowId();
     if (!STUDENT_ID || !pid) return;
     fetch(`${PROXY_URL}/student/${encodeURIComponent(STUDENT_ID)}/complete/${encodeURIComponent(pid)}`, {
@@ -1308,15 +1407,24 @@
       stepHistory.push(input);
       addStepToHistory(input);
       document.getElementById('feedback').style.display = 'none';
+      if (IS_UNIT_TEST) recordUnitTestQuestionResult(true);
       markProblemComplete();
       document.getElementById('input-area').style.display = 'none';
       document.getElementById('completed-card').style.display = 'block';
       document.getElementById('next-problem-btn').style.display = 'block';
       document.getElementById('next-problem-btn').textContent =
-        currentIndex < problems.length - 1 ? 'Next Problem →' : 'Finish ✓';
+        currentIndex < problems.length - 1
+          ? (IS_UNIT_TEST ? 'Siguiente pregunta →' : 'Next Problem →')
+          : (IS_UNIT_TEST ? 'Ver resultados ✓' : 'Finish ✓');
     } else {
       wrongCount++;
       studentCalc.clear();
+      if (IS_UNIT_TEST) {
+        if (unitTestRecordRejection()) return;
+        showFeedback('wrong', 'No es correcto. Intenta de nuevo.');
+        reenableInput();
+        return;
+      }
       if (wrongCount >= 2) {
         showLoading('Getting a hint...');
         const hint = await askClaudeForTranslateHint(problem, input);
@@ -1585,8 +1693,212 @@
     document.getElementById('calc-grid').classList.remove('disabled');
   }
 
+  // ── Unit test helpers ─────────────────────────────────────────
+  function shuffleArray(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function pickRandom(arr, n) {
+    return shuffleArray(arr).slice(0, n);
+  }
+
+  function unitTestLevelStatus(score) {
+    if (score >= 7) return 'pass';
+    if (score >= 4) return 'borderline';
+    return 'fail';
+  }
+
+  function recordUnitTestQuestionResult(reached) {
+    if (!IS_UNIT_TEST || unitTestQuestionRecorded) return;
+    unitTestQuestionRecorded = true;
+    const p = problems[currentIndex];
+    const level = String(p._unitLevel || p.stage || '1');
+    let points = 0;
+    let rating = 'Fail';
+    if (reached) {
+      if (unitTestRejections === 0) {
+        points = 3;
+        rating = 'Mastery';
+      } else if (unitTestRejections <= 2) {
+        points = 2;
+        rating = 'Solid';
+      } else {
+        points = 1;
+        rating = 'Shaky';
+      }
+    }
+    unitTestResults.push({
+      level,
+      points,
+      rating,
+      rejections: reached ? unitTestRejections : unitTestRejections,
+      problemId: p.id,
+    });
+  }
+
+  function unitTestRecordRejection() {
+    if (!IS_UNIT_TEST) return false;
+    unitTestRejections++;
+    if (unitTestRejections >= UNIT_TEST_REJECTION_LIMIT) {
+      recordUnitTestQuestionResult(false);
+      document.getElementById('input-area').style.display = 'none';
+      document.getElementById('completed-card').style.display = 'none';
+      document.getElementById('next-problem-btn').style.display = 'none';
+      showFeedback('wrong', 'Límite de intentos alcanzado. Pasando a la siguiente pregunta…');
+      studentCalc.clear();
+      setTimeout(() => advanceUnitTestQuestion(), 1500);
+      return true;
+    }
+    return false;
+  }
+
+  function advanceUnitTestQuestion() {
+    document.getElementById('feedback').style.display = 'none';
+    if (currentIndex < problems.length - 1) {
+      loadProblem(currentIndex + 1);
+    } else {
+      finishUnitTest();
+    }
+  }
+
+  function buildUnitTestAttempt() {
+    const perLevel = {};
+    for (const lv of ['1', '2', '3']) {
+      perLevel[lv] = { score: 0, ratings: [], status: 'fail' };
+    }
+    for (const r of unitTestResults) {
+      const pl = perLevel[r.level];
+      if (!pl) continue;
+      pl.score += r.points;
+      pl.ratings.push(r.points);
+    }
+    for (const lv of ['1', '2', '3']) {
+      perLevel[lv].status = unitTestLevelStatus(perLevel[lv].score);
+    }
+    const totalScore = unitTestResults.reduce((sum, r) => sum + r.points, 0);
+    const levelsToReview = ['1', '2', '3'].filter((lv) => perLevel[lv].status === 'fail');
+    return {
+      takenAt: unitTestTakenAt || new Date().toISOString(),
+      perLevel,
+      totalScore,
+      levelsToReview,
+      released: true,
+    };
+  }
+
+  async function finishUnitTest() {
+    document.getElementById('practice-screen').style.display = 'none';
+    const attempt = buildUnitTestAttempt();
+    try {
+      await fetch(
+        `${PROXY_URL}/unit-test/${encodeURIComponent(PARAM_UNIT)}/${encodeURIComponent(STUDENT_ID)}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(attempt),
+        }
+      );
+    } catch (e) {
+      console.warn('Failed to persist unit test attempt:', e);
+    }
+    showUnitTestResults(attempt);
+  }
+
+  function showUnitTestResults(attempt) {
+    document.getElementById('practice-screen').style.display = 'none';
+    document.getElementById('done-screen').style.display = 'none';
+    const screen = document.getElementById('unit-test-results-screen');
+    screen.style.display = 'block';
+
+    const unitLabel = UNIT_LABELS[PARAM_UNIT] || PARAM_UNIT;
+    document.getElementById('ut-results-subtitle').textContent =
+      'Prueba de unidad — ' + unitLabel;
+    document.getElementById('ut-total-score').textContent =
+      'Puntaje total: ' + attempt.totalScore + ' / 27';
+
+    const statusLabels = {
+      pass: '✓ Aprobado',
+      borderline: '⚠ Aprobado con observación',
+      fail: '✗ A repasar',
+    };
+    const rowsEl = document.getElementById('ut-level-rows');
+    rowsEl.innerHTML = '';
+    for (const lv of ['1', '2', '3']) {
+      const pl = attempt.perLevel[lv] || { score: 0, status: 'fail' };
+      const row = document.createElement('div');
+      row.className = 'ut-level-row ' + pl.status;
+      row.innerHTML =
+        '<span><strong>Nivel ' + lv + '</strong> (' + pl.score + '/9)</span>' +
+        '<span>' + (statusLabels[pl.status] || pl.status) + '</span>';
+      rowsEl.appendChild(row);
+    }
+
+    const msgEl = document.getElementById('ut-results-message');
+    const allPassed = attempt.levelsToReview.length === 0;
+    if (allPassed) {
+      msgEl.className = 'ut-message success';
+      msgEl.textContent = '¡Unidad aprobada!';
+    } else {
+      msgEl.className = 'ut-message fail';
+      const levels = attempt.levelsToReview.map((lv) => 'Nivel ' + lv).join(', ');
+      msgEl.textContent = 'Necesitas repasar ' + levels + ' antes de continuar.';
+    }
+
+    const backBtn = document.getElementById('ut-back-btn');
+    const curriculum = PARAM_CURRICULUM || 'PAA';
+    backBtn.href = 'home.html?curriculum=' + encodeURIComponent(curriculum);
+  }
+
+  async function loadUnitTest() {
+    if (!STUDENT_ID) {
+      window.location.href = 'login.html';
+      return;
+    }
+    unitTestTakenAt = new Date().toISOString();
+    unitTestResults = [];
+    document.getElementById('setup-screen').style.display = 'none';
+    document.getElementById('practice-screen').style.display = 'block';
+
+    const unitLabel = UNIT_LABELS[PARAM_UNIT] || PARAM_UNIT;
+    document.querySelector('.student-header h1').textContent =
+      'Prueba de unidad — ' + unitLabel;
+    document.querySelector('.student-header p').textContent =
+      'Resuelve cada problema paso a paso.';
+    document.getElementById('curriculum-breadcrumb').style.display = 'none';
+
+    const selected = [];
+    for (const lv of ['1', '2', '3']) {
+      const pool = await fetchBankProblemsForLesson(
+        PARAM_CURRICULUM, PARAM_UNIT, lv, 'practice'
+      );
+      if (pool.length < 3) {
+        document.getElementById('practice-screen').style.display = 'none';
+        const doneEl = document.getElementById('done-screen');
+        doneEl.style.display = 'block';
+        doneEl.querySelector('h2').textContent = 'No hay suficientes problemas';
+        doneEl.querySelector('p').textContent =
+          'No hay suficientes problemas de práctica para el Nivel ' + lv + '.';
+        return;
+      }
+      selected.push(...pickRandom(pool, 3).map((p) => ({ ...p, _unitLevel: lv })));
+    }
+    problems = shuffleArray(selected);
+    loadProblem(0);
+  }
+
   // ── Boot: check URL for student data, else show teacher setup ──
   function init() {
+    // Unit test mode: 9 questions across 3 levels
+    if (IS_UNIT_TEST && PARAM_CURRICULUM && PARAM_UNIT) {
+      loadUnitTest();
+      return;
+    }
+
     // Guest mode: curriculum practice without login
     if (PARAM_GUEST && PARAM_CURRICULUM) {
       loadGuestProblems();
@@ -1744,10 +2056,20 @@
     wrongCount = 0;
     formCheckAttempts = 0;
     guestProblemAttempted = false;
+    if (IS_UNIT_TEST) {
+      unitTestRejections = 0;
+      unitTestQuestionRecorded = false;
+    }
 
     const p = problems[index];
-    const typeStr = p.type ? ` · ${p.type}` : '';
-    document.getElementById('problem-label').textContent = `Problem ${index + 1} of ${problems.length}${typeStr}`;
+    const typeStr = (!IS_UNIT_TEST && p.type) ? ` · ${p.type}` : '';
+    if (IS_UNIT_TEST) {
+      document.getElementById('problem-label').textContent =
+        'Pregunta ' + (index + 1) + ' de ' + problems.length;
+    } else {
+      document.getElementById('problem-label').textContent =
+        'Problem ' + (index + 1) + ' of ' + problems.length + typeStr;
+    }
     document.getElementById('problem-text').innerHTML = renderMath(p.question);
     const workWrap = document.getElementById('problem-work-wrap');
     const workExpr = document.getElementById('problem-work-expression');
@@ -1783,8 +2105,13 @@
   function updateProgress() {
     const total = problems.length;
     const current = currentIndex + 1;
-    document.getElementById('progress-text').textContent = `${current} / ${total}`;
-    document.getElementById('progress-fill').style.width = `${(current / total) * 100}%`;
+    if (IS_UNIT_TEST) {
+      document.getElementById('progress-text').textContent =
+        'Pregunta ' + current + ' de ' + total;
+    } else {
+      document.getElementById('progress-text').textContent = current + ' / ' + total;
+    }
+    document.getElementById('progress-fill').style.width = (current / total * 100) + '%';
   }
 
   // ── Submit step (student) ──
@@ -1837,6 +2164,12 @@
         hideLoading();
         if (interpreted) equiv = checkEquivalence(previousExpression, interpreted, problem.type);
         if (equiv.valid === null) {
+          if (IS_UNIT_TEST) {
+            if (unitTestRecordRejection()) return;
+            showFeedback('wrong', 'No se pudo interpretar tu respuesta. Intenta de nuevo.');
+            reenableInput();
+            return;
+          }
           showFeedback('unsure', "I couldn't understand your answer. Try rewriting it using the math buttons.");
           reenableInput();
           return;
@@ -1856,12 +2189,15 @@
       if (isFinal.valid === true) {
         if (input.includes(',')) {
           console.log('[submitStep] comma answer — skipping form check, marking complete');
+          if (IS_UNIT_TEST) recordUnitTestQuestionResult(true);
           markProblemComplete();
           document.getElementById('input-area').style.display = 'none';
           document.getElementById('completed-card').style.display = 'block';
           document.getElementById('next-problem-btn').style.display = 'block';
           document.getElementById('next-problem-btn').textContent =
-            currentIndex < problems.length - 1 ? 'Next Problem →' : 'Finish ✓';
+            currentIndex < problems.length - 1
+              ? (IS_UNIT_TEST ? 'Siguiente pregunta →' : 'Next Problem →')
+              : (IS_UNIT_TEST ? 'Ver resultados ✓' : 'Finish ✓');
         } else {
           const useRawMatch = !(problem.modules?.includes('formCheck'));
           let formMatches, formFeedback;
@@ -1879,6 +2215,13 @@
             console.log(`[submitStep] askClaudeFormCheck returned in ${(performance.now()-tF).toFixed(1)}ms:`, formCheck);
             hideLoading();
             if (formCheck === null) {
+              if (IS_UNIT_TEST) {
+                if (unitTestRecordRejection()) return;
+                showFeedback('wrong', 'No se pudo verificar tu respuesta. Intenta de nuevo.');
+                studentCalc.clear();
+                reenableInput();
+                return;
+              }
               askRonelProblems.push(problem.question);
               showFeedback('unsure', "I couldn't verify your answer right now — save this one for Ronel to check.");
               studentCalc.clear();
@@ -1891,14 +2234,24 @@
 
           if (formMatches) {
             console.log('[submitStep] problem complete — updating DOM');
+            if (IS_UNIT_TEST) recordUnitTestQuestionResult(true);
             markProblemComplete();
             document.getElementById('input-area').style.display = 'none';
             document.getElementById('completed-card').style.display = 'block';
             document.getElementById('next-problem-btn').style.display = 'block';
             document.getElementById('next-problem-btn').textContent =
-              currentIndex < problems.length - 1 ? 'Next Problem →' : 'Finish ✓';
+              currentIndex < problems.length - 1
+                ? (IS_UNIT_TEST ? 'Siguiente pregunta →' : 'Next Problem →')
+                : (IS_UNIT_TEST ? 'Ver resultados ✓' : 'Finish ✓');
           } else {
             formCheckAttempts++;
+            if (IS_UNIT_TEST) {
+              if (unitTestRecordRejection()) return;
+              showFeedback('wrong', 'Valor correcto, pero simplifica o factoriza más.');
+              studentCalc.clear();
+              reenableInput();
+              return;
+            }
             showFeedback('nudge', formFeedback || 'Correct value, but try to simplify or factor further!');
             studentCalc.clear();
             reenableInput();
@@ -1912,6 +2265,13 @@
       wrongCount++;
       logStep(input, false);
       studentCalc.clear();
+
+      if (IS_UNIT_TEST) {
+        if (unitTestRecordRejection()) return;
+        showFeedback('wrong', 'Ese paso no es válido. Intenta de nuevo.');
+        reenableInput();
+        return;
+      }
 
       if (wrongCount >= 4) {
         showLoading('Getting help...');
@@ -2026,6 +2386,10 @@
   }
 
   function nextProblem() {
+    if (IS_UNIT_TEST) {
+      advanceUnitTestQuestion();
+      return;
+    }
     if (PARAM_GUEST && PARAM_MODE !== 'test') {
       const count = parseInt(localStorage.getItem('nuvo_guest_count') || '0', 10);
       if (count >= 5) {
@@ -2118,7 +2482,7 @@
 
       if (todayStr > student.trialExpiry) {
         // Expired — hide all screens, show overlay
-        ['setup-screen', 'link-screen', 'practice-screen', 'done-screen'].forEach(id => {
+        ['setup-screen', 'link-screen', 'practice-screen', 'done-screen', 'unit-test-results-screen'].forEach(id => {
           const el = document.getElementById(id);
           if (el) el.style.display = 'none';
         });

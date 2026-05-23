@@ -1,4 +1,4 @@
-import { migrateStudentRecord } from './student-model.js';
+import { migrateStudentRecord, ensureUnitRecord, levelStatusFromScore } from './student-model.js';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -64,6 +64,51 @@ export default {
       }
       await saveStudent(env, studentId, student);
       return jsonResponse({ ok: true });
+    }
+
+    // POST /unit-test/:unitId/:studentId — persist completed unit test attempt
+    const unitTestMatch = path.match(/^\/unit-test\/([^/]+)\/([^/]+)$/);
+    if (unitTestMatch && request.method === 'POST') {
+      const [, unitId, studentId] = unitTestMatch;
+      let body;
+      try {
+        body = await request.json();
+      } catch {
+        return jsonResponse({ error: 'Invalid JSON' }, 400);
+      }
+      const { takenAt, perLevel, totalScore, levelsToReview, released } = body;
+      if (!takenAt || !perLevel || typeof perLevel !== 'object') {
+        return jsonResponse({ error: 'Missing takenAt or perLevel' }, 400);
+      }
+      for (const lv of ['1', '2', '3']) {
+        const pl = perLevel[lv];
+        if (!pl || typeof pl.score !== 'number' || !Array.isArray(pl.ratings)) {
+          return jsonResponse({ error: `Invalid perLevel.${lv}` }, 400);
+        }
+        pl.status = levelStatusFromScore(pl.score);
+      }
+      const levelsToReviewArr = Array.isArray(levelsToReview)
+        ? levelsToReview.map(String)
+        : ['1', '2', '3'].filter((lv) => perLevel[lv].status === 'fail');
+      const computedTotal = ['1', '2', '3'].reduce((sum, lv) => sum + (perLevel[lv].score || 0), 0);
+      const attempt = {
+        takenAt: String(takenAt),
+        perLevel,
+        totalScore: typeof totalScore === 'number' ? totalScore : computedTotal,
+        levelsToReview: levelsToReviewArr,
+        released: released !== false,
+      };
+      const allPassed = ['1', '2', '3'].every((lv) => {
+        const st = perLevel[lv].status;
+        return st === 'pass' || st === 'borderline';
+      });
+      const student = await loadStudent(env, studentId);
+      if (!student) return jsonResponse({ error: 'Student not found' }, 404);
+      ensureUnitRecord(student, unitId);
+      student.units[unitId].unitTest.attempts.push(attempt);
+      student.units[unitId].unitTest.passed = allPassed;
+      await saveStudent(env, studentId, student);
+      return jsonResponse({ ok: true, attempt, passed: allPassed });
     }
 
     // PUT /student/:id/progress — student-facing, updates progress map
