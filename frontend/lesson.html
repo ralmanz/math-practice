@@ -1720,9 +1720,9 @@
       return;
     }
 
-    // Hand off to app.html for test phase (same URL for guests and logged-in)
+    // Legacy ?phase=test URLs — level tests removed; treat as practice completion
     if (phaseParam === 'test') {
-      window.location.replace(curriculumAppUrl('test', 'complete'));
+      window.location.replace(buildLessonUrl({ phase: 'complete' }));
       return;
     }
 
@@ -2149,22 +2149,6 @@
       const r = await fetch(`${WORKER}/problems/curriculum/${encodeURIComponent(curriculum)}/${encodeURIComponent(unit)}/${encodeURIComponent(stage)}/practice`);
       const arr = r.ok ? await r.json() : [];
       if (!arr.length) {
-        showTest();
-        return;
-      }
-    } catch (e) {
-      showTest();
-      return;
-    }
-    window.location.href = curriculumAppUrl('practice', 'test');
-  }
-
-  // ── Phase 5: Test (always app.html) ─────────────────────────────
-  async function showTest() {
-    try {
-      const r = await fetch(`${WORKER}/problems/curriculum/${encodeURIComponent(curriculum)}/${encodeURIComponent(unit)}/${encodeURIComponent(stage)}/test`);
-      const arr = r.ok ? await r.json() : [];
-      if (!arr.length) {
         if (guestMode) showGuestCompletionCard();
         else await markProgressAndShow('complete', null, null);
         return;
@@ -2174,7 +2158,7 @@
       else await markProgressAndShow('complete', null, null);
       return;
     }
-    window.location.href = curriculumAppUrl('test', 'complete');
+    window.location.href = curriculumAppUrl('practice', 'complete');
   }
 
   // ── Update progress + show result card ───────────────────────
@@ -2615,7 +2599,7 @@
       <h2>¡Lección completada!</h2>
       <p style="font-size:0.9rem;color:var(--accent-dark,var(--accent));margin-bottom:4px">Dominaste todos los temas de esta lección.</p>
       <ul class="st-summary-list">${listItems}</ul>
-      <button class="main-btn" style="margin:0 auto;display:inline-block" onclick="showTest()">Ir al test →</button>
+      <button class="main-btn" style="margin:0 auto;display:inline-block" onclick="showPractice()">${Lang.t('example_btn_try_yourself')}</button>
     `;
     container.appendChild(card);
     setTimeout(() => card.scrollIntoView({ behavior:'smooth', block:'center' }), 50);

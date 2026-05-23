@@ -1,3 +1,5 @@
+import { migrateStudentRecord } from './student-model.js';
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, OPTIONS',
@@ -9,6 +11,23 @@ function jsonResponse(data, status = 200) {
     status,
     headers: { ...corsHeaders, 'Content-Type': 'application/json' }
   });
+}
+
+async function loadStudent(env, studentId, { persistIfMigrated = false } = {}) {
+  const raw = await env.STUDENTS.get(studentId);
+  if (!raw) return null;
+  const parsed = JSON.parse(raw);
+  const migrated = migrateStudentRecord(parsed);
+  if (persistIfMigrated && JSON.stringify(migrated) !== JSON.stringify(parsed)) {
+    await env.STUDENTS.put(studentId, JSON.stringify(migrated));
+  }
+  return migrated;
+}
+
+async function saveStudent(env, studentId, student) {
+  const migrated = migrateStudentRecord(student);
+  await env.STUDENTS.put(studentId, JSON.stringify(migrated));
+  return migrated;
 }
 
 export default {
@@ -24,27 +43,26 @@ export default {
     const studentMatch = path.match(/^\/student\/([^/]+)$/);
     if (studentMatch && request.method === 'GET') {
       const studentId = studentMatch[1];
-      const raw = await env.STUDENTS.get(studentId);
-      if (!raw) {
+      const student = await loadStudent(env, studentId, { persistIfMigrated: true });
+      if (!student) {
         return jsonResponse({ error: 'Student not found' }, 404);
       }
-      return jsonResponse(JSON.parse(raw));
+      return jsonResponse(student);
     }
 
     // POST /student/:id/complete/:problemId
     const completeMatch = path.match(/^\/student\/([^/]+)\/complete\/([^/]+)$/);
     if (completeMatch && request.method === 'POST') {
       const [, studentId, problemId] = completeMatch;
-      const raw = await env.STUDENTS.get(studentId);
-      if (!raw) {
+      const student = await loadStudent(env, studentId);
+      if (!student) {
         return jsonResponse({ error: 'Student not found' }, 404);
       }
-      const student = JSON.parse(raw);
       const problem = student.problems.find(p => p.id === problemId);
       if (problem) {
         problem.completed = true;
       }
-      await env.STUDENTS.put(studentId, JSON.stringify(student));
+      await saveStudent(env, studentId, student);
       return jsonResponse({ ok: true });
     }
 
@@ -62,13 +80,12 @@ export default {
       if (!unit || !stage || !status) {
         return jsonResponse({ error: 'Missing unit, stage, or status' }, 400);
       }
-      const raw = await env.STUDENTS.get(studentId);
-      if (!raw) return jsonResponse({ error: 'Student not found' }, 404);
-      const student = JSON.parse(raw);
+      const student = await loadStudent(env, studentId);
+      if (!student) return jsonResponse({ error: 'Student not found' }, 404);
       if (!student.progress) student.progress = {};
       if (!student.progress[String(unit)]) student.progress[String(unit)] = {};
       student.progress[String(unit)][String(stage)] = status;
-      await env.STUDENTS.put(studentId, JSON.stringify(student));
+      await saveStudent(env, studentId, student);
       return jsonResponse({ ok: true });
     }
 
@@ -91,13 +108,12 @@ export default {
       if (!name) {
         return jsonResponse({ error: 'Missing name' }, 400);
       }
-      const raw = await env.STUDENTS.get(studentId);
-      const existing = raw ? JSON.parse(raw) : { problems: [] };
+      const existing = await loadStudent(env, studentId) || { problems: [] };
       const updated = { ...existing, name };
       if (trialExpiry  !== undefined) updated.trialExpiry  = trialExpiry  || null;
       if (curriculum   !== undefined) updated.curriculum   = curriculum   || '';
       if (grade        !== undefined) updated.grade        = grade        || '';
-      await env.STUDENTS.put(studentId, JSON.stringify(updated));
+      await saveStudent(env, studentId, updated);
       return jsonResponse({ ok: true });
     }
 
@@ -120,8 +136,7 @@ export default {
       if (!Array.isArray(problems)) {
         return jsonResponse({ error: 'Missing problems' }, 400);
       }
-      const raw = await env.STUDENTS.get(studentId);
-      const existing = raw ? JSON.parse(raw) : {};
+      const existing = await loadStudent(env, studentId) || {};
       const existingById = {};
       for (const p of (existing.problems || [])) {
         existingById[p.id] = p;
@@ -131,7 +146,7 @@ export default {
           ? { ...p, completed: existingById[p.id].completed }
           : p
       );
-      await env.STUDENTS.put(studentId, JSON.stringify({ ...existing, name: existing.name || studentId, problems: mergedProblems }));
+      await saveStudent(env, studentId, { ...existing, name: existing.name || studentId, problems: mergedProblems });
       return jsonResponse({ ok: true });
     }
 
@@ -208,9 +223,8 @@ Rules:
       try { body = await request.json(); } catch { return jsonResponse({ error: 'Invalid JSON' }, 400); }
       const { studentId: svStudentId, expression: svExpr, answer: svAnswer, type: svType, label, modules: svModules, url: svUrl } = body;
       if (!svStudentId || !svExpr || !svAnswer || !svType) return jsonResponse({ error: 'Missing fields' }, 400);
-      const svRaw = await env.STUDENTS.get(svStudentId);
-      if (!svRaw) return jsonResponse({ error: 'Student not found' }, 404);
-      const svStudent = JSON.parse(svRaw);
+      const svStudent = await loadStudent(env, svStudentId);
+      if (!svStudent) return jsonResponse({ error: 'Student not found' }, 404);
       const newProblemId = `variant_${Date.now()}`;
       svStudent.problems = svStudent.problems || [];
       svStudent.problems.push({
@@ -224,7 +238,7 @@ Rules:
         completed: false,
         generated: true
       });
-      await env.STUDENTS.put(svStudentId, JSON.stringify(svStudent));
+      await saveStudent(env, svStudentId, svStudent);
       return jsonResponse({ success: true, problemId: newProblemId });
     }
 

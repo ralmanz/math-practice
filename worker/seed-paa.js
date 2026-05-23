@@ -98,30 +98,6 @@ const PAA_PROBLEMS = [
     ],
     options: [], modules: ['equivalence'], createdAt: CREATED_AT,
   },
-  {
-    id: 'paa-aritmetica-n1-t1',
-    curriculum: 'PAA', unit: 'aritmetica', stage: '1',
-    problemType: 'test', type: '', format: 'open',
-    question: '¿Cuánto es 18 + 2³ ÷ 4 × 2?',
-    answer: '22',
-    hints: [], options: [], modules: ['equivalence'], createdAt: CREATED_AT,
-  },
-  {
-    id: 'paa-aritmetica-n1-t2',
-    curriculum: 'PAA', unit: 'aritmetica', stage: '1',
-    problemType: 'test', type: '', format: 'open',
-    question: '¿Cuánto es 3(4 + 2) − 2(5 − 3)?',
-    answer: '14',
-    hints: [], options: [], modules: ['equivalence'], createdAt: CREATED_AT,
-  },
-  {
-    id: 'paa-aritmetica-n1-t3',
-    curriculum: 'PAA', unit: 'aritmetica', stage: '1',
-    problemType: 'test', type: '', format: 'open',
-    question: 'Si a = 3 y b = 2, ¿cuánto es a² + 2ab − b²?',
-    answer: '17',
-    hints: [], options: [], modules: ['equivalence'], createdAt: CREATED_AT,
-  },
 
   // ── NIVEL 2: Razón, proporción y porcentaje ─────────────────────────────────
 
@@ -206,33 +182,6 @@ const PAA_PROBLEMS = [
       '45 ÷ 150 = 0.30. Ahora multiplica por 100.',
     ],
     options: [], modules: ['equivalence'], createdAt: CREATED_AT,
-  },
-  {
-    id: 'paa-aritmetica-n2-t1',
-    curriculum: 'PAA', unit: 'aritmetica', stage: '2',
-    problemType: 'test', type: '', format: 'open',
-    expression: '120*0.75',
-    question: 'Un artículo de $120.00 tiene 25% de descuento. ¿Cuál es el precio final?',
-    answer: '90',
-    hints: [], options: [], modules: ['equivalence'], createdAt: CREATED_AT,
-  },
-  {
-    id: 'paa-aritmetica-n2-t2',
-    curriculum: 'PAA', unit: 'aritmetica', stage: '2',
-    problemType: 'test', type: '', format: 'open',
-    expression: '300/(5/8)',
-    question: 'Si 5/8 de la distancia total son 300 km, ¿cuál es la distancia total en km?',
-    answer: '480',
-    hints: [], options: [], modules: ['equivalence'], createdAt: CREATED_AT,
-  },
-  {
-    id: 'paa-aritmetica-n2-t3',
-    curriculum: 'PAA', unit: 'aritmetica', stage: '2',
-    problemType: 'test', type: '', format: 'open',
-    expression: '250*3/0.25',
-    question: 'Un joven retira el 25% de sus ahorros y gasta el 33⅓% de eso en adornos que costaron $250.00. ¿Cuántos dólares tenía en el banco?',
-    answer: '3000',
-    hints: [], options: [], modules: ['equivalence'], createdAt: CREATED_AT,
   },
 
   // ── NIVEL 3: Patrones numéricos y teoría de números ────────────────────────
@@ -441,33 +390,6 @@ const PAA_PROBLEMS = [
     ],
     options: [], modules: ['equivalence'], createdAt: CREATED_AT,
   },
-
-  {
-    id: 'paa-aritmetica-n3-t1',
-    curriculum: 'PAA', unit: 'aritmetica', stage: '3',
-    problemType: 'test', type: '', format: 'open',
-    expression: 'lcm(12,18)',
-    question: 'Dos autobuses salen juntos de la terminal. Uno pasa cada 12 minutos y otro cada 18 minutos. ¿En cuántos minutos volverán a salir juntos?',
-    answer: '36',
-    hints: [], options: [], modules: ['equivalence'], createdAt: CREATED_AT,
-  },
-  {
-    id: 'paa-aritmetica-n3-t2',
-    curriculum: 'PAA', unit: 'aritmetica', stage: '3',
-    problemType: 'test', type: '', format: 'open',
-    question: '¿Cuál es el siguiente término en la sucesión 2, 6, 18, 54...?',
-    answer: '162',
-    hints: [], options: [], modules: ['equivalence'], createdAt: CREATED_AT,
-  },
-  {
-    id: 'paa-aritmetica-n3-t3',
-    curriculum: 'PAA', unit: 'aritmetica', stage: '3',
-    problemType: 'test', type: 'MCQ', format: 'mcq',
-    question: '¿Cuál es la factorización prima de 84?',
-    answer: 'C',
-    options: ['2 × 42', '4 × 21', '2² × 3 × 7', '2 × 3 × 14'],
-    hints: [], modules: ['equivalence'], createdAt: CREATED_AT,
-  },
 ];
 
 // ── Lesson data ───────────────────────────────────────────────────────────────
@@ -497,7 +419,7 @@ const PAA_LESSONS = [
           'Expresiones numéricas con suma, resta, multiplicación, división y paréntesis.',
           'Ejercicios donde un solo error de orden cambia la respuesta.',
         ],
-        practice: 'Después del recorrido guiado y un ejemplo resuelto, practicarás con 6 ejercicios y cerrarás con una prueba corta del nivel.',
+        practice: 'Después del recorrido guiado y un ejemplo resuelto, practicarás con 6 ejercicios.',
       },
       conceptVoice:
         'En la Prueba de Admisión aparecen expresiones con sumas, restas, productos, cocientes y potencias. ' +
@@ -636,7 +558,6 @@ const PAA_LESSONS = [
       },
       practiceProblems: ['paa-aritmetica-n1-p1','paa-aritmetica-n1-p2','paa-aritmetica-n1-p3',
                          'paa-aritmetica-n1-p4','paa-aritmetica-n1-p5','paa-aritmetica-n1-p6'],
-      testProblems:     ['paa-aritmetica-n1-t1','paa-aritmetica-n1-t2','paa-aritmetica-n1-t3'],
     },
   },
   {
@@ -730,7 +651,6 @@ const PAA_LESSONS = [
       },
       practiceProblems: ['paa-aritmetica-n2-p1','paa-aritmetica-n2-p2','paa-aritmetica-n2-p3',
                          'paa-aritmetica-n2-p4','paa-aritmetica-n2-p5','paa-aritmetica-n2-p6'],
-      testProblems:     ['paa-aritmetica-n2-t1','paa-aritmetica-n2-t2','paa-aritmetica-n2-t3'],
     },
   },
   {
@@ -1096,7 +1016,6 @@ const PAA_LESSONS = [
       ],
       practiceProblems: ['paa-aritmetica-n3-p1','paa-aritmetica-n3-p2','paa-aritmetica-n3-p3',
                          'paa-aritmetica-n3-p4','paa-aritmetica-n3-p5','paa-aritmetica-n3-p6'],
-      testProblems:     ['paa-aritmetica-n3-t1','paa-aritmetica-n3-t2','paa-aritmetica-n3-t3'],
     },
   },
 ];
