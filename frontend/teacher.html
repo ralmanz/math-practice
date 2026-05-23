@@ -475,6 +475,7 @@
               <label data-i18n="teacher_label_curriculum">Curriculum</label>
               <select id="student-curriculum" onchange="updateGradeOptions(this.value)">
                 <option value="" disabled selected>Select curriculum...</option>
+                <option value="PAA">UTP Admission Prep (PAA)</option>
                 <option value="cambridge">Cambridge Lower Secondary</option>
                 <option value="common-core">Common Core (US)</option>
                 <option value="ib-myp">IB MYP</option>
@@ -515,6 +516,7 @@
               <label data-i18n="teacher_label_curriculum">Curriculum</label>
               <select id="ns-curriculum" onchange="updateNewGradeOptions(this.value)">
                 <option value="" disabled selected>Select curriculum...</option>
+                <option value="PAA">UTP Admission Prep (PAA)</option>
                 <option value="cambridge">Cambridge Lower Secondary</option>
                 <option value="common-core">Common Core (US)</option>
                 <option value="ib-myp">IB MYP</option>
@@ -1054,6 +1056,7 @@
 
   // ── Grade options ─────────────────────────────────────────────
   const GRADE_SETS = {
+    PAA:           [{ v: 'admission', l: 'UTP Admission Prep' }],
     cambridge:     [{ v: '7', l: 'Stage 7' }, { v: '8', l: 'Stage 8' }, { v: '9', l: 'Stage 9' }],
     'common-core': [{ v: '6', l: 'Grade 6' }, { v: '7', l: 'Grade 7' }, { v: '8', l: 'Grade 8' }, { v: '9', l: 'Grade 9' }],
     'ib-myp':      [{ v: '1', l: 'MYP 1'  }, { v: '2', l: 'MYP 2'  }, { v: '3', l: 'MYP 3'  }, { v: '4', l: 'MYP 4'  }],
@@ -1061,7 +1064,8 @@
 
   function buildGradeOpts(curriculum) {
     const label = curriculum === 'cambridge' ? 'Select stage...' :
-                  curriculum === 'ib-myp'    ? 'Select year...'  : 'Select grade...';
+                  curriculum === 'ib-myp'    ? 'Select year...'  :
+                  curriculum === 'PAA'       ? 'Select program...' : 'Select grade...';
     const opts  = GRADE_SETS[curriculum] || [
       { v: '6', l: 'Year 6 / Grade 6' }, { v: '7', l: 'Year 7 / Grade 7' },
       { v: '8', l: 'Year 8 / Grade 8' }, { v: '9', l: 'Year 9 / Grade 9' },
@@ -1085,12 +1089,13 @@
   function formatMeta(curriculum, grade) {
     if (!curriculum || !grade) return '';
     const stageMap = {
+      PAA:           { admission: 'Admission Prep' },
       cambridge:     { '7': 'Stage 7', '8': 'Stage 8', '9': 'Stage 9' },
       'common-core': { '6': 'Grade 6', '7': 'Grade 7', '8': 'Grade 8', '9': 'Grade 9' },
       'ib-myp':      { '1': 'MYP 1',   '2': 'MYP 2',   '3': 'MYP 3',  '4': 'MYP 4'  },
       other:         { '6': 'Year 6',  '7': 'Year 7',  '8': 'Year 8', '9': 'Year 9' },
     };
-    const nameMap = { cambridge: 'Cambridge', 'common-core': 'Common Core', 'ib-myp': 'IB MYP', other: 'Other' };
+    const nameMap = { PAA: 'UTP (PAA)', cambridge: 'Cambridge', 'common-core': 'Common Core', 'ib-myp': 'IB MYP', other: 'Other' };
     const stage = (stageMap[curriculum] || {})[grade] || `Grade ${grade}`;
     const name  = nameMap[curriculum] || curriculum;
     return `${name} · ${stage}`;
