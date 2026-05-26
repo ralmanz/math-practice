@@ -537,47 +537,53 @@
     return 'locked';
   }
 
-  // ── Render PAA curriculum (Aritmética · 3 levels) ──
+  // ── Render PAA curriculum (Álgebra Unit 1 + Aritmética Unit 2) ──
+  // STEP 5 HIDE: to hide Aritmética after Álgebra is confirmed working,
+  // delete the "── Unit 2: Aritmética ──" block below (clearly marked).
   function renderPAACurriculum(student, studentId) {
     const progress = student.progress || {};
     const grid = document.getElementById('units-grid');
     grid.innerHTML = '';
 
-    const unitKey  = 'aritmetica';
-    const unitName = Lang.t('paa_unit_aritmetica');
-    const card = document.createElement('div');
-    card.className = 'unit-card';
+    function makePAAUnitCard(unitKey, unitName, unitNumber) {
+      const card = document.createElement('div');
+      card.className = 'unit-card';
+      const pillsHtml = [1, 2, 3].map(function(l) {
+        const st = (progress[unitKey] || {})[String(l)];
+        let state;
+        if (st === 'complete') {
+          state = 'complete';
+        } else if (st === 'current') {
+          state = 'available';
+        } else {
+          state = getPAALevelState(l, unitKey, progress);
+        }
+        const label = Lang.t('level_label') + ' ' + l;
+        if (state === 'complete') {
+          return '<span class="level-pill complete">&#x2713; ' + label + '</span>';
+        }
+        if (state === 'available') {
+          const url = 'lesson.html?curriculum=PAA&unit=' + encodeURIComponent(unitKey) +
+                      '&stage=' + l + (studentId ? '&student=' + encodeURIComponent(studentId) : '');
+          return '<a href="' + url + '" class="level-pill available">' + label + '</a>';
+        }
+        return '<span class="level-pill locked">&#x1F512; ' + label + '</span>';
+      }).join('');
+      card.innerHTML =
+        '<div class="unit-card-header">' +
+          '<span class="unit-number-badge">' + Lang.t('unit_label') + ' ' + unitNumber + '</span>' +
+          '<span class="unit-name">' + unitName + '</span>' +
+        '</div>' +
+        '<div class="level-pills">' + pillsHtml + '</div>';
+      return card;
+    }
 
-    const pillsHtml = [1, 2, 3].map(function(l) {
-      const aritState = (progress[unitKey] || {})[String(l)];
-      let state;
-      if (aritState === 'complete') {
-        state = 'complete';
-      } else if (aritState === 'current') {
-        state = 'available';
-      } else {
-        state = getPAALevelState(l, unitKey, progress);
-      }
-      const label = Lang.t('level_label') + ' ' + l;
-      if (state === 'complete') {
-        return '<span class="level-pill complete">&#x2713; ' + label + '</span>';
-      }
-      if (state === 'available') {
-        const url = 'lesson.html?curriculum=PAA&unit=' + encodeURIComponent(unitKey) +
-                    '&stage=' + l + (studentId ? '&student=' + encodeURIComponent(studentId) : '');
-        return '<a href="' + url + '" class="level-pill available">' + label + '</a>';
-      }
-      return '<span class="level-pill locked">&#x1F512; ' + label + '</span>';
-    }).join('');
+    // ── Unit 1: Álgebra (active unit) ──
+    grid.appendChild(makePAAUnitCard('algebra', '\u00C1lgebra', 1));
 
-    card.innerHTML =
-      '<div class="unit-card-header">' +
-        '<span class="unit-number-badge">' + Lang.t('unit_label') + ' 1</span>' +
-        '<span class="unit-name">' + unitName + '</span>' +
-      '</div>' +
-      '<div class="level-pills">' + pillsHtml + '</div>';
-
-    grid.appendChild(card);
+    // ── Unit 2: Aritmética (legacy — BEGIN STEP 5 HIDE BLOCK) ──
+    grid.appendChild(makePAAUnitCard('aritmetica', Lang.t('paa_unit_aritmetica'), 2));
+    // ── END STEP 5 HIDE BLOCK ──
   }
 
   // ── Render the unit cards ──
