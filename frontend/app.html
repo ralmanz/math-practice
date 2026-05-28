@@ -7,6 +7,7 @@
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="nuvo-tokens.css?v=20260518-grammar">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=DM+Mono:wght@400;500&display=swap');
 
@@ -16,19 +17,6 @@
     --text: #1A1A1A;
     --text-secondary: #6B6B6B;
     --border: #E8E8E4;
-    --accent: #2D6A4F;
-    --accent-light: #D8F3DC;
-    --accent-bg: #F0FAF3;
-    --correct: #2D6A4F;
-    --correct-bg: #D8F3DC;
-    --wrong: #C1453B;
-    --wrong-bg: #FDE8E6;
-    --feedback-wrong-bg: #EDF1F5;
-    --feedback-wrong-text: #3D4F5F;
-    --nudge: #B8860B;
-    --nudge-bg: #FFF8E7;
-    --unsure: #5A6B7A;
-    --unsure-bg: #EDF1F5;
     --mono: 'DM Mono', monospace;
     --sans: 'DM Sans', sans-serif;
   }
@@ -398,7 +386,7 @@
 
   .progress-fill {
     height: 100%;
-    background: var(--accent);
+    background: var(--nuvo-action);
     border-radius: 3px;
     transition: width 0.4s ease;
     width: 0%;
@@ -425,7 +413,7 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: var(--accent);
+    color: var(--text-secondary);
     margin-bottom: 10px;
   }
 
@@ -442,15 +430,15 @@
     margin-top: 16px;
     padding: 12px 14px;
     border-radius: 10px;
-    border: 1.5px solid var(--accent-light, #D8F3DC);
-    background: var(--accent-bg, #F0FAF3);
+    border: 1.5px solid var(--border);
+    background: var(--card);
   }
   .problem-work-label {
     font-size: 0.65rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: var(--accent);
+    color: var(--text-secondary);
     margin-bottom: 6px;
   }
   .problem-work-expression {
@@ -477,7 +465,7 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
-  .step-entry.correct { background: var(--correct-bg); }
+  .step-entry.correct { background: var(--nuvo-correct-light); }
 
   .step-entry .step-icon {
     font-size: 1rem;
@@ -502,10 +490,10 @@
     display: none;
   }
 
-  .feedback.wrong  { background: var(--feedback-wrong-bg); color: var(--feedback-wrong-text); border: 1px solid var(--border); display: block; }
-  .feedback.nudge  { background: var(--nudge-bg);  color: var(--nudge);  display: block; }
-  .feedback.unsure { background: var(--unsure-bg); color: var(--unsure); display: block; }
-  .feedback.reveal { background: var(--accent-bg); color: var(--accent); display: block; font-family: var(--mono); }
+  .feedback.wrong  { background: var(--nuvo-wrong-bg); color: var(--nuvo-wrong-text); border: 1px solid var(--border); display: block; }
+  .feedback.nudge  { background: var(--nuvo-keepgoing-bg); color: var(--nuvo-keepgoing); border: 1px solid var(--nuvo-keepgoing-border); display: block; }
+  .feedback.unsure { background: var(--nuvo-keepgoing-bg); color: var(--nuvo-keepgoing); border: 1px solid var(--nuvo-keepgoing-border); display: block; }
+  .feedback.reveal { background: var(--nuvo-keepgoing-bg); color: var(--nuvo-keepgoing); border: 1px solid var(--nuvo-keepgoing-border); display: block; font-family: var(--mono); }
 
   /* ── Calculator Display ── */
   #input-area {
@@ -528,7 +516,7 @@
     transition: border-color 0.2s;
   }
 
-  #step-input:focus { border-color: var(--accent); }
+  #step-input:focus { border-color: var(--nuvo-action); }
 
   /* ── Math preview (live rendered fraction display) ── */
   .math-preview {
@@ -536,8 +524,8 @@
     font-family: var(--mono);
     font-size: 1.05rem;
     padding: 10px 14px;
-    background: var(--accent-bg);
-    border: 1.5px solid var(--accent-light);
+    background: var(--card);
+    border: 1.5px solid var(--border);
     border-radius: 10px;
     line-height: 2.2;
     color: var(--text);
@@ -584,7 +572,7 @@
     width: 16px;
     height: 16px;
     border: 2px solid var(--border);
-    border-top-color: var(--accent);
+    border-top-color: var(--nuvo-action);
     border-radius: 50%;
     animation: spin 0.7s linear infinite;
   }
@@ -592,8 +580,8 @@
   @keyframes spin { to { transform: rotate(360deg); } }
 
   .completed-card {
-    background: var(--correct-bg);
-    border: 1.5px solid var(--correct);
+    background: var(--nuvo-correct-light);
+    border: 1.5px solid var(--nuvo-correct);
     border-radius: 14px;
     padding: 24px;
     text-align: center;
@@ -603,13 +591,13 @@
   }
 
   .completed-card .check { font-size: 2rem; margin-bottom: 8px; }
-  .completed-card h3 { color: var(--correct); font-size: 1.1rem; margin-bottom: 4px; }
-  .completed-card p  { color: var(--correct); font-size: 0.88rem; opacity: 0.8; }
+  .completed-card h3 { color: var(--nuvo-correct); font-size: 1.1rem; margin-bottom: 4px; }
+  .completed-card p  { color: var(--nuvo-correct); font-size: 0.88rem; opacity: 0.8; }
 
   #next-problem-btn {
     width: 100%;
     padding: 14px;
-    background: var(--accent);
+    background: var(--nuvo-action);
     color: white;
     border: none;
     border-radius: 10px;
@@ -639,7 +627,8 @@
   .ask-ronel-list {
     margin-top: 20px;
     text-align: left;
-    background: var(--unsure-bg);
+    background: var(--nuvo-keepgoing-bg);
+    border: 1px solid var(--nuvo-keepgoing-border);
     border-radius: 10px;
     padding: 16px 20px;
   }
@@ -648,7 +637,7 @@
     font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: var(--unsure);
+    color: var(--nuvo-keepgoing);
     margin-bottom: 10px;
   }
 
@@ -666,7 +655,7 @@
     content: '?';
     position: absolute;
     left: 0;
-    color: var(--unsure);
+    color: var(--nuvo-keepgoing);
     font-weight: 700;
   }
 
@@ -849,7 +838,7 @@
 
 </style>
 <script src="lang.js?v=20260514-practicar"></script>
-<script src="lesson-phase-nav.js?v=20260531-match-lesson"></script>
+<script src="lesson-phase-nav.js?v=20260518-grammar"></script>
 <script src="calculator.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/algebrite@1.4.0/dist/algebrite.bundle-for-browser.js"></script>
 <script src="math-validation.js?v=20260518-ineq"></script>
@@ -919,7 +908,7 @@
     <div id="lesson-phase-root"></div>
   </div>
 <div id="practice-screen">
-  <div id="curriculum-breadcrumb" style="display:none;font-size:0.78rem;font-weight:600;color:var(--accent);background:var(--accent-bg);padding:5px 14px;border-radius:99px;margin-bottom:16px;text-align:center;"></div>
+  <div id="curriculum-breadcrumb" style="display:none;font-size:0.78rem;font-weight:600;color:var(--text-secondary);background:var(--card);border:1px solid var(--border);padding:5px 14px;border-radius:99px;margin-bottom:16px;text-align:center;"></div>
   <div class="student-header">
     <h1>Nuvo Studio ✏️</h1>
     <p>Work through each problem one step at a time.</p>
@@ -977,7 +966,7 @@
     <h4>📋 Ask Ronel about these</h4>
     <ul id="ask-ronel-items"></ul>
   </div>
-  <button id="back-to-curriculum-btn" onclick="backToCurriculum()" style="display:none;margin-top:24px;padding:14px 24px;background:var(--accent);color:white;border:none;border-radius:10px;font-family:var(--sans);font-size:1rem;font-weight:600;cursor:pointer;width:100%;">Back to curriculum</button>
+  <button id="back-to-curriculum-btn" onclick="backToCurriculum()" style="display:none;margin-top:24px;padding:14px 24px;background:var(--nuvo-action);color:white;border:none;border-radius:10px;font-family:var(--sans);font-size:1rem;font-weight:600;cursor:pointer;width:100%;">Back to curriculum</button>
 </div>
 
 <!-- ════════ UNIT TEST RESULTS ════════ -->
@@ -2394,6 +2383,6 @@
   checkTrialStatus();
 </script>
 
-<script src="nav.js?v=20260518-menu-fix"></script>
+<script src="nav.js?v=20260518-grammar"></script>
 </body>
 </html>

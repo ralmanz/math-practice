@@ -41,34 +41,34 @@
   -webkit-tap-highlight-color: transparent;
   transition: background 0.1s, transform 0.08s, border-color 0.1s;
 }
-.calc-btn:hover  { background: #EBEBEA; }
-.calc-btn:active { background: #DCDCDA; transform: scale(0.95); }
-.calc-btn.num { background: #F5F5F3; }
-.calc-btn.num:hover  { background: #EBEBEA; }
-.calc-btn.num:active { background: #DCDCDA; transform: scale(0.95); }
-.calc-btn.op { background: var(--accent-bg, #F0FAF3); color: var(--accent, #2D6A4F); border-color: var(--accent-light, #D8F3DC); }
-.calc-btn.op:hover  { background: #E3F7EB; }
-.calc-btn.op:active { background: #C8EDD5; transform: scale(0.95); }
-.calc-btn.var { background: #EEF2FF; color: #4338CA; border-color: #C7D2FE; }
-.calc-btn.var:hover  { background: #E2E8FF; }
-.calc-btn.var:active { background: #C7D2FE; transform: scale(0.95); }
-.calc-btn.special { background: #FFF8E7; color: #92680D; border-color: #F0D897; }
-.calc-btn.special:hover  { background: #FFF0CC; }
-.calc-btn.special:active { background: #F0D897; transform: scale(0.95); }
-.calc-btn.backspace { background: var(--wrong-bg, #FDE8E6); color: var(--wrong, #C1453B); border-color: #F5C6C3; font-size: 1.1rem; }
-.calc-btn.backspace:hover  { background: #FAD0CD; }
-.calc-btn.backspace:active { background: #F0ACAA; transform: scale(0.95); }
+.calc-btn:hover  { background: var(--nuvo-neutral-key-hover, #EBEBEA); }
+.calc-btn:active { background: var(--nuvo-neutral-key-active, #DCDCDA); transform: scale(0.95); }
+.calc-btn.num { background: var(--nuvo-neutral-key, #F5F5F3); }
+.calc-btn.num:hover  { background: var(--nuvo-neutral-key-hover, #EBEBEA); }
+.calc-btn.num:active { background: var(--nuvo-neutral-key-active, #DCDCDA); transform: scale(0.95); }
+.calc-btn.op { background: var(--nuvo-action-bg, #EFF6FF); color: var(--nuvo-action, #2563EB); border-color: var(--nuvo-action-light, #BFDBFE); }
+.calc-btn.op:hover  { background: var(--nuvo-action-light, #BFDBFE); }
+.calc-btn.op:active { background: var(--nuvo-action-light, #BFDBFE); transform: scale(0.95); }
+.calc-btn.var { background: var(--nuvo-neutral-key, #F5F5F3); color: var(--text, #1A1A1A); border-color: var(--border, #E8E8E4); }
+.calc-btn.var:hover  { background: var(--nuvo-neutral-key-hover, #EBEBEA); }
+.calc-btn.var:active { background: var(--nuvo-neutral-key-active, #DCDCDA); transform: scale(0.95); }
+.calc-btn.special { background: var(--nuvo-action-bg, #EFF6FF); color: var(--nuvo-action, #2563EB); border-color: var(--nuvo-action-light, #BFDBFE); }
+.calc-btn.special:hover  { background: var(--nuvo-action-light, #BFDBFE); }
+.calc-btn.special:active { background: var(--nuvo-action-light, #BFDBFE); transform: scale(0.95); }
+.calc-btn.backspace { background: var(--nuvo-destructive-bg, #FDE8E6); color: var(--nuvo-destructive, #C1453B); border-color: var(--nuvo-destructive-border, #F5C6C3); font-size: 1.1rem; }
+.calc-btn.backspace:hover  { background: var(--nuvo-destructive-bg, #FDE8E6); filter: brightness(0.97); }
+.calc-btn.backspace:active { background: var(--nuvo-destructive-bg, #FDE8E6); filter: brightness(0.94); transform: scale(0.95); }
 .calc-btn.submit {
-  background: var(--accent, #2D6A4F);
+  background: var(--nuvo-action, #2563EB);
   color: white;
-  border-color: var(--accent, #2D6A4F);
+  border-color: var(--nuvo-action, #2563EB);
   font-family: var(--sans, sans-serif);
   font-weight: 600;
   font-size: 0.95rem;
   letter-spacing: 0.01em;
 }
-.calc-btn.submit:hover  { background: #265E44; }
-.calc-btn.submit:active { background: #1E4D38; transform: scale(0.95); }
+.calc-btn.submit:hover  { background: var(--nuvo-action-dark, #1E40AF); border-color: var(--nuvo-action-dark, #1E40AF); }
+.calc-btn.submit:active { background: var(--nuvo-action-dark, #1E40AF); transform: scale(0.95); }
 .calc-toggles {
   display: flex;
   gap: 8px;
@@ -88,11 +88,11 @@
   -webkit-tap-highlight-color: transparent;
   user-select: none;
 }
-.toggle-btn:hover  { background: var(--accent-bg, #F0FAF3); border-color: var(--accent, #2D6A4F); color: var(--accent, #2D6A4F); }
-.toggle-btn:active { background: var(--accent-light, #D8F3DC); border-color: var(--accent, #2D6A4F); color: var(--accent, #2D6A4F); transform: scale(0.95); }
-.toggle-btn.active { background: var(--accent-bg, #F0FAF3); border-color: var(--accent, #2D6A4F); color: var(--accent, #2D6A4F); font-weight: 600; }
-.toggle-btn.active:hover  { background: #E3F7EB; }
-.toggle-btn.active:active { background: var(--accent-light, #D8F3DC); transform: scale(0.95); }
+.toggle-btn:hover  { background: var(--nuvo-action-bg, #EFF6FF); border-color: var(--nuvo-action, #2563EB); color: var(--nuvo-action, #2563EB); }
+.toggle-btn:active { background: var(--nuvo-action-light, #BFDBFE); border-color: var(--nuvo-action, #2563EB); color: var(--nuvo-action, #2563EB); transform: scale(0.95); }
+.toggle-btn.active { background: var(--nuvo-action-bg, #EFF6FF); border-color: var(--nuvo-action, #2563EB); color: var(--nuvo-action, #2563EB); font-weight: 600; }
+.toggle-btn.active:hover  { background: var(--nuvo-action-light, #BFDBFE); }
+.toggle-btn.active:active { background: var(--nuvo-action-light, #BFDBFE); transform: scale(0.95); }
 .calc-panel {
   display: none;
   background: #F2F2EF;

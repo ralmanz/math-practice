@@ -1,0 +1,47 @@
+/* Nuvo color grammar — single source for lesson + practice UI */
+:root {
+  --nuvo-action: #2563EB;
+  --nuvo-action-dark: #1E40AF;
+  --nuvo-action-light: #BFDBFE;
+  --nuvo-action-bg: #EFF6FF;
+
+  --nuvo-correct: #2D6A4F;
+  --nuvo-correct-light: #D8F3DC;
+  --nuvo-correct-bg: #F0FAF3;
+
+  --nuvo-keepgoing: #B45309;
+  --nuvo-keepgoing-bg: #FEF3C7;
+  --nuvo-keepgoing-border: #F5D06A;
+
+  --nuvo-wrong-text: #3D4F5F;
+  --nuvo-wrong-bg: #EDF1F5;
+
+  --nuvo-destructive: #C1453B;
+  --nuvo-destructive-bg: #FDE8E6;
+  --nuvo-destructive-border: #F5C6C3;
+
+  --nuvo-neutral-key: #F5F5F3;
+  --nuvo-neutral-key-hover: #EBEBEA;
+  --nuvo-neutral-key-active: #DCDCDA;
+
+  /* Legacy aliases → semantic roles (lesson.html / app.html) */
+  --accent: var(--nuvo-action);
+  --accent-light: var(--nuvo-action-light);
+  --accent-bg: var(--nuvo-action-bg);
+  --correct: var(--nuvo-correct);
+  --correct-bg: var(--nuvo-correct-light);
+  --feedback-wrong-bg: var(--nuvo-wrong-bg);
+  --feedback-wrong-text: var(--nuvo-wrong-text);
+  --amber: var(--nuvo-keepgoing);
+  --amber-bg: var(--nuvo-keepgoing-bg);
+  --nudge: var(--nuvo-keepgoing);
+  --nudge-bg: var(--nuvo-keepgoing-bg);
+  --unsure: var(--nuvo-keepgoing);
+  --unsure-bg: var(--nuvo-keepgoing-bg);
+  --wrong: var(--nuvo-destructive);
+  --wrong-bg: var(--nuvo-destructive-bg);
+  --teal: var(--nuvo-correct);
+  --teal-light: var(--nuvo-correct-light);
+  --blue: var(--nuvo-action-dark);
+  --blue-light: var(--nuvo-action-bg);
+}

@@ -7,6 +7,7 @@
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="nuvo-tokens.css?v=20260518-grammar">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=DM+Mono:wght@400;500&display=swap');
 
@@ -16,19 +17,6 @@
     --text: #1A1A1A;
     --text-secondary: #6B6B6B;
     --border: #E8E8E4;
-    --accent: #2D6A4F;
-    --accent-light: #D8F3DC;
-    --accent-bg: #F0FAF3;
-    --teal: #1D9E75;
-    --teal-light: #E6F7F2;
-    --wrong: #C1453B;
-    --wrong-bg: #FDE8E6;
-    --feedback-wrong-bg: #EDF1F5;
-    --feedback-wrong-text: #3D4F5F;
-    --amber: #B45309;
-    --amber-bg: #FEF3C7;
-    --blue: #1D4ED8;
-    --blue-light: #EFF6FF;
     --sans: 'DM Sans', sans-serif;
     --mono: 'DM Mono', monospace;
   }
@@ -219,7 +207,7 @@
     height: 16px;
     flex-shrink: 0;
     margin-top: 2px;
-    color: var(--teal);
+    color: var(--nuvo-correct);
   }
   /* Qué tipo de problemas verás */
   .cover-problems-list {
@@ -257,38 +245,6 @@
     color: var(--text-secondary);
     line-height: 1.5;
     margin: 0;
-  }
-
-  /* Intro phase — Nuvo Math blue (#2563EB) preview (phase 1 only) */
-  body.lesson-phase-intro .lesson-page {
-    --accent: #2563EB;
-    --accent-light: #BFDBFE;
-    --accent-bg: #EFF6FF;
-  }
-  body.lesson-phase-intro .lesson-page .main-btn--cta {
-    background: #2563EB;
-  }
-  body.lesson-phase-intro .lesson-page .cover-check-icon {
-    color: #2563EB;
-  }
-  body.lesson-phase-intro .lesson-page .cover-rule-inner {
-    background: #EFF6FF;
-    border-color: #BFDBFE;
-  }
-  body.lesson-phase-intro .lesson-page .cover-rule-title {
-    color: #1E40AF;
-  }
-  body.lesson-phase-intro .lesson-page .cover-rule-chip {
-    background: #DBEAFE;
-    border-color: #93C5FD;
-    color: #1D4ED8;
-  }
-  body.lesson-phase-intro .lesson-page .lesson-phase-step.is-done:not(.is-current) {
-    border-color: #BFDBFE;
-    background: #EFF6FF;
-  }
-  body.lesson-phase-intro .lesson-page .lesson-phase-step.is-current .lesson-phase-label {
-    color: #1D4ED8;
   }
 
   /* ── Cards ── */
@@ -347,13 +303,14 @@
     font-size: 1.2rem;
     font-weight: 500;
     padding: 16px;
-    background: var(--accent-bg);
-    border: 1.5px solid var(--accent-light);
+    background: var(--card);
+    border: 1.5px solid var(--border);
     border-radius: 10px;
     margin-bottom: 10px;
     min-height: 56px;
     display: flex;
     align-items: center;
+    color: var(--text);
     transition: background 0.2s;
     word-break: break-all;
   }
@@ -361,7 +318,7 @@
   .annotation-box {
     font-size: 0.82rem;
     font-weight: 600;
-    color: var(--accent);
+    color: var(--text-secondary);
     margin-bottom: 10px;
     min-height: 1.2em;
   }
@@ -395,8 +352,8 @@
     flex-shrink: 0;
   }
 
-  .step-dot.active { background: var(--accent); }
-  .step-dot.done   { background: var(--accent-light); }
+  .step-dot.active { background: var(--nuvo-action); }
+  .step-dot.done   { background: var(--nuvo-correct); }
 
   /* ── Tabs ── */
   .tab-row {
@@ -471,8 +428,8 @@
   .formula-pill {
     font-family: var(--mono);
     color: var(--text);
-    background: var(--accent-bg);
-    border: 1.5px solid var(--accent-light);
+    background: var(--card);
+    border: 1.5px solid var(--border);
     border-radius: 10px;
     padding: 10px 12px;
   }
@@ -488,9 +445,9 @@
   .visual-term-chip {
     font-family: var(--mono);
     font-weight: 600;
-    color: var(--accent);
-    background: var(--accent-bg);
-    border: 1.5px solid var(--accent-light);
+    color: var(--text);
+    background: var(--card);
+    border: 1.5px solid var(--border);
     border-radius: 999px;
     padding: 8px 12px;
   }
@@ -796,7 +753,7 @@
     margin-top: 4px;
   }
 
-  .balance-status.balanced { color: var(--accent); font-weight: 600; }
+  .balance-status.balanced { color: var(--nuvo-correct); font-weight: 600; }
   .balance-status.unbalanced { color: var(--amber); font-weight: 600; }
 
   .balance-operation {
@@ -984,7 +941,7 @@
     border: 1.5px solid var(--accent);
   }
 
-  .main-btn--cta { background: #0F6E56; }
+  .main-btn--cta { background: var(--nuvo-action); }
 
   /* ── Result cards ── */
   .result-card {
@@ -999,10 +956,10 @@
   .result-card p  { font-size: 0.9rem; line-height: 1.55; margin-bottom: 20px; }
 
   .result-card.pass {
-    background: var(--accent-bg);
-    border: 1.5px solid var(--accent-light);
+    background: var(--nuvo-correct-bg);
+    border: 1.5px solid var(--nuvo-correct-light);
   }
-  .result-card.pass h2, .result-card.pass p { color: var(--accent); }
+  .result-card.pass h2, .result-card.pass p { color: var(--nuvo-correct); }
 
   .result-card.fail {
     background: var(--amber-bg);
@@ -1023,7 +980,7 @@
     transition: opacity 0.15s;
   }
   .result-btn:hover { opacity: 0.85; }
-  .result-btn.primary { background: var(--accent); color: white; }
+  .result-btn.primary { background: var(--nuvo-action); color: white; }
   .result-btn.secondary { background: var(--amber); color: white; }
 
   /* ── Score display ── */
@@ -1107,8 +1064,8 @@
     flex-shrink: 0;
     transition: background 0.25s;
   }
-  .subtopic-dot.active { background: var(--accent); }
-  .subtopic-dot.done   { background: var(--teal); }
+  .subtopic-dot.active { background: var(--nuvo-action); }
+  .subtopic-dot.done   { background: var(--nuvo-correct); }
 
   @media (max-width: 500px) {
     body { padding: 0; }
@@ -1137,12 +1094,12 @@
 
   .st-completed-row {
     display: flex; align-items: center; gap: 10px;
-    padding: 12px 16px; background: var(--teal-light);
-    border: 1.5px solid var(--teal); border-radius: 12px;
+    padding: 12px 16px; background: var(--nuvo-correct-light);
+    border: 1.5px solid var(--nuvo-correct); border-radius: 12px;
     margin-bottom: 8px; animation: slideIn 0.3s ease;
   }
-  .st-completed-icon { color: var(--teal); font-size: 1.1rem; flex-shrink: 0; }
-  .st-completed-title { font-weight: 600; color: var(--teal); font-size: 0.92rem; }
+  .st-completed-icon { color: var(--nuvo-correct); font-size: 1.1rem; flex-shrink: 0; }
+  .st-completed-title { font-weight: 600; color: var(--nuvo-correct); font-size: 0.92rem; }
 
   .st-example-btn {
     display: inline-block; background: transparent;
@@ -1153,7 +1110,7 @@
     transition: background 0.15s, border-color 0.15s, color 0.15s;
   }
   .st-example-btn:hover {
-    background: var(--accent-bg); border-color: var(--accent-light); color: var(--accent);
+    background: var(--nuvo-action-bg); border-color: var(--nuvo-action-light); color: var(--nuvo-action);
   }
 
   .st-problem-card {
@@ -1182,9 +1139,9 @@
     cursor: pointer; width: 100%;
     transition: background 0.15s, border-color 0.15s;
   }
-  .st-mcq-opt:hover:not([disabled]) { background: var(--accent-bg); border-color: var(--accent-light); }
-  .st-mcq-correct { background: var(--teal-light) !important; border-color: var(--teal) !important; color: var(--teal) !important; }
-  .st-mcq-wrong   { background: var(--wrong-bg)   !important; border-color: var(--wrong)  !important; color: var(--wrong)  !important; }
+  .st-mcq-opt:hover:not([disabled]) { background: var(--bg); border-color: var(--border); }
+  .st-mcq-correct { background: var(--nuvo-correct-light) !important; border-color: var(--nuvo-correct) !important; color: var(--nuvo-correct) !important; }
+  .st-mcq-wrong   { background: var(--nuvo-wrong-bg) !important; border-color: var(--border) !important; color: var(--nuvo-wrong-text) !important; }
 
   .st-open-row { display: flex; gap: 8px; margin-bottom: 12px; }
   .st-open-input {
@@ -1203,22 +1160,22 @@
   .st-submit-btn:hover { opacity: 0.9; }
 
   .st-feedback { padding: 10px 14px; border-radius: 10px; margin-bottom: 12px; font-size: 0.88rem; line-height: 1.5; animation: slideIn 0.25s ease; }
-  .st-feedback-correct { background: var(--teal-light); border: 1.5px solid var(--teal); color: var(--teal); }
-  .st-feedback-wrong   { background: var(--feedback-wrong-bg); border: 1.5px solid var(--border); color: var(--feedback-wrong-text); }
+  .st-feedback-correct { background: var(--nuvo-correct-light); border: 1.5px solid var(--nuvo-correct); color: var(--nuvo-correct); }
+  .st-feedback-wrong   { background: var(--nuvo-wrong-bg); border: 1.5px solid var(--border); color: var(--nuvo-wrong-text); }
 
   .st-completion-card {
-    background: var(--accent-bg); border: 1.5px solid var(--accent-light);
+    background: var(--nuvo-correct-bg); border: 1.5px solid var(--nuvo-correct-light);
     border-radius: 14px; padding: 28px; text-align: center; margin-top: 24px;
     animation: slideIn 0.3s ease;
   }
-  .st-completion-card h2 { font-size: 1.2rem; font-weight: 700; color: var(--accent); margin-bottom: 8px; }
+  .st-completion-card h2 { font-size: 1.2rem; font-weight: 700; color: var(--nuvo-correct); margin-bottom: 8px; }
   .st-summary-list { list-style: none; text-align: left; margin: 16px 0; }
   .st-summary-list li {
     display: flex; align-items: center; gap: 10px;
-    padding: 8px 0; border-bottom: 1px solid var(--accent-light); font-size: 0.9rem;
+    padding: 8px 0; border-bottom: 1px solid var(--nuvo-correct-light); font-size: 0.9rem;
   }
   .st-summary-list li:last-child { border-bottom: none; }
-  .st-check { color: var(--teal); font-weight: 700; flex-shrink: 0; }
+  .st-check { color: var(--nuvo-correct); font-weight: 700; flex-shrink: 0; }
 
   /* ── Walkthrough board ────────────────────────────────────── */
   .walkthrough-board {
@@ -1295,6 +1252,12 @@
     margin-left: auto;
     font-size: 0.72rem;
     padding: 4px 10px;
+    color: var(--nuvo-action);
+    border-color: var(--nuvo-action-light);
+  }
+  .wt-rule-toggle:hover {
+    background: var(--nuvo-action-bg);
+    border-color: var(--nuvo-action);
   }
   .wt-rule-full-panel {
     display: none;
@@ -1575,20 +1538,20 @@
   .blu { color: #1D4ED8; font-weight: 700; }
   .amb { color: #B45309; font-weight: 700; }
   .wt-q-bubble {
-    border: 1.5px solid var(--teal);
+    border: 1.5px solid var(--nuvo-action-light);
     border-radius: 10px;
     padding: 9px;
-    background: var(--teal-light);
+    background: var(--nuvo-action-bg);
     animation: wt-in 0.4s ease forwards;
     margin-top: 4px;
   }
-  .wt-q-text { font-size: 0.79rem; font-weight: 600; color: var(--teal); margin-bottom: 3px; font-family: var(--sans); }
-  .wt-q-hint { font-size: 0.72rem; color: var(--text-secondary); margin-bottom: 6px; font-family: var(--sans); }
+  .wt-q-text { font-size: 0.79rem; font-weight: 600; color: var(--nuvo-action); margin-bottom: 3px; font-family: var(--sans); }
+  .wt-q-hint { font-size: 0.72rem; color: var(--nuvo-keepgoing); margin-bottom: 6px; font-family: var(--sans); }
   .wt-q-row  { display: flex; gap: 5px; }
   .wt-q-input {
     flex: 1; min-width: 0;
     padding: 5px 7px;
-    border: 1.5px solid var(--teal);
+    border: 1.5px solid var(--nuvo-action-light);
     border-radius: 7px;
     font-family: var(--mono);
     font-size: 0.85rem;
@@ -1596,8 +1559,8 @@
     outline: none;
     transition: border-color 0.2s;
   }
-  .wt-q-input:focus { border-color: var(--accent); }
-  .wt-q-input.wrong { border-color: var(--wrong); animation: wt-shake 0.3s ease; }
+  .wt-q-input:focus { border-color: var(--nuvo-action); }
+  .wt-q-input.wrong { border-color: var(--border); animation: wt-shake 0.3s ease; }
   @keyframes wt-shake {
     0%,100% { transform: translateX(0); }
     25%      { transform: translateX(-3px); }
@@ -1605,7 +1568,7 @@
   }
   .wt-q-btn {
     padding: 5px 9px;
-    background: var(--teal); color: white;
+    background: var(--nuvo-action); color: white;
     border: none; border-radius: 7px;
     font-family: var(--sans); font-size: 0.79rem; font-weight: 600;
     cursor: pointer; white-space: nowrap;
@@ -1623,7 +1586,7 @@
   .wt-writing-dots { display: inline-flex; gap: 3px; align-items: center; }
   .wt-writing-dots span {
     width: 4px; height: 4px; border-radius: 50%;
-    background: var(--accent);
+    background: var(--nuvo-action);
     animation: wt-dots-anim 1.2s ease-in-out infinite;
   }
   .wt-writing-dots span:nth-child(2) { animation-delay: 0.2s; }
@@ -1633,12 +1596,12 @@
   }
   .wt-wait-dot {
     width: 8px; height: 8px; border-radius: 50%;
-    background: var(--amber);
+    background: var(--nuvo-keepgoing);
     animation: wt-pulse-anim 1s ease-in-out infinite;
     flex-shrink: 0;
   }
   .wt-progress-bar  { flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
-  .wt-progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.4s ease; }
+  .wt-progress-fill { height: 100%; background: var(--nuvo-action); border-radius: 2px; transition: width 0.4s ease; }
   .wt-note { margin-bottom: 6px; border-radius: 8px; padding: 8px 10px; }
   .wt-note-label { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; font-family: var(--sans); }
   .wt-note-rule { background: #EEEDFE; border-left: 2px solid #534AB7; }
@@ -1711,7 +1674,7 @@
   .wt-note-ds-active { outline: 2px solid currentColor; outline-offset: 1px; }
   .wt-scrubber { display: flex; gap: 3px; padding: 10px 14px; background: var(--wt-header-bg); border-top: 1px solid var(--wt-border); border-radius: 0 0 12px 12px; }
   .wt-scrub-seg { flex: 1; height: 3px; border-radius: 2px; cursor: pointer; background: var(--wt-border); transition: background 0.2s; }
-  .wt-scrub-seg.done   { background: #1D9E75; }
+  .wt-scrub-seg.done   { background: var(--nuvo-correct); }
   .wt-scrub-seg.active { background: #534AB7; }
   .wt-rail-marker {
     width: 20px; height: 20px; border-radius: 50%;
@@ -1764,7 +1727,7 @@
 </div>
 
 <script src="lang.js?v=20260514-concept-nav"></script>
-<script src="lesson-phase-nav.js?v=20260531-match-lesson"></script>
+<script src="lesson-phase-nav.js?v=20260518-grammar"></script>
 <script src="calculator.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/algebrite@1.4.0/dist/algebrite.bundle-for-browser.js"></script>
 <script>
@@ -2906,8 +2869,8 @@
     const isLast = (idx === subs.length - 1);
     const btnLabel = isLast ? '¡Listo! Ver resumen →' : 'Siguiente tema →';
     area.innerHTML = `
-      <div class="st-problem-card" style="background:var(--teal-light);border-color:var(--teal);text-align:center">
-        <div style="color:var(--teal);font-weight:700;margin-bottom:10px">¡Bien hecho! Tema completado ✓</div>
+      <div class="st-problem-card" style="background:var(--nuvo-correct-light);border-color:var(--nuvo-correct);text-align:center">
+        <div style="color:var(--nuvo-correct);font-weight:700;margin-bottom:10px">¡Bien hecho! Tema completado ✓</div>
         <button class="main-btn" style="margin:0 auto;display:inline-block" onclick="collapseStSubtopic(${idx})">${btnLabel}</button>
       </div>
     `;
@@ -3763,6 +3726,6 @@
 
   init();
 </script>
-<script src="nav.js?v=20260518-menu-fix"></script>
+<script src="nav.js?v=20260518-grammar"></script>
 </body>
 </html>

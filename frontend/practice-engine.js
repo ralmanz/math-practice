@@ -11,16 +11,14 @@
   // ── Injected styles ────────────────────────────────────────────────────────
   const PE_CSS = `
   .pe-wrap {
-    --pe-correct:    #2D6A4F;
-    --pe-correct-bg: #D8F3DC;
-    --pe-wrong:      #C1453B;
-    --pe-wrong-bg:   #FDE8E6;
-    --pe-feedback-wrong-bg:   #EDF1F5;
-    --pe-feedback-wrong-text: #3D4F5F;
-    --pe-nudge:      #B8860B;
-    --pe-nudge-bg:   #FFF8E7;
-    --pe-unsure:     #5A6B7A;
-    --pe-unsure-bg:  #EDF1F5;
+    --pe-correct:    var(--nuvo-correct, #2D6A4F);
+    --pe-correct-bg: var(--nuvo-correct-light, #D8F3DC);
+    --pe-feedback-wrong-bg:   var(--nuvo-wrong-bg, #EDF1F5);
+    --pe-feedback-wrong-text: var(--nuvo-wrong-text, #3D4F5F);
+    --pe-nudge:      var(--nuvo-keepgoing, #B45309);
+    --pe-nudge-bg:   var(--nuvo-keepgoing-bg, #FEF3C7);
+    --pe-unsure:     var(--nuvo-keepgoing, #B45309);
+    --pe-unsure-bg:  var(--nuvo-keepgoing-bg, #FEF3C7);
   }
   @keyframes peSlideIn {
     from { opacity: 0; transform: translateY(6px); }
@@ -35,7 +33,7 @@
     flex: 1; height: 6px; background: var(--border, #E8E8E4); border-radius: 3px; overflow: hidden;
   }
   .pe-progress-fill {
-    height: 100%; background: var(--accent, #2D6A4F); border-radius: 3px;
+    height: 100%; background: var(--nuvo-action, #2563EB); border-radius: 3px;
     transition: width 0.4s ease; width: 0%;
   }
   .pe-progress-text {
@@ -43,7 +41,7 @@
   }
   .pe-test-notice {
     background: var(--pe-nudge-bg); color: var(--pe-nudge);
-    border: 1.5px solid #F5D06A; border-radius: 10px;
+    border: 1.5px solid var(--nuvo-keepgoing-border, #F5D06A); border-radius: 10px;
     padding: 10px 14px; font-size: 0.88rem; font-weight: 600;
     margin-bottom: 20px; text-align: center;
     animation: peSlideIn 0.25s ease;
@@ -55,7 +53,7 @@
   }
   .pe-wrap .problem-label {
     font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
-    letter-spacing: 0.06em; color: var(--accent, #2D6A4F); margin-bottom: 10px;
+    letter-spacing: 0.06em; color: var(--text-secondary, #6B6B6B); margin-bottom: 10px;
   }
   .pe-wrap .problem-text {
     font-family: var(--mono, monospace); font-size: 1.15rem;
@@ -66,15 +64,15 @@
     margin-top: 16px;
     padding: 12px 14px;
     border-radius: 10px;
-    border: 1.5px solid var(--accent-light, #D8F3DC);
-    background: var(--accent-bg, #F0FAF3);
+    border: 1.5px solid var(--border, #E8E8E4);
+    background: var(--card, #FFFFFF);
   }
   .pe-wrap .problem-work-label {
     font-size: 0.65rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: var(--accent, #2D6A4F);
+    color: var(--text-secondary, #6B6B6B);
     margin-bottom: 6px;
   }
   .pe-wrap .problem-work-expression {
@@ -100,7 +98,8 @@
   .pe-wrap .feedback.nudge  { background: var(--pe-nudge-bg);  color: var(--pe-nudge);  display: block; }
   .pe-wrap .feedback.unsure { background: var(--pe-unsure-bg); color: var(--pe-unsure); display: block; }
   .pe-wrap .feedback.reveal {
-    background: var(--accent-bg, #F0FAF3); color: var(--accent, #2D6A4F);
+    background: var(--nuvo-keepgoing-bg, #FEF3C7); color: var(--nuvo-keepgoing, #B45309);
+    border: 1px solid var(--nuvo-keepgoing-border, #F5D06A);
     display: block; font-family: var(--mono, monospace);
   }
   .pe-input-area { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
@@ -110,11 +109,11 @@
     background: var(--card, #FFFFFF); color: var(--text, #1A1A1A);
     outline: none; transition: border-color 0.2s; box-sizing: border-box;
   }
-  .pe-step-input:focus { border-color: var(--accent, #2D6A4F); }
+  .pe-step-input:focus { border-color: var(--nuvo-action, #2563EB); }
   .pe-wrap .math-preview {
     display: none; font-family: var(--mono, monospace); font-size: 1.05rem;
-    padding: 10px 14px; background: var(--accent-bg, #F0FAF3);
-    border: 1.5px solid var(--accent-light, #D8F3DC); border-radius: 10px;
+    padding: 10px 14px; background: var(--card, #FFFFFF);
+    border: 1.5px solid var(--border, #E8E8E4); border-radius: 10px;
     line-height: 2.2; color: var(--text, #1A1A1A); min-height: 48px;
   }
   .pe-wrap .math-preview.visible { display: block; }
@@ -130,7 +129,7 @@
   .pe-wrap .loading-indicator.show { display: flex; }
   .pe-wrap .spinner {
     width: 16px; height: 16px; border: 2px solid var(--border, #E8E8E4);
-    border-top-color: var(--accent, #2D6A4F); border-radius: 50%;
+    border-top-color: var(--nuvo-action, #2563EB); border-radius: 50%;
     animation: peSpin 0.7s linear infinite; flex-shrink: 0;
   }
   .pe-wrap .completed-card {
@@ -142,7 +141,7 @@
   .pe-wrap .completed-card h3 { color: var(--pe-correct); font-size: 1.1rem; margin-bottom: 4px; }
   .pe-wrap .completed-card p  { color: var(--pe-correct); font-size: 0.88rem; opacity: 0.8; }
   .pe-next-btn {
-    width: 100%; padding: 14px; background: var(--accent, #2D6A4F); color: white;
+    width: 100%; padding: 14px; background: var(--nuvo-action, #2563EB); color: white;
     border: none; border-radius: 10px; font-family: var(--sans, sans-serif);
     font-weight: 600; font-size: 1rem; cursor: pointer; transition: opacity 0.2s;
   }
@@ -159,18 +158,18 @@
     cursor: pointer; transition: background 0.15s, border-color 0.15s;
     display: flex; align-items: center; gap: 10px;
   }
-  .pe-mcq-btn:hover:not(:disabled) { border-color: var(--accent, #2D6A4F); background: var(--accent-bg, #F0FAF3); }
+  .pe-mcq-btn:hover:not(:disabled) { border-color: var(--border, #E8E8E4); background: var(--bg, #FAFAF8); }
   .pe-mcq-btn:disabled { opacity: 0.6; cursor: not-allowed; }
   .pe-mcq-btn.pe-mcq-correct { background: var(--pe-correct-bg); border-color: var(--pe-correct); color: var(--pe-correct); }
-  .pe-mcq-btn.pe-mcq-wrong   { background: var(--pe-wrong-bg);   border-color: var(--pe-wrong);   color: var(--pe-wrong); }
+  .pe-mcq-btn.pe-mcq-wrong   { background: var(--pe-feedback-wrong-bg); border-color: var(--border, #E8E8E4); color: var(--pe-feedback-wrong-text); }
   .pe-mcq-letter {
     display: inline-flex; align-items: center; justify-content: center;
     width: 24px; height: 24px; border-radius: 50%;
-    background: var(--accent-bg, #F0FAF3); color: var(--accent, #2D6A4F);
+    background: var(--bg, #FAFAF8); color: var(--text-secondary, #6B6B6B);
     font-size: 0.8rem; font-weight: 700; flex-shrink: 0;
   }
   .pe-mcq-btn.pe-mcq-correct .pe-mcq-letter { background: var(--pe-correct); color: white; }
-  .pe-mcq-btn.pe-mcq-wrong   .pe-mcq-letter { background: var(--pe-wrong);   color: white; }
+  .pe-mcq-btn.pe-mcq-wrong   .pe-mcq-letter { background: var(--pe-feedback-wrong-text); color: white; }
   @media (max-width: 500px) {
     .pe-wrap .problem-card { padding: 20px; }
     .pe-wrap .problem-text { font-size: 1rem; }
