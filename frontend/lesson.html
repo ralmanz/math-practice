@@ -1276,12 +1276,64 @@
     flex-direction: column;
     justify-content: center;
   }
-  /* Cálculos: compact fixed-height scratchpad, overrides the shared rule above */
-  .col-calc .wt-col-content {
-    flex: 0 0 auto;
-    max-height: 8rem;
+  /* Cálculos: horizontal filmstrip viewport (replaces vertical scratchpad) */
+  .col-calc .wt-col-content#wt-col-calc {
+    flex: 1 1 auto;
+    max-height: none;
     display: block;
-    /* overflow-y: auto already set by .wt-col-content base rule */
+    overflow: hidden;
+    padding: 0;
+    justify-content: flex-start;
+  }
+  .wt-calc-track {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    min-height: 100%;
+    padding: 16px 0 18px;
+    transition: transform 0.85s cubic-bezier(0.33, 0, 0.2, 1);
+    will-change: transform;
+  }
+  .wt-calc-card {
+    flex: 0 0 72%;
+    width: 72%;
+    max-width: 72%;
+    box-sizing: border-box;
+    margin: 0 14%;
+    padding: 12px 14px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-family: var(--mono);
+    font-size: 0.79rem;
+    line-height: 1.5;
+    opacity: 0;
+    transform: scale(0.94);
+    transition: opacity 0.85s cubic-bezier(0.33, 0, 0.2, 1),
+                transform 0.85s cubic-bezier(0.33, 0, 0.2, 1);
+    pointer-events: none;
+  }
+  .wt-calc-card.is-past {
+    opacity: 0;
+    transform: scale(0.9) translateX(-12%);
+    pointer-events: none;
+  }
+  .wt-calc-card.is-ghost {
+    opacity: 0.26;
+    transform: scale(0.96);
+    pointer-events: none;
+  }
+  .wt-calc-card.is-current {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+    z-index: 1;
+  }
+  .wt-calc-card .calc-line,
+  .wt-calc-card .calc-sep { animation: wt-in 0.4s ease forwards; }
+  .wt-calc-card .wt-q-bubble {
+    margin-top: 0;
+    animation: wt-in 0.4s ease forwards;
   }
   .wt-grid-svg {
     position: absolute; top: 0; left: 0;
@@ -2690,7 +2742,7 @@
           <div class="wt-col col-calc">
             ${gridSvg('calc')}
             <div class="wt-col-label">c&aacute;lculos</div>
-            <div class="wt-col-content" id="wt-col-calc"></div>
+            <div class="wt-col-content" id="wt-col-calc"><div class="wt-calc-track" id="wt-calc-track"></div></div>
           </div>
         </div>
         <div class="wt-bottombar">
@@ -2847,28 +2899,74 @@
       });
     }
 
-    // ── Cálculos scratchpad: opacity fade + auto-scroll ────────
-    function _calcDidUpdate() {
-      var el = document.getElementById('wt-col-calc');
-      if (!el) return;
-      var ch = el.children;
-      var n = ch.length;
-      for (var i = 0; i < n; i++) {
-        var d = n - 1 - i; // 0 = newest (last child), grows toward oldest
-        ch[i].style.opacity = d === 0 ? 1 : d === 1 ? 0.6 : d === 2 ? 0.35 : 0.18;
-      }
-      el.scrollTop = el.scrollHeight;
+    // ── Cálculos filmstrip (one card per step index) ─────────────
+    function _calcTrack() {
+      return document.getElementById('wt-calc-track');
     }
 
-    function _appendWrite(step) {
+    function _calcCardForStep(stepIdx) {
+      var track = _calcTrack();
+      if (!track) return null;
+      return track.querySelector('.wt-calc-card[data-step-idx="' + stepIdx + '"]');
+    }
+
+    function _calcFilmstripFocus(stepIdx) {
+      var viewport = document.getElementById('wt-col-calc');
+      var track = _calcTrack();
+      if (!viewport || !track) return;
+      var cards = track.querySelectorAll('.wt-calc-card');
+      cards.forEach(function (card) {
+        var si = parseInt(card.dataset.stepIdx, 10);
+        card.classList.remove('is-current', 'is-ghost', 'is-past');
+        if (si < stepIdx - 1) card.classList.add('is-past');
+        else if (si === stepIdx - 1) card.classList.add('is-ghost');
+        else if (si === stepIdx) card.classList.add('is-current');
+        else card.classList.add('is-past');
+      });
+      var current = _calcCardForStep(stepIdx);
+      if (!current) return;
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          var vpW = viewport.clientWidth;
+          var cardL = current.offsetLeft;
+          var cardW = current.offsetWidth;
+          var offset = cardL + cardW / 2 - vpW / 2;
+          track.style.transform = 'translateX(' + (-offset) + 'px)';
+        });
+      });
+    }
+
+    function _calcAppendCard(stepIdx, innerHTML, kind) {
+      if (_calcCardForStep(stepIdx)) return _calcCardForStep(stepIdx);
+      var track = _calcTrack();
+      if (!track) return null;
+      var card = document.createElement('div');
+      card.className = 'wt-calc-card';
+      card.dataset.stepIdx = String(stepIdx);
+      card.dataset.kind = kind || 'write';
+      if (innerHTML) card.innerHTML = innerHTML;
+      track.appendChild(card);
+      _calcFilmstripFocus(stepIdx);
+      return card;
+    }
+
+    function _calcResolveQuestionCard(stepIdx, html) {
+      var card = _calcCardForStep(stepIdx);
+      if (!card) return;
+      card.dataset.kind = 'resolved';
+      card.innerHTML = html;
+      _calcFilmstripFocus(stepIdx);
+    }
+
+    function _appendWrite(step, replayStepIdx) {
       const col = document.getElementById('wt-col-' + step.col);
       if (!col) return;
       if (step.col === 'theory') {
         const notes = document.getElementById('wt-notes');
         if (notes && step.html && !step.note) notes.insertAdjacentHTML('beforeend', step.html);
       } else if (step.col === 'calc') {
-        col.insertAdjacentHTML('beforeend', step.html);
-        _calcDidUpdate();
+        var calcIdx = replayStepIdx != null ? replayStepIdx : _s.idx;
+        _calcAppendCard(calcIdx, step.html, 'write');
       } else if (step.col === 'prob') {
         const existing = col.querySelectorAll('.prob-line');
         existing.forEach(function(el) { el.classList.add('dimmed'); el.classList.remove('final'); });
@@ -2881,13 +2979,11 @@
       }
     }
 
-    function _appendQuestion(step) {
-      const col = document.getElementById('wt-col-calc');
-      if (!col) return;
-      const bub = document.createElement('div');
-      bub.id = 'wt-qbub';
-      bub.className = 'wt-q-bubble';
-      bub.innerHTML =
+    function _appendQuestion(step, replayStepIdx) {
+      var qIdx = replayStepIdx != null ? replayStepIdx : _s.idx;
+      if (_calcCardForStep(qIdx)) return;
+      var card = _calcAppendCard(qIdx,
+        '<div class="wt-q-bubble" id="wt-qbub">' +
         '<div class="wt-q-text">' + escHtml(step.question) + '</div>' +
         '<div class="wt-q-hint">' + escHtml(step.hint) + '</div>' +
         '<div class="wt-q-row">' +
@@ -2895,9 +2991,10 @@
         ' onkeydown="if(event.key===\'Enter\')wtSubmitAnswer()">' +
         '<button class="wt-q-btn" onclick="wtSubmitAnswer()">Listo</button>' +
         '</div>' +
-        '<div class="wt-q-trytext" id="wt-qtry"></div>';
-      col.appendChild(bub);
-      _calcDidUpdate();
+        '<div class="wt-q-trytext" id="wt-qtry"></div>' +
+        '</div>',
+        'question');
+      if (!card) return;
       setTimeout(function() { const inp = document.getElementById('wt-qinp'); if (inp) inp.focus(); }, 100);
     }
 
@@ -2966,7 +3063,8 @@
       _s.paused = !_s.paused;
       const btn = document.getElementById('wt-pause-btn');
       if (btn) btn.textContent = _s.paused ? '\u25B6 Reanudar' : '&#9208; Pausar';
-      if (!_s.paused) _resume();
+      if (_s.paused) _clearContinueTimer();
+      else _resume();
     };
 
     window.wtRestart = function() {
@@ -2974,9 +3072,13 @@
       _s.idx = 0; _s.paused = false; _s.waiting = false; _s.tries = 0; _s.timer = null;
       const theoryEl = document.getElementById('wt-col-theory');
       if (theoryEl) theoryEl.innerHTML = '<div class="wt-col-label">TEOR\u00CDA</div><div class="wt-col-content" id="wt-notes"></div>';
-      ['wt-col-prob', 'wt-col-calc'].forEach(function(id) {
-        const el = document.getElementById(id); if (el) el.innerHTML = '';
-      });
+      const probEl = document.getElementById('wt-col-prob');
+      if (probEl) probEl.innerHTML = '';
+      var calcTrack = _calcTrack();
+      if (calcTrack) {
+        calcTrack.innerHTML = '';
+        calcTrack.style.transform = '';
+      }
       const btn = document.getElementById('wt-pause-btn');
       if (btn) btn.textContent = '\u23F8 Pausar';
       _setStatus('writing');
@@ -2988,19 +3090,25 @@
     function _jumpTo(targetIdx) {
       const theoryEl = document.getElementById('wt-col-theory');
       if (theoryEl) theoryEl.innerHTML = '<div class="wt-col-label">TEOR\u00CDA</div><div class="wt-col-content" id="wt-notes"></div>';
-      ['wt-col-prob', 'wt-col-calc'].forEach(function(id) {
-        const el = document.getElementById(id); if (el) el.innerHTML = '';
-      });
+      const probEl = document.getElementById('wt-col-prob');
+      if (probEl) probEl.innerHTML = '';
+      var calcTrack = _calcTrack();
+      if (calcTrack) {
+        calcTrack.innerHTML = '';
+        calcTrack.style.transform = '';
+      }
       _clearContinueTimer();
+      var lastCalcIdx = null;
       for (var i = 0; i < targetIdx; i++) {
         var step = steps[i];
         if (step.type === 'write') {
-          _appendWrite(step);
+          if (step.col === 'calc') lastCalcIdx = i;
+          _appendWrite(step, i);
           renderNote(step.note, true);
         }
         if (step.type === 'question') {
-          var calcCol = document.getElementById('wt-col-calc');
-          if (calcCol) calcCol.insertAdjacentHTML('beforeend', '<div class="calc-line">' + step.correct + '</div>');
+          _calcResolveQuestionCard(i, '<div class="calc-line">' + step.correct + '</div>');
+          lastCalcIdx = i;
           markDiagramStepDone();
         }
       }
@@ -3008,7 +3116,9 @@
       _s.paused = false;
       _s.waiting = false;
       _s.tries = 0;
-      _calcDidUpdate(); // scroll to & highlight newest calc entry after replay
+      var targetStep = steps[targetIdx];
+      var targetIsCalc = targetStep && targetStep.col === 'calc';
+      if (lastCalcIdx != null && !targetIsCalc) _calcFilmstripFocus(lastCalcIdx);
       _updateBar();
       scheduleSyncRailMarkers();
       _resume();
@@ -3042,24 +3152,18 @@
         } catch(e) {}
       }
       _s.tries++;
-      const col = document.getElementById('wt-col-calc');
+      var qStepIdx = _s.idx - 1;
       if (correct) {
         inp.disabled = true;
-        const bub = document.getElementById('wt-qbub');
-        if (bub) bub.remove();
-        if (col) col.insertAdjacentHTML('beforeend', '<div class="calc-line">' + step.correct + '</div>');
-        if (col) _calcDidUpdate();
+        _calcResolveQuestionCard(qStepIdx, '<div class="calc-line">' + step.correct + '</div>');
         markDiagramStepDone();
         _s.waiting = false;
         _setStatus('writing');
         _scheduleContinue(1200);
       } else if (_s.tries >= 2) {
         inp.disabled = true;
-        const bub = document.getElementById('wt-qbub');
-        if (bub) bub.remove();
-        if (col) col.insertAdjacentHTML('beforeend',
+        _calcResolveQuestionCard(qStepIdx,
           '<div class="calc-line" style="color:var(--text-secondary)">' + step.wrong + '</div>');
-        if (col) _calcDidUpdate();
         markDiagramStepDone();
         _s.waiting = false;
         _setStatus('writing');
