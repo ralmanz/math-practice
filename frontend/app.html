@@ -59,6 +59,16 @@
     box-sizing: border-box;
   }
 
+  /* Phase bar must scroll away on practice (same as lesson.html) */
+  #lesson-page .lesson-topnav,
+  #lesson-page .lesson-phase-shell,
+  #lesson-page .lesson-phase-nav,
+  #lesson-page .lesson-phase-step {
+    position: static !important;
+    top: auto !important;
+    z-index: auto !important;
+  }
+
   /* ── Setup Screen (Teacher Mode) ── */
   #setup-screen {
     max-width: 640px;
@@ -1028,6 +1038,12 @@
     const page = document.getElementById('lesson-page');
     const practice = document.getElementById('practice-screen');
     if (!page) return;
+
+    if (window.LessonPhaseNav && LessonPhaseNav.injectStyles) {
+      var stale = document.getElementById('lesson-phase-nav-css');
+      if (stale) stale.remove();
+      LessonPhaseNav.injectStyles();
+    }
 
     page.style.display = 'block';
     if (practice) practice.classList.add('curriculum-practice');
