@@ -1335,6 +1335,29 @@
     margin-top: 0;
     animation: wt-in 0.4s ease forwards;
   }
+  .wt-calc-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 6px;
+    width: 100%;
+  }
+  .wt-calc-nav {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .wt-calc-nav-btn {
+    padding: 3px 8px;
+    min-width: 28px;
+    line-height: 1;
+    font-size: 0.85rem;
+  }
+  .wt-calc-nav-btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+    pointer-events: none;
+  }
   .wt-grid-svg {
     position: absolute; top: 0; left: 0;
     width: 100%; height: 100%;
@@ -2741,7 +2764,13 @@
           </div>
           <div class="wt-col col-calc">
             ${gridSvg('calc')}
-            <div class="wt-col-label">c&aacute;lculos</div>
+            <div class="wt-col-label wt-calc-head">
+              <span>c&aacute;lculos</span>
+              <div class="wt-calc-nav">
+                <button type="button" class="wt-ctrl-btn wt-calc-nav-btn" id="wt-calc-prev" onclick="wtCalcNav(-1)" aria-label="Tarjeta anterior" disabled>&#8592;</button>
+                <button type="button" class="wt-ctrl-btn wt-calc-nav-btn" id="wt-calc-next" onclick="wtCalcNav(1)" aria-label="Tarjeta siguiente" disabled>&#8594;</button>
+              </div>
+            </div>
             <div class="wt-col-content" id="wt-col-calc"><div class="wt-calc-track" id="wt-calc-track"></div></div>
           </div>
         </div>
@@ -2910,31 +2939,62 @@
       return track.querySelector('.wt-calc-card[data-step-idx="' + stepIdx + '"]');
     }
 
-    function _calcFilmstripFocus(stepIdx) {
+    function _calcSortedCards() {
+      var track = _calcTrack();
+      return track ? Array.from(track.querySelectorAll('.wt-calc-card')) : [];
+    }
+
+    function _updateCalcNavButtons() {
+      var cards = _calcSortedCards();
+      var cur = _calcTrack() && _calcTrack().querySelector('.wt-calc-card.is-current');
+      var pos = cur ? cards.indexOf(cur) : -1;
+      var prevBtn = document.getElementById('wt-calc-prev');
+      var nextBtn = document.getElementById('wt-calc-next');
+      if (prevBtn) prevBtn.disabled = pos <= 0;
+      if (nextBtn) nextBtn.disabled = pos < 0 || pos >= cards.length - 1;
+    }
+
+    function _calcFilmstripFocusCard(card) {
       var viewport = document.getElementById('wt-col-calc');
       var track = _calcTrack();
-      if (!viewport || !track) return;
-      var cards = track.querySelectorAll('.wt-calc-card');
-      cards.forEach(function (card) {
-        var si = parseInt(card.dataset.stepIdx, 10);
-        card.classList.remove('is-current', 'is-ghost', 'is-past');
-        if (si < stepIdx - 1) card.classList.add('is-past');
-        else if (si === stepIdx - 1) card.classList.add('is-ghost');
-        else if (si === stepIdx) card.classList.add('is-current');
-        else card.classList.add('is-past');
+      if (!viewport || !track || !card) return;
+      var cards = _calcSortedCards();
+      var pos = cards.indexOf(card);
+      if (pos < 0) return;
+      cards.forEach(function (c, i) {
+        c.classList.remove('is-current', 'is-ghost', 'is-past');
+        if (i < pos - 1) c.classList.add('is-past');
+        else if (i === pos - 1) c.classList.add('is-ghost');
+        else if (i === pos) c.classList.add('is-current');
+        else c.classList.add('is-past');
       });
-      var current = _calcCardForStep(stepIdx);
-      if (!current) return;
       requestAnimationFrame(function () {
         requestAnimationFrame(function () {
           var vpW = viewport.clientWidth;
-          var cardL = current.offsetLeft;
-          var cardW = current.offsetWidth;
+          var cardL = card.offsetLeft;
+          var cardW = card.offsetWidth;
           var offset = cardL + cardW / 2 - vpW / 2;
           track.style.transform = 'translateX(' + (-offset) + 'px)';
+          _updateCalcNavButtons();
         });
       });
     }
+
+    function _calcFilmstripFocus(stepIdx) {
+      var card = _calcCardForStep(stepIdx);
+      if (card) _calcFilmstripFocusCard(card);
+      else _updateCalcNavButtons();
+    }
+
+    window.wtCalcNav = function (dir) {
+      var cards = _calcSortedCards();
+      if (!cards.length) return;
+      var cur = _calcTrack().querySelector('.wt-calc-card.is-current');
+      var pos = cur ? cards.indexOf(cur) : cards.length - 1;
+      var nextPos = pos + dir;
+      if (nextPos < 0 || nextPos >= cards.length) return;
+      _calcFilmstripFocusCard(cards[nextPos]);
+    };
 
     function _calcAppendCard(stepIdx, innerHTML, kind) {
       if (_calcCardForStep(stepIdx)) return _calcCardForStep(stepIdx);
@@ -3237,6 +3297,8 @@
       _wtRailLayoutTimer = setTimeout(function() {
         _wtRailLayoutTimer = null;
         syncRailMarkersToProbLines();
+        var curCard = _calcTrack() && _calcTrack().querySelector('.wt-calc-card.is-current');
+        if (curCard) _calcFilmstripFocusCard(curCard);
       }, 50);
     }
     window.addEventListener('resize', onWtRailLayout);
