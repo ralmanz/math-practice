@@ -129,6 +129,9 @@ function calcQuestion(opts) {
     wrong,
     railLabel = '',
     audio = null,
+    note = null,
+    /** Optional HTML shown above the prompt (avoids a separate calcWrite card). */
+    lead = '',
   } = opts;
   const ans = String(answer);
   const okHtml = correct || `✓ ${question.replace('¿cuánto es ', '').replace('?', '')} = <span class="hl">${ans}</span>`;
@@ -141,6 +144,8 @@ function calcQuestion(opts) {
     correct: okHtml,
     wrong: wrong || okHtml,
     audio,
+    note,
+    lead,
     railLabel,
   });
 }
@@ -329,26 +334,24 @@ function linearSolveWalkthrough(opts = {}) {
         String(subtractResult),
         `<span class="hl">${subtractResult}</span>`
       ),
+      pause: 2600,
       audio: aud(4),
       railLabel: 'Tras restar',
     }),
-    calcWrite({
-      html: calcLine(`${middle.split('=')[0].trim()} ÷ ${divideLabel}`, 'blu'),
-      audio: aud(5),
+    calcQuestion({
+      lead: calcLine(`${middle.split('=')[0].trim()} ÷ ${divideLabel}`, 'blu'),
+      question: `¿cuánto es ${subtractResult} ÷ ${divideLabel}?`,
+      hint: `Divide ambos lados entre ${divideLabel} para despejar x.`,
+      answer: finalAnswer,
+      correct: `✓ ${subtractResult} ÷ ${divideLabel} = <span class="hl">${finalAnswer}</span>`,
       railLabel: 'Paso 2: dividir',
+      audio: aud(5),
       note: diagramNote({
         label: 'luego: × / ÷',
         diagram: chips,
         active: 'M/D',
         text: `Divide ambos lados entre ${divideLabel} para despejar x.`,
       }),
-    }),
-    calcQuestion({
-      question: `¿cuánto es ${subtractResult} ÷ ${divideLabel}?`,
-      hint: 'divide entre el coeficiente de x',
-      answer: finalAnswer,
-      correct: `✓ ${subtractResult} ÷ ${divideLabel} = <span class="hl">${finalAnswer}</span>`,
-      railLabel: `Calcula ${subtractResult} ÷ ${divideLabel}`,
     }),
     probWrite({
       html: `x = <span class="hl">${finalAnswer}</span> ✓`,
@@ -439,27 +442,24 @@ function linearSolveBothSidesWalkthrough(opts = {}) {
         String(Number(rightAfterMove) + Number(addLabel)),
         `<span class="hl">${Number(rightAfterMove) + Number(addLabel)}</span>`
       ),
+      pause: 2600,
       audio: aud(6),
       railLabel: 'Tras sumar',
     }),
-    calcWrite({
-      html: calcLine(`${lhs} ÷ ${divideLabel}`, 'blu'),
-      sep: true,
-      audio: aud(7),
+    calcQuestion({
+      lead: calcLine(`${lhs} ÷ ${divideLabel}`, 'blu'),
+      question: `¿cuánto es ${Number(rightAfterMove) + Number(addLabel)} ÷ ${divideLabel}?`,
+      hint: `Divide ambos lados entre ${divideLabel} para despejar x.`,
+      answer: finalAnswer,
+      correct: `✓ ${Number(rightAfterMove) + Number(addLabel)} ÷ ${divideLabel} = <span class="hl">${finalAnswer}</span>`,
       railLabel: 'Paso 3: dividir',
+      audio: aud(7),
       note: diagramNote({
         label: 'despejar x',
         diagram: chips,
         active: 'M/D',
         text: `Divide ambos lados entre ${divideLabel}.`,
       }),
-    }),
-    calcQuestion({
-      question: `¿cuánto es ${Number(rightAfterMove) + Number(addLabel)} ÷ ${divideLabel}?`,
-      hint: 'divide entre el coeficiente de x',
-      answer: finalAnswer,
-      correct: `✓ ${Number(rightAfterMove) + Number(addLabel)} ÷ ${divideLabel} = <span class="hl">${finalAnswer}</span>`,
-      railLabel: `Calcula ÷ ${divideLabel}`,
     }),
     probWrite({
       html: `x = <span class="hl">${finalAnswer}</span> ✓`,

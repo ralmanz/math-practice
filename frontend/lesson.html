@@ -3279,7 +3279,9 @@
     function _appendQuestion(step, replayStepIdx) {
       var qIdx = replayStepIdx != null ? replayStepIdx : _s.idx;
       if (_calcCardForStep(qIdx)) return;
+      var leadHtml = step.lead ? String(step.lead) : '';
       var card = _calcAppendCard(qIdx,
+        (leadHtml ? leadHtml : '') +
         '<div class="wt-q-bubble" id="wt-qbub">' +
         '<div class="wt-q-text">' + escHtml(step.question) + '</div>' +
         '<div class="wt-q-hint">' + escHtml(step.hint) + '</div>' +
@@ -3318,7 +3320,10 @@
         }
       } else if (step.type === 'question') {
         _appendQuestion(step);
-        playStepAudio(step.audio);
+        renderNote(step.note);
+        if (step.audio) {
+          wtPlayStepAudio(step.audio, null);
+        }
         _s.idx++;
         _s.tries = 0;
         _s.waiting = true;
@@ -3403,7 +3408,12 @@
           renderNote(step.note, true);
         }
         if (step.type === 'question') {
-          _calcResolveQuestionCard(i, '<div class="calc-line">' + step.correct + '</div>');
+          renderNote(step.note, true);
+          var qLead = step.lead ? String(step.lead) : '';
+          _calcResolveQuestionCard(
+            i,
+            qLead + '<div class="calc-line">' + step.correct + '</div>'
+          );
           lastCalcIdx = i;
           markDiagramStepDone();
         }
@@ -3449,9 +3459,10 @@
       }
       _s.tries++;
       var qStepIdx = _s.idx - 1;
+      var qLead = step.lead ? String(step.lead) : '';
       if (correct) {
         inp.disabled = true;
-        _calcResolveQuestionCard(qStepIdx, '<div class="calc-line">' + step.correct + '</div>');
+        _calcResolveQuestionCard(qStepIdx, qLead + '<div class="calc-line">' + step.correct + '</div>');
         markDiagramStepDone();
         _s.waiting = false;
         _setStatus('writing');
@@ -3459,7 +3470,7 @@
       } else if (_s.tries >= 2) {
         inp.disabled = true;
         _calcResolveQuestionCard(qStepIdx,
-          '<div class="calc-line" style="color:var(--text-secondary)">' + step.wrong + '</div>');
+          qLead + '<div class="calc-line" style="color:var(--text-secondary)">' + step.wrong + '</div>');
         markDiagramStepDone();
         _s.waiting = false;
         _setStatus('writing');
