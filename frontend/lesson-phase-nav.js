@@ -36,8 +36,6 @@
     '.lesson-phase-shell {',
     '  width: 100%; max-width: 600px; margin: 0 auto 12px;',
     '  padding: 8px 16px 0; box-sizing: border-box; flex-shrink: 0;',
-    '  position: sticky; top: 56px; z-index: 95;',
-    '  background: var(--bg, #FAFAF8);',
     '}',
     /* Fixed 4-column bar — no horizontal scroll */
     '.lesson-phase-nav {',
