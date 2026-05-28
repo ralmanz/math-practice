@@ -825,7 +825,8 @@
       document.getElementById('loading-state').style.display = 'none';
       document.getElementById('home-content').style.display = 'block';
       document.getElementById('student-name').textContent = studentId;
-      document.getElementById('nav-student-name').textContent = studentId;
+      const navNameOffline = document.getElementById('nav-student-name');
+      if (navNameOffline) navNameOffline.textContent = studentId;
       document.getElementById('curriculum-badge').textContent = Lang.t('home_offline');
       return;
     }
@@ -838,7 +839,8 @@
     // Populate nav + welcome
     const displayName = student.name || studentId;
     document.getElementById('student-name').textContent = displayName;
-    document.getElementById('nav-student-name').textContent = displayName;
+    const navNameEl = document.getElementById('nav-student-name');
+    if (navNameEl) navNameEl.textContent = displayName;
 
     const badgeText = curriculumLabel(student.curriculum || 'cambridge', student.grade || '');
     document.getElementById('curriculum-badge').innerHTML = `&#x1F4D0; ${badgeText}`;
