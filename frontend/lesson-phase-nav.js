@@ -35,22 +35,21 @@
     '}',
     '.lesson-phase-shell {',
     '  width: 100%; max-width: 600px; margin: 0 auto 12px;',
-    '  padding: 8px 16px 0; box-sizing: border-box; flex-shrink: 0; min-height: 40px;',
+    '  padding: 8px 16px 0; box-sizing: border-box; flex-shrink: 0;',
     '  position: sticky; top: 56px; z-index: 95;',
     '  background: var(--bg, #FAFAF8);',
     '}',
+    /* Fixed 4-column bar — no horizontal scroll */
     '.lesson-phase-nav {',
-    '  display: flex; flex-wrap: nowrap; gap: 6px; width: 100%;',
-    '  margin-bottom: 0; overflow-x: auto; overflow-y: hidden;',
-    '  -webkit-overflow-scrolling: touch;',
-    '  scrollbar-width: none; padding-bottom: 4px;',
+    '  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));',
+    '  gap: 4px; width: 100%; margin-bottom: 0; overflow: visible;',
     '}',
-    '.lesson-phase-nav::-webkit-scrollbar { display: none; }',
     '.lesson-phase-step {',
-    '  display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0;',
-    '  padding: 6px 10px 6px 6px; border: 1.5px solid var(--border, #E8E8E4);',
+    '  display: flex; flex-direction: column; align-items: center; justify-content: center;',
+    '  gap: 3px; min-width: 0; width: 100%;',
+    '  padding: 7px 2px; border: 1.5px solid var(--border, #E8E8E4);',
     '  border-radius: 10px; background: #fff; font-family: inherit;',
-    '  cursor: pointer; text-decoration: none; color: inherit;',
+    '  cursor: pointer; text-decoration: none; color: inherit; text-align: center;',
     '  transition: border-color 0.15s, background 0.15s, color 0.15s;',
     '}',
     'a.lesson-phase-step:hover, button.lesson-phase-step:hover {',
@@ -64,8 +63,8 @@
     '}',
     '.lesson-phase-num {',
     '  display: inline-flex; align-items: center; justify-content: center;',
-    '  width: 22px; height: 22px; border-radius: 5px;',
-    '  font-size: 0.72rem; font-weight: 800; line-height: 1;',
+    '  width: 20px; height: 20px; border-radius: 5px; flex-shrink: 0;',
+    '  font-size: 0.68rem; font-weight: 800; line-height: 1;',
     '  background: var(--border, #E8E8E4); color: var(--text-secondary, #6B6B6B);',
     '}',
     '.lesson-phase-step.is-current .lesson-phase-num,',
@@ -73,7 +72,9 @@
     '  background: var(--accent, #2D6A4F); color: #fff;',
     '}',
     '.lesson-phase-label {',
-    '  font-size: 0.78rem; font-weight: 600; color: var(--text-secondary, #6B6B6B);',
+    '  font-size: clamp(0.58rem, 2.6vw, 0.72rem); font-weight: 600;',
+    '  color: var(--text-secondary, #6B6B6B); line-height: 1.15;',
+    '  max-width: 100%; overflow: hidden; text-overflow: ellipsis;',
     '  white-space: nowrap;',
     '}',
     '.lesson-phase-step.is-current .lesson-phase-label {',
@@ -82,7 +83,11 @@
   ].join('\n');
 
   function injectStyles() {
-    if (document.getElementById('lesson-phase-nav-css')) return;
+    var existing = document.getElementById('lesson-phase-nav-css');
+    if (existing) {
+      existing.textContent = CSS;
+      return;
+    }
     var s = document.createElement('style');
     s.id = 'lesson-phase-nav-css';
     s.textContent = CSS;
@@ -111,18 +116,20 @@
       var cls = 'lesson-phase-step';
       if (isCurrent) cls += ' is-current';
       if (isDone) cls += ' is-done';
+      var stepLabel = label(LABEL_KEYS[i]);
       var inner =
         '<span class="lesson-phase-num">' + i + '</span>' +
-        '<span class="lesson-phase-label">' + esc(label(LABEL_KEYS[i])) + '</span>';
+        '<span class="lesson-phase-label">' + esc(stepLabel) + '</span>';
       var href = opts.href ? opts.href(i) : null;
+      var aria = ' aria-label="' + esc(stepLabel) + '"';
       if (href && !isCurrent) {
         steps.push(
-          '<a class="' + cls + '" href="' + href + '" data-lesson-phase="' + i + '">' + inner + '</a>'
+          '<a class="' + cls + '" href="' + href + '" data-lesson-phase="' + i + '"' + aria + '>' + inner + '</a>'
         );
       } else {
         steps.push(
           '<button type="button" class="' + cls + '" data-lesson-phase="' + i + '"' +
-          (isCurrent ? ' aria-current="step"' : '') + '>' + inner + '</button>'
+          (isCurrent ? ' aria-current="step"' : '') + aria + '>' + inner + '</button>'
         );
       }
     }
@@ -149,26 +156,6 @@
     });
   }
 
-  function scrollActivePhaseIntoView(root, current) {
-    var nav = root.querySelector('.lesson-phase-nav');
-    var cur = root.querySelector('.lesson-phase-step.is-current');
-    if (!nav || !cur) return;
-    requestAnimationFrame(function () {
-      var navW = nav.clientWidth;
-      var curL = cur.offsetLeft;
-      var curW = cur.offsetWidth;
-      if (current === 1) {
-        nav.scrollLeft = 0;
-      } else if (current === PHASE_COUNT) {
-        nav.scrollLeft = Math.max(0, nav.scrollWidth - navW);
-      } else if (curL + curW > nav.scrollLeft + navW) {
-        nav.scrollLeft = curL + curW - navW;
-      } else if (curL < nav.scrollLeft) {
-        nav.scrollLeft = curL;
-      }
-    });
-  }
-
   function render(root, opts) {
     if (!root) return;
     injectStyles();
@@ -176,7 +163,6 @@
     var current = Math.min(Math.max(opts.current || 1, 1), PHASE_COUNT);
     root.innerHTML = buildHtml(current, opts);
     bind(root, opts.onNavigate);
-    scrollActivePhaseIntoView(root, current);
   }
 
   window.LessonPhaseNav = {
