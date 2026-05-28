@@ -241,27 +241,23 @@
       '</nav>';
 
     wireMenu(buildMenuPanel(isTeacher, isStudent, isGuest));
-
-    var signOutBtn = document.getElementById('nav-signout-btn');
-    if (signOutBtn) {
-      signOutBtn.addEventListener('click', function (e) {
-        e.preventDefault();
-        if (isTeacher) {
-          localStorage.removeItem('nuvo_teacher');
-          sessionStorage.removeItem('teacherSecret');
-        } else {
-          localStorage.removeItem('nuvo_student');
-          localStorage.removeItem('studentId');
-        }
-        window.location.href = 'index.html';
-      });
-    }
+    bindSignOut(isTeacher);
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initNav);
-  } else {
-    initNav();
+  function bindSignOut(isTeacher) {
+    var signOutBtn = document.getElementById('nav-signout-btn');
+    if (!signOutBtn) return;
+    signOutBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      if (isTeacher) {
+        localStorage.removeItem('nuvo_teacher');
+        sessionStorage.removeItem('teacherSecret');
+      } else {
+        localStorage.removeItem('nuvo_student');
+        localStorage.removeItem('studentId');
+      }
+      window.location.href = 'index.html';
+    });
   }
 
   function refreshMenu() {
@@ -270,21 +266,13 @@
     var isStudent = !isTeacher && !!nuvoStudent;
     var isGuest = !isTeacher && !isStudent;
     wireMenu(buildMenuPanel(isTeacher, isStudent, isGuest));
-    var signOutBtn = document.getElementById('nav-signout-btn');
-    if (signOutBtn && !signOutBtn.dataset.bound) {
-      signOutBtn.dataset.bound = '1';
-      signOutBtn.addEventListener('click', function (e) {
-        e.preventDefault();
-        if (isTeacher) {
-          localStorage.removeItem('nuvo_teacher');
-          sessionStorage.removeItem('teacherSecret');
-        } else {
-          localStorage.removeItem('nuvo_student');
-          localStorage.removeItem('studentId');
-        }
-        window.location.href = 'index.html';
-      });
-    }
+    bindSignOut(isTeacher);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initNav);
+  } else {
+    initNav();
   }
 
   window.initNav = initNav;
