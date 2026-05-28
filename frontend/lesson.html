@@ -79,35 +79,78 @@
     padding: 28px clamp(14px, 2.5vw, 32px) 60px;
   }
 
-  /* ── Progress bar ── */
-  .progress-bar-container {
+  /* ── Lesson phase steps (replaces progress bar) ── */
+  .lesson-phase-nav {
     display: flex;
+    flex-wrap: nowrap;
+    gap: 6px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+  .lesson-phase-nav::-webkit-scrollbar { display: none; }
+
+  .lesson-phase-step {
+    display: inline-flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 24px;
+    gap: 6px;
+    flex-shrink: 0;
+    padding: 6px 10px 6px 6px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: #fff;
+    font-family: inherit;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s, color 0.15s;
+  }
+  .lesson-phase-step:hover:not(:disabled) {
+    border-color: var(--accent);
+    background: var(--accent-bg);
+  }
+  .lesson-phase-step.is-current {
+    border-color: var(--accent);
+    background: var(--accent-bg);
+  }
+  .lesson-phase-step.is-done:not(.is-current) {
+    border-color: #D1FAE5;
+    background: #F0FDF4;
+  }
+  .lesson-phase-step.is-locked,
+  .lesson-phase-step:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
   }
 
-  .progress-bar {
-    flex: 1;
-    height: 6px;
+  .lesson-phase-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 5px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    line-height: 1;
     background: var(--border);
-    border-radius: 3px;
-    overflow: hidden;
+    color: var(--text-secondary);
   }
-
-  .progress-fill {
-    height: 100%;
+  .lesson-phase-step.is-current .lesson-phase-num,
+  .lesson-phase-step.is-done .lesson-phase-num {
     background: var(--accent);
-    border-radius: 3px;
-    transition: width 0.4s ease;
-    width: 0%;
+    color: #fff;
   }
 
-  .progress-text {
-    font-size: 0.8rem;
+  .lesson-phase-label {
+    font-size: 0.78rem;
     font-weight: 600;
     color: var(--text-secondary);
     white-space: nowrap;
+  }
+  .lesson-phase-step.is-current .lesson-phase-label {
+    color: var(--accent-dark, var(--accent));
   }
 
   /* ── Badge ── */
@@ -1787,6 +1830,8 @@
   let activeConceptTab = 'written';
   let activeExampleTab = 'symbolic';
   let subtopicIndex    = 0;
+  let lessonMaxPhase   = 1;
+  let lessonCurrentPhase = 1;
 
   // ── Helpers ──────────────────────────────────────────────────
   function curriculumLabel(c) {
@@ -1983,6 +2028,8 @@
     }
 
     lesson = await lessonRes.json();
+    lessonMaxPhase = 1;
+    lessonCurrentPhase = 1;
 
     const backLink = document.querySelector('.back-link');
     if (localStorage.getItem('nuvo_teacher') === 'true') {
@@ -1996,17 +2043,86 @@
     showCover();
   }
 
-  // ── Progress bar helper ───────────────────────────────────────
-  // phaseNum: 1=cover, 2=concepts, 3=example, 4=practice, 5=test
-  function progressBarHtml(phaseNum) {
-    const pct = Math.round((phaseNum / 5) * 100);
-    const labels = ['', Lang.t('phase_intro'), Lang.t('phase_concepts'), Lang.t('phase_example'), Lang.t('phase_practice'), Lang.t('phase_test')];
-    return `
-      <div class="progress-bar-container">
-        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
-        <div class="progress-text">${labels[phaseNum] || ''}</div>
-      </div>`;
+  // ── Lesson phase nav (1=intro … 4=practice) ───────────────────
+  const LESSON_PHASE_COUNT = 4;
+  const LESSON_PHASE_LABELS = [
+    '',
+    'phase_intro',
+    'phase_concepts',
+    'phase_example',
+    'phase_practice',
+  ];
+
+  function touchLessonPhase(phaseNum) {
+    const n = Math.min(Math.max(phaseNum, 1), LESSON_PHASE_COUNT);
+    lessonCurrentPhase = n;
+    lessonMaxPhase = Math.max(lessonMaxPhase, n);
+    return n;
   }
+
+  function lessonPhaseNavHtml(currentPhase) {
+    const current = touchLessonPhase(currentPhase >= 5 ? LESSON_PHASE_COUNT : currentPhase);
+    if (currentPhase >= 5) lessonMaxPhase = LESSON_PHASE_COUNT;
+
+    const steps = [];
+    for (let n = 1; n <= LESSON_PHASE_COUNT; n++) {
+      const unlocked = n <= lessonMaxPhase;
+      const isCurrent = n === current;
+      const isDone = unlocked && n < current;
+      let cls = 'lesson-phase-step';
+      if (isCurrent) cls += ' is-current';
+      if (isDone) cls += ' is-done';
+      if (!unlocked) cls += ' is-locked';
+      const label = Lang.t(LESSON_PHASE_LABELS[n]);
+      steps.push(
+        `<button type="button" class="${cls}" ${unlocked ? '' : 'disabled'} ` +
+        `onclick="goToLessonPhase(${n})" aria-current="${isCurrent ? 'step' : 'false'}">` +
+        `<span class="lesson-phase-num">${n}</span>` +
+        `<span class="lesson-phase-label">${escHtml(label)}</span>` +
+        `</button>`
+      );
+    }
+    return `<nav class="lesson-phase-nav" aria-label="${escHtml(Lang.t('lesson_phase_nav_aria'))}">${steps.join('')}</nav>`;
+  }
+
+  function progressBarHtml(phaseNum) {
+    return lessonPhaseNavHtml(phaseNum);
+  }
+
+  function syncLessonPhaseNav(current) {
+    const nav = document.querySelector('.lesson-phase-nav');
+    if (!nav) return;
+    const wrap = document.createElement('div');
+    wrap.innerHTML = lessonPhaseNavHtml(current || lessonCurrentPhase);
+    nav.replaceWith(wrap.firstElementChild);
+  }
+
+  function lessonUsesWalkthroughConcepts() {
+    return !!(lesson && lesson.subtopics && lesson.subtopics.some(
+      (s) => s.walkthrough && s.walkthrough.length > 0
+    ));
+  }
+
+  function goToConceptsPhase() {
+    stopVoice();
+    document.body.classList.remove('has-walkthrough');
+    if (lessonUsesWalkthroughConcepts()) {
+      startSubtopicFlow();
+      return;
+    }
+    showConcepts();
+  }
+
+  window.goToLessonPhase = function (n) {
+    const phase = Number(n);
+    if (!phase || phase > lessonMaxPhase) return;
+    stopVoice();
+    document.body.classList.remove('has-walkthrough');
+    if (phase === 1) showCover();
+    else if (phase === 2) goToConceptsPhase();
+    else if (phase === 3) showExample();
+    else if (phase === 4) showPractice();
+  };
 
   function badgeHtml() {
     const lvl = (lesson && lesson.level) ? lesson.level : (String(stage).match(/\d+/) || [''])[0] || stage;
@@ -2319,6 +2435,7 @@
     const steps = (lesson.example || {}).steps || [];
 
     if (exampleStep >= steps.length) {
+      lessonMaxPhase = LESSON_PHASE_COUNT;
       showPractice();
       return;
     }
@@ -2355,10 +2472,6 @@
       else                             dot.className = 'step-dot';
     }
 
-    const pct  = steps.length > 0 ? Math.round((Math.max(exampleStep, 1) / steps.length) * 100) : 100;
-    const fill = document.getElementById('progress-fill');
-    if (fill) fill.style.width = pct + '%';
-
     const btn = document.getElementById('main-btn');
     btn.textContent = exampleStep >= steps.length
       ? Lang.t('example_btn_try_yourself')
@@ -2370,6 +2483,8 @@
 
   // ── Phase 4: Practice (always app.html — same engine as guests) ──
   async function showPractice() {
+    lessonMaxPhase = LESSON_PHASE_COUNT;
+    lessonCurrentPhase = LESSON_PHASE_COUNT;
     try {
       const r = await fetch(`${WORKER}/problems/curriculum/${encodeURIComponent(curriculum)}/${encodeURIComponent(unit)}/${encodeURIComponent(stage)}/practice`);
       const arr = r.ok ? await r.json() : [];
@@ -2827,6 +2942,8 @@
       <button class="main-btn" style="margin:0 auto;display:inline-block" onclick="showPractice()">${Lang.t('example_btn_try_yourself')}</button>
     `;
     container.appendChild(card);
+    lessonMaxPhase = LESSON_PHASE_COUNT;
+    syncLessonPhaseNav(2);
     setTimeout(() => card.scrollIntoView({ behavior:'smooth', block:'center' }), 50);
 
     // mark lesson progress
@@ -2843,14 +2960,7 @@
   }
 
   function updateStProgress() {
-    const subs = lesson.subtopics || [];
-    const done = subs.filter((_,i) => document.getElementById(`st-done-${i}`)).length;
-    const total = subs.length;
-    const pct = total ? Math.round((done / total) * 60 + 10) : 10; // 10–70% range for concept phase
-    const fill = document.querySelector('.progress-fill');
-    const text = document.querySelector('.progress-text');
-    if (fill) fill.style.width = `${pct}%`;
-    if (text) text.textContent = `${pct}%`;
+    /* phase nav is static during subtopic flow */
   }
 
   function scrollToStConcept(idx) {
@@ -3332,6 +3442,8 @@
     }
 
     function _onComplete() {
+      lessonMaxPhase = LESSON_PHASE_COUNT;
+      syncLessonPhaseNav(2);
       window.removeEventListener('resize', onWtRailLayout);
       window.removeEventListener('scroll', onWtRailLayout);
       /* Keep body.has-walkthrough so .container stays wide until navigation (e.g. Practicar). */

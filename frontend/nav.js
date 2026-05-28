@@ -12,10 +12,10 @@
     '  border-bottom: 1px solid var(--border, #E5E7EB);',
     '}',
     '#nav-root .nav-inner {',
-    '  max-width: 1100px; margin: 0 auto;',
-    '  padding: 0 24px; height: 64px;',
+    '  width: 100%; max-width: none; margin: 0;',
+    '  padding: 0 16px; height: 56px;',
     '  display: flex; align-items: center;',
-    '  justify-content: space-between; gap: 16px;',
+    '  justify-content: space-between; gap: 12px;',
     '}',
     '#nav-root .nav-logo {',
     '  font-weight: 400; font-size: 1.2rem;',
@@ -23,7 +23,37 @@
     '  letter-spacing: -0.03em; flex-shrink: 0;',
     '}',
     '#nav-root .nav-logo .logo-math { color: #2563EB; font-weight: 700; }',
-    '#nav-root .nav-right { display: flex; align-items: center; gap: 20px; }',
+    '#nav-root .nav-right { display: flex; align-items: center; gap: 12px; position: relative; }',
+    '#nav-root .nav-menu-wrap { position: relative; }',
+    '#nav-root .nav-menu-btn {',
+    '  display: flex; flex-direction: column; align-items: center; justify-content: center;',
+    '  gap: 5px; width: 44px; height: 44px; padding: 0;',
+    '  border: 1.5px solid var(--border, #E5E7EB); border-radius: 10px;',
+    '  background: #fff; cursor: pointer; transition: border-color 0.15s, background 0.15s;',
+    '}',
+    '#nav-root .nav-menu-btn:hover { border-color: #D1D5DB; background: #F9FAFB; }',
+    '#nav-root .nav-menu-btn[aria-expanded="true"] { border-color: #2563EB; background: #EFF6FF; }',
+    '#nav-root .nav-menu-bar {',
+    '  display: block; width: 18px; height: 2px; border-radius: 1px;',
+    '  background: var(--text, #111827);',
+    '}',
+    '#nav-root .nav-menu-panel {',
+    '  position: absolute; top: calc(100% + 8px); right: 0; min-width: 200px;',
+    '  padding: 6px; background: #fff; border: 1px solid var(--border, #E5E7EB);',
+    '  border-radius: 12px; box-shadow: 0 10px 30px rgba(17,24,39,0.12);',
+    '  z-index: 300;',
+    '}',
+    '#nav-root .nav-menu-panel[hidden] { display: none; }',
+    '#nav-root .nav-menu-item {',
+    '  display: block; width: 100%; text-align: left;',
+    '  padding: 10px 14px; border: none; border-radius: 8px;',
+    '  font-size: 0.9rem; font-weight: 500; font-family: inherit;',
+    '  color: var(--text, #111827); background: transparent;',
+    '  text-decoration: none; cursor: pointer; transition: background 0.12s;',
+    '}',
+    '#nav-root .nav-menu-item:hover { background: #F3F4F6; }',
+    '#nav-root .nav-menu-item--danger { color: #B91C1C; }',
+    '#nav-root .nav-menu-item--danger:hover { background: #FEF2F2; }',
     '#nav-root .nav-student {',
     '  font-size: 0.88rem; font-weight: 600;',
     '  color: var(--text-mid, #374151);',
@@ -59,11 +89,85 @@
     '  transition: background 0.15s; white-space: nowrap;',
     '}',
     '#nav-root .nav-practicar:hover { background: #1E40AF; }',
-    '@media (max-width: 640px) {',
-    '  #nav-root .nav-student { display: none; }',
-    '  #nav-root .nav-teacher-link { display: none; }',
-    '}',
   ].join('\n');
+
+  function menuLabel(key, fallback) {
+    if (typeof Lang !== 'undefined' && Lang.t) {
+      var t = Lang.t(key);
+      if (t && t !== key) return t;
+    }
+    return fallback;
+  }
+
+  function buildMenuPanel(isTeacher, isStudent, isGuest) {
+    var accountHref = isTeacher ? 'teacher.html' : (isStudent ? 'home.html' : 'login.html');
+    var accountLabel = menuLabel('nav_account', 'Account');
+    var signLabel = isGuest
+      ? menuLabel('nav_signin', 'Sign in')
+      : menuLabel('nav_signout', 'Sign out');
+    var html =
+      '<a href="' + accountHref + '" class="nav-menu-item" id="nav-account-link">' + accountLabel + '</a>';
+    if (isGuest) {
+      html += '<a href="login.html" class="nav-menu-item">' + signLabel + '</a>';
+      html +=
+        '<a href="filter.html" class="nav-menu-item">' +
+        menuLabel('nav_practice_guest', 'Practice') +
+        '</a>';
+    } else {
+      html +=
+        '<button type="button" class="nav-menu-item nav-menu-item--danger" id="nav-signout-btn">' +
+        signLabel +
+        '</button>';
+    }
+    return html;
+  }
+
+  function menuButtonHtml() {
+    return (
+      '<div class="nav-menu-wrap">' +
+      '<button type="button" class="nav-menu-btn" id="nav-menu-btn" aria-label="' +
+      menuLabel('nav_menu_aria', 'Menu') +
+      '" aria-expanded="false" aria-haspopup="true">' +
+      '<span class="nav-menu-bar"></span>' +
+      '<span class="nav-menu-bar"></span>' +
+      '<span class="nav-menu-bar"></span>' +
+      '</button>' +
+      '<div class="nav-menu-panel" id="nav-menu-panel" role="menu" hidden>' +
+      '</div>' +
+      '</div>'
+    );
+  }
+
+  function wireMenu(panelHtml) {
+    var btn = document.getElementById('nav-menu-btn');
+    var panel = document.getElementById('nav-menu-panel');
+    if (!btn || !panel) return;
+    panel.innerHTML = panelHtml;
+
+    function closeMenu() {
+      btn.setAttribute('aria-expanded', 'false');
+      panel.hidden = true;
+    }
+
+    function openMenu() {
+      btn.setAttribute('aria-expanded', 'true');
+      panel.hidden = false;
+    }
+
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (panel.hidden) openMenu();
+      else closeMenu();
+    });
+
+    document.addEventListener('click', function () {
+      closeMenu();
+    });
+
+    panel.addEventListener('click', function (e) {
+      e.stopPropagation();
+    });
+  }
 
   function injectStyles() {
     if (document.getElementById('nuvo-nav-css')) return;
@@ -94,39 +198,22 @@
     var nuvoStudent = localStorage.getItem('nuvo_student');
     var isStudent  = !isTeacher && !!nuvoStudent;
 
-    var logoHref, rightHtml;
-
-    if (isTeacher) {
-      logoHref = 'index.html';
-      rightHtml =
-        '<a href="filter.html" class="nav-teacher-link">Ver curr\u00edculo</a>' +
-        '<a href="teacher.html" class="nav-teacher-link">Panel del maestro</a>' +
-        '<a href="#" class="nav-ghost" id="nav-signout-btn">Cerrar sesi\u00f3n</a>' +
-        '<span id="nav-student-name" style="display:none;" aria-hidden="true"></span>';
-    } else if (isStudent) {
-      var firstName = getStudentFirstName();
-      logoHref = 'home.html';
-      rightHtml =
-        '<span class="nav-student" id="nav-student-name">' + firstName + '</span>' +
-        '<a href="#" class="nav-ghost" id="nav-signout-btn">Cerrar sesi\u00f3n</a>';
-    } else {
-      logoHref = 'index.html';
-      rightHtml =
-        '<a href="login.html" class="nav-signin">Iniciar sesi\u00f3n</a>' +
-        '<a href="filter.html" class="nav-practicar">Practicar</a>';
-    }
+    var logoHref = isStudent ? 'home.html' : (isTeacher ? 'index.html' : 'index.html');
+    var isGuest = !isTeacher && !isStudent;
 
     root.innerHTML =
       '<nav>' +
       '<div class="nav-inner">' +
       '<a href="' + logoHref + '" class="nav-logo">Nuvo <span class="logo-math">Math</span></a>' +
-      '<div class="nav-right">' + rightHtml + '</div>' +
+      '<div class="nav-right">' + menuButtonHtml() + '</div>' +
       '</div>' +
       '</nav>';
 
-    var btn = document.getElementById('nav-signout-btn');
-    if (btn) {
-      btn.addEventListener('click', function (e) {
+    wireMenu(buildMenuPanel(isTeacher, isStudent, isGuest));
+
+    var signOutBtn = document.getElementById('nav-signout-btn');
+    if (signOutBtn) {
+      signOutBtn.addEventListener('click', function (e) {
         e.preventDefault();
         if (isTeacher) {
           localStorage.removeItem('nuvo_teacher');
