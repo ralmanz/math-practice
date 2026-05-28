@@ -42,8 +42,21 @@
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    padding: 20px;
+    align-items: stretch;
+    padding: 0;
+  }
+
+  #nav-root {
+    width: 100%;
+    flex-shrink: 0;
+  }
+
+  #practice-screen.curriculum-practice {
+    max-width: 600px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 16px 48px;
+    box-sizing: border-box;
   }
 
   /* ── Setup Screen (Teacher Mode) ── */
@@ -332,8 +345,10 @@
   #practice-screen {
     max-width: 640px;
     width: 100%;
-    margin-top: 30px;
+    margin: 24px auto 0;
+    padding: 0 20px 48px;
     display: none;
+    box-sizing: border-box;
   }
 
   .student-header {
@@ -820,12 +835,20 @@
 
 </style>
 <script src="lang.js?v=20260514-practicar"></script>
+<script src="lesson-phase-nav.js?v=20260528-phase-shell"></script>
 <script src="calculator.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/algebrite@1.4.0/dist/algebrite.bundle-for-browser.js"></script>
 <script src="math-validation.js?v=20260518-ineq"></script>
 </head>
 <body>
 <div id="nav-root"></div>
+
+<div class="lesson-topnav" id="lesson-topnav" style="display:none;">
+  <a href="home.html" class="back-link" id="lesson-back-link" data-i18n="back_to_curriculum">← Back to curriculum</a>
+</div>
+<div class="lesson-phase-shell" id="lesson-phase-shell" style="display:none;">
+  <div id="lesson-phase-root"></div>
+</div>
 
 <!-- ── Trial banner (shown when trial is active) ── -->
 <div id="trial-banner"></div>
@@ -986,6 +1009,52 @@
   const UNIT_TEST_REJECTION_LIMIT = 5;
 
   const UNIT_LABELS = { aritmetica: 'Aritmética', algebra: 'Álgebra' };
+
+  function buildLessonPhaseUrl(phaseSlug) {
+    const defaultUnit = PARAM_CURRICULUM === 'PAA' ? 'algebra' : '1';
+    const q = new URLSearchParams({
+      curriculum: PARAM_CURRICULUM,
+      unit: PARAM_UNIT || defaultUnit,
+      stage: PARAM_STAGE || PARAM_LEVEL || '1',
+      phase: phaseSlug,
+    });
+    if (PARAM_GUEST) q.set('guest', 'true');
+    if (STUDENT_ID) q.set('student', STUDENT_ID);
+    return 'lesson.html?' + q.toString();
+  }
+
+  function mountCurriculumLessonChrome() {
+    const topnav = document.getElementById('lesson-topnav');
+    const shell = document.getElementById('lesson-phase-shell');
+    const practice = document.getElementById('practice-screen');
+    if (!topnav || !shell) return;
+
+    topnav.style.display = 'block';
+    shell.style.display = 'block';
+    if (practice) practice.classList.add('curriculum-practice');
+
+    const back = document.getElementById('lesson-back-link');
+    if (back) {
+      back.href = PARAM_RETURN_TO || buildLessonPhaseUrl('concepts');
+    }
+
+    const breadcrumb = document.getElementById('curriculum-breadcrumb');
+    if (breadcrumb) breadcrumb.style.display = 'none';
+
+    const header = document.querySelector('#practice-screen .student-header');
+    if (header) header.style.display = 'none';
+
+    const root = document.getElementById('lesson-phase-root');
+    if (root && window.LessonPhaseNav) {
+      LessonPhaseNav.render(root, {
+        current: 4,
+        href: function (n) {
+          if (n === 4) return null;
+          return buildLessonPhaseUrl(LessonPhaseNav.PHASE_SLUGS[n]);
+        },
+      });
+    }
+  }
 
   let unitTestRejections = 0;
   let unitTestQuestionRecorded = false;
@@ -1761,29 +1830,12 @@
   async function loadCurriculumProblemsFromBank(useGuestBreadcrumb) {
     document.getElementById('setup-screen').style.display = 'none';
     document.getElementById('practice-screen').style.display = 'block';
+    mountCurriculumLessonChrome();
 
-    const curriculumLabelMap = {
-      PAA: 'PAA',
-      cambridge: 'Cambridge',
-      'common-core': 'Common Core',
-      'ib-myp': 'IB MYP'
-    };
     const defaultUnit = PARAM_CURRICULUM === 'PAA' ? 'aritmetica' : '1';
     const unitVal = PARAM_UNIT || defaultUnit;
     const levelVal = PARAM_STAGE || PARAM_LEVEL || '1';
     const problemType = PARAM_MODE === 'test' ? 'test' : 'practice';
-
-    const breadcrumb = document.getElementById('curriculum-breadcrumb');
-    if (breadcrumb) {
-      if (useGuestBreadcrumb) {
-        const guestPhase = PARAM_MODE === 'test' ? 'Prueba' : 'Pr\u00e1ctica';
-        breadcrumb.textContent = (curriculumLabelMap[PARAM_CURRICULUM] || PARAM_CURRICULUM) + ' \u00b7 Unidad ' + unitVal + ' \u00b7 Nivel ' + levelVal + ' \u00b7 ' + guestPhase;
-      } else {
-        const phaseLabel = PARAM_MODE === 'test' ? 'Test' : 'Practice';
-        breadcrumb.textContent = (curriculumLabelMap[PARAM_CURRICULUM] || PARAM_CURRICULUM) + ' \u00b7 Unit ' + unitVal + ' \u00b7 Level ' + levelVal + ' \u00b7 ' + phaseLabel;
-      }
-      breadcrumb.style.display = 'block';
-    }
 
     problems = await fetchBankProblemsForLesson(PARAM_CURRICULUM, unitVal, levelVal, problemType);
 
@@ -2328,6 +2380,6 @@
   checkTrialStatus();
 </script>
 
-<script src="nav.js?v=20260515-teacher-filter"></script>
+<script src="nav.js?v=20260528-phase-shell"></script>
 </body>
 </html>

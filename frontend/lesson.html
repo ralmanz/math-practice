@@ -50,30 +50,6 @@
     flex-shrink: 0;
   }
 
-  /* ── Top nav ── */
-  .lesson-topnav {
-    width: 100%;
-    padding: 10px max(12px, env(safe-area-inset-right)) 10px max(12px, env(safe-area-inset-left));
-    display: flex;
-    align-items: center;
-    border-bottom: 1px solid var(--border);
-    background: var(--card);
-    flex-shrink: 0;
-  }
-
-  .back-link {
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: var(--accent);
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    transition: opacity 0.15s;
-  }
-
-  .back-link:hover { opacity: 0.75; }
-
   /* ── Content area ── */
   .container {
     width: 100%;
@@ -86,80 +62,6 @@
     max-width: min(1400px, calc(100vw - 48px));
     width: 100%;
     padding: 28px clamp(14px, 2.5vw, 32px) 60px;
-  }
-
-  /* ── Lesson phase nav (in-lesson sections) ── */
-  .lesson-phase-nav {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 6px;
-    margin-bottom: 20px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    padding-bottom: 2px;
-    position: sticky;
-    top: 56px;
-    z-index: 90;
-    background: var(--bg);
-    padding-top: 4px;
-    margin-top: -4px;
-  }
-  .lesson-phase-nav::-webkit-scrollbar { display: none; }
-
-  .lesson-phase-step {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
-    padding: 6px 10px 6px 6px;
-    border: 1.5px solid var(--border);
-    border-radius: 10px;
-    background: #fff;
-    font-family: inherit;
-    cursor: pointer;
-    transition: border-color 0.15s, background 0.15s, color 0.15s;
-  }
-  .lesson-phase-step:hover {
-    border-color: var(--accent);
-    background: var(--accent-bg);
-  }
-  .lesson-phase-step.is-current {
-    border-color: var(--accent);
-    background: var(--accent-bg);
-  }
-  .lesson-phase-step.is-done:not(.is-current) {
-    border-color: #D1FAE5;
-    background: #F0FDF4;
-  }
-
-  .lesson-phase-num {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 22px;
-    height: 22px;
-    border-radius: 5px;
-    font-size: 0.72rem;
-    font-weight: 800;
-    line-height: 1;
-    background: var(--border);
-    color: var(--text-secondary);
-  }
-  .lesson-phase-step.is-current .lesson-phase-num,
-  .lesson-phase-step.is-done .lesson-phase-num {
-    background: var(--accent);
-    color: #fff;
-  }
-
-  .lesson-phase-label {
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    white-space: nowrap;
-  }
-  .lesson-phase-step.is-current .lesson-phase-label {
-    color: var(--accent-dark, var(--accent));
   }
 
   /* ── Badge ── */
@@ -1800,6 +1702,9 @@
 <div class="lesson-topnav">
   <a href="home.html" class="back-link" data-i18n="back_to_curriculum">← Back to curriculum</a>
 </div>
+<div class="lesson-phase-shell" id="lesson-phase-shell" style="display:none;">
+  <div id="lesson-phase-root"></div>
+</div>
 
 <div class="container" id="app">
   <div class="state-card">
@@ -1810,6 +1715,7 @@
 </div>
 
 <script src="lang.js?v=20260514-concept-nav"></script>
+<script src="lesson-phase-nav.js?v=20260528-phase-shell"></script>
 <script src="calculator.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/algebrite@1.4.0/dist/algebrite.bundle-for-browser.js"></script>
 <script>
@@ -1865,6 +1771,11 @@
 
   function render(html) {
     document.getElementById('app').innerHTML = html;
+  }
+
+  function renderWithPhase(phaseNum, html) {
+    updateLessonPhaseNav(phaseNum);
+    render(html);
   }
 
   function setPanelVisible(id, visible) {
@@ -1973,8 +1884,7 @@
     const titleKey = isPAA ? 'guest_lesson_complete_title' : 'guest_lesson_complete_title_secondary';
     const subtitleKey = isPAA ? 'guest_lesson_complete_subtitle' : 'guest_lesson_complete_subtitle_secondary';
     const trialUrl = 'trial.html?from=guest_lesson&curriculum=' + encodeURIComponent(curriculum) + '&lang=' + encodeURIComponent(Lang.detect());
-    render(`
-      ${progressBarHtml(5)}
+    renderWithPhase(5, `
       <div class="result-card pass">
         <div class="result-icon">&#127942;</div>
         <h2>${Lang.t(titleKey)}</h2>
@@ -2049,18 +1959,27 @@
       backLink.href = 'home.html?curriculum=' + encodeURIComponent(curriculum);
     }
 
+    routeInitialLessonPhase();
+  }
+
+  function routeInitialLessonPhase() {
+    if (phaseParam === 'concepts') {
+      goToConceptsPhase();
+      return;
+    }
+    if (phaseParam === 'example') {
+      showExample();
+      return;
+    }
+    if (phaseParam === 'practice') {
+      showPractice();
+      return;
+    }
     showCover();
   }
 
   // ── Lesson phase nav (1=intro … 4=practice) ───────────────────
   const LESSON_PHASE_COUNT = 4;
-  const LESSON_PHASE_LABELS = [
-    '',
-    'phase_intro',
-    'phase_concepts',
-    'phase_example',
-    'phase_practice',
-  ];
 
   function touchLessonPhase(phaseNum) {
     const n = Math.min(Math.max(phaseNum, 1), LESSON_PHASE_COUNT);
@@ -2069,39 +1988,26 @@
     return n;
   }
 
-  function lessonPhaseNavHtml(currentPhase) {
-    const current = touchLessonPhase(currentPhase >= 5 ? LESSON_PHASE_COUNT : currentPhase);
-    if (currentPhase >= 5) lessonMaxPhase = LESSON_PHASE_COUNT;
-
-    const steps = [];
-    for (let n = 1; n <= LESSON_PHASE_COUNT; n++) {
-      const isCurrent = n === current;
-      const isDone = n < current;
-      let cls = 'lesson-phase-step';
-      if (isCurrent) cls += ' is-current';
-      if (isDone) cls += ' is-done';
-      const label = Lang.t(LESSON_PHASE_LABELS[n]);
-      steps.push(
-        `<button type="button" class="${cls}" data-lesson-phase="${n}" ` +
-        `aria-current="${isCurrent ? 'step' : 'false'}">` +
-        `<span class="lesson-phase-num">${n}</span>` +
-        `<span class="lesson-phase-label">${escHtml(label)}</span>` +
-        `</button>`
-      );
-    }
-    return `<nav class="lesson-phase-nav" aria-label="${escHtml(Lang.t('lesson_phase_nav_aria'))}">${steps.join('')}</nav>`;
-  }
-
-  function progressBarHtml(phaseNum) {
-    return lessonPhaseNavHtml(phaseNum);
+  function updateLessonPhaseNav(phaseNum) {
+    const current = touchLessonPhase(phaseNum >= 5 ? LESSON_PHASE_COUNT : phaseNum);
+    if (phaseNum >= 5) lessonMaxPhase = LESSON_PHASE_COUNT;
+    const root = document.getElementById('lesson-phase-root');
+    if (!root || !window.LessonPhaseNav) return;
+    LessonPhaseNav.render(root, {
+      current: current,
+      escHtml: escHtml,
+      href: function (n) {
+        if (n === 4) return curriculumAppUrl('practice', 'complete');
+        return null;
+      },
+      onNavigate: function (n) {
+        goToLessonPhase(n);
+      },
+    });
   }
 
   function syncLessonPhaseNav(current) {
-    const nav = document.querySelector('.lesson-phase-nav');
-    if (!nav) return;
-    const wrap = document.createElement('div');
-    wrap.innerHTML = lessonPhaseNavHtml(current || lessonCurrentPhase);
-    nav.replaceWith(wrap.firstElementChild);
+    updateLessonPhaseNav(current || lessonCurrentPhase);
   }
 
   function lessonUsesWalkthroughConcepts() {
@@ -2139,18 +2045,6 @@
     else if (phase === 3) showExample();
     else if (phase === 4) showPractice();
   };
-
-  (function bindLessonPhaseNavClicks() {
-    const app = document.getElementById('app');
-    if (!app || app.dataset.phaseNavBound) return;
-    app.dataset.phaseNavBound = '1';
-    app.addEventListener('click', function (e) {
-      const step = e.target.closest('.lesson-phase-step[data-lesson-phase]');
-      if (!step) return;
-      e.preventDefault();
-      goToLessonPhase(Number(step.getAttribute('data-lesson-phase')));
-    });
-  })();
 
   function badgeHtml() {
     const lvl = (lesson && lesson.level) ? lesson.level : (String(stage).match(/\d+/) || [''])[0] || stage;
@@ -2236,8 +2130,7 @@
   }
 
   function showCover() {
-    render(`
-      ${progressBarHtml(1)}
+    renderWithPhase(1, `
       <div class="cover-badge-wrap">${badgeHtml()}</div>
       <h1 class="cover-heading">${escHtml(lesson.title || 'Lesson')}</h1>
       ${coverIntroHtml()}
@@ -2265,8 +2158,7 @@
     const conceptVoiceText = (lesson.conceptVoice || lesson.subtitle || (lesson.rules || []).join(' ')).trim();
     const formulas = formulasFromLesson();
 
-    render(`
-      ${progressBarHtml(2)}
+    renderWithPhase(2, `
       ${badgeHtml()}
       <h1>${escHtml(lesson.title || 'Lesson')}</h1>
       <div class="card">
@@ -2329,8 +2221,7 @@
     const nextAction = isLast ? 'showExample()' : 'advanceSubtopic()';
     const backLabel  = subtopicIndex === 0 ? Lang.t('concept_back_intro') : Lang.t('concept_back_prev');
 
-    render(`
-      ${progressBarHtml(2)}
+    renderWithPhase(2, `
       ${badgeHtml()}
       <h1>${escHtml(lesson.title || 'Lesson')}</h1>
       <div class="subtopic-progress-row">
@@ -2423,8 +2314,7 @@
 
     const initBtnLabel = steps.length === 0 ? Lang.t('example_btn_goto_practice') : Lang.t('example_btn_show_step_n').replace('{n}', 1);
 
-    render(`
-      ${progressBarHtml(3)}
+    renderWithPhase(3, `
       ${badgeHtml()}
       <h1>${escHtml(lesson.title || 'Lesson')}</h1>
       <div class="card">
@@ -2557,8 +2447,7 @@
         ? Lang.t('result_level_complete')
         : Lang.t('result_score_correct').replace('{score}', score).replace('{total}', total);
 
-      render(`
-        ${progressBarHtml(5)}
+      renderWithPhase(5, `
         <div class="result-card pass">
           <div class="result-icon">&#127941;</div>
           <div class="score-display">${noTest ? '' : `${score} / ${total}`}</div>
@@ -2570,8 +2459,7 @@
     } else {
       // Failed
       const failScoreText = Lang.t('result_score_correct').replace('{score}', score).replace('{total}', total);
-      render(`
-        ${progressBarHtml(5)}
+      renderWithPhase(5, `
         <div class="result-card fail">
           <div class="result-icon">&#128218;</div>
           <div class="score-display">${score} / ${total}</div>
@@ -2623,8 +2511,7 @@
     } catch(e) { _allPracticeProblems = []; }
 
     // render skeleton: progress bar + empty container
-    render(`
-      ${progressBarHtml(2)}
+    renderWithPhase(2, `
       <h2 style="font-size:1rem;font-weight:700;margin:0 0 20px;color:var(--text)">${escHtml(lesson.title||'')}</h2>
       <div id="st-container"></div>
     `);
@@ -3002,8 +2889,8 @@
       return `<svg class="wt-grid-svg" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="gp-${colId}" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M 28 0 L 0 0 0 28" fill="none" stroke="#E8E6E0" stroke-width="0.5"/></pattern></defs><rect width="100%" height="100%" fill="url(#gp-${colId})"/></svg>`;
     }
 
-    document.body.classList.add("has-walkthrough"); render(`
-      ${progressBarHtml(2)}
+    document.body.classList.add("has-walkthrough");
+    renderWithPhase(2, `
       ${badgeHtml()}
       <h1>${escHtml(lesson.title || '')}</h1>
       <div class="walkthrough-board" id="wt-board">
@@ -3724,6 +3611,6 @@
 
   init();
 </script>
-<script src="nav.js?v=20260515-nav-blue"></script>
+<script src="nav.js?v=20260528-phase-shell"></script>
 </body>
 </html>
