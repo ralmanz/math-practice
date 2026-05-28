@@ -259,6 +259,38 @@
     margin: 0;
   }
 
+  /* Intro phase — Nuvo Math blue (#2563EB) preview (phase 1 only) */
+  body.lesson-phase-intro .lesson-page {
+    --accent: #2563EB;
+    --accent-light: #BFDBFE;
+    --accent-bg: #EFF6FF;
+  }
+  body.lesson-phase-intro .lesson-page .main-btn--cta {
+    background: #2563EB;
+  }
+  body.lesson-phase-intro .lesson-page .cover-check-icon {
+    color: #2563EB;
+  }
+  body.lesson-phase-intro .lesson-page .cover-rule-inner {
+    background: #EFF6FF;
+    border-color: #BFDBFE;
+  }
+  body.lesson-phase-intro .lesson-page .cover-rule-title {
+    color: #1E40AF;
+  }
+  body.lesson-phase-intro .lesson-page .cover-rule-chip {
+    background: #DBEAFE;
+    border-color: #93C5FD;
+    color: #1D4ED8;
+  }
+  body.lesson-phase-intro .lesson-page .lesson-phase-step.is-done:not(.is-current) {
+    border-color: #BFDBFE;
+    background: #EFF6FF;
+  }
+  body.lesson-phase-intro .lesson-page .lesson-phase-step.is-current .lesson-phase-label {
+    color: #1D4ED8;
+  }
+
   /* ── Cards ── */
   .card {
     background: var(--card);
@@ -1791,6 +1823,7 @@
   }
 
   function renderWithPhase(phaseNum, html) {
+    document.body.classList.toggle('lesson-phase-intro', phaseNum === 1);
     updateLessonPhaseNav(phaseNum);
     render(html);
   }
