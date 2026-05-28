@@ -1276,6 +1276,13 @@
     flex-direction: column;
     justify-content: center;
   }
+  /* Cálculos: compact fixed-height scratchpad, overrides the shared rule above */
+  .col-calc .wt-col-content {
+    flex: 0 0 auto;
+    max-height: 8rem;
+    display: block;
+    /* overflow-y: auto already set by .wt-col-content base rule */
+  }
   .wt-grid-svg {
     position: absolute; top: 0; left: 0;
     width: 100%; height: 100%;
@@ -2840,6 +2847,19 @@
       });
     }
 
+    // ── Cálculos scratchpad: opacity fade + auto-scroll ────────
+    function _calcDidUpdate() {
+      var el = document.getElementById('wt-col-calc');
+      if (!el) return;
+      var ch = el.children;
+      var n = ch.length;
+      for (var i = 0; i < n; i++) {
+        var d = n - 1 - i; // 0 = newest (last child), grows toward oldest
+        ch[i].style.opacity = d === 0 ? 1 : d === 1 ? 0.6 : d === 2 ? 0.35 : 0.18;
+      }
+      el.scrollTop = el.scrollHeight;
+    }
+
     function _appendWrite(step) {
       const col = document.getElementById('wt-col-' + step.col);
       if (!col) return;
@@ -2848,6 +2868,7 @@
         if (notes && step.html && !step.note) notes.insertAdjacentHTML('beforeend', step.html);
       } else if (step.col === 'calc') {
         col.insertAdjacentHTML('beforeend', step.html);
+        _calcDidUpdate();
       } else if (step.col === 'prob') {
         const existing = col.querySelectorAll('.prob-line');
         existing.forEach(function(el) { el.classList.add('dimmed'); el.classList.remove('final'); });
@@ -2876,6 +2897,7 @@
         '</div>' +
         '<div class="wt-q-trytext" id="wt-qtry"></div>';
       col.appendChild(bub);
+      _calcDidUpdate();
       setTimeout(function() { const inp = document.getElementById('wt-qinp'); if (inp) inp.focus(); }, 100);
     }
 
@@ -2986,6 +3008,7 @@
       _s.paused = false;
       _s.waiting = false;
       _s.tries = 0;
+      _calcDidUpdate(); // scroll to & highlight newest calc entry after replay
       _updateBar();
       scheduleSyncRailMarkers();
       _resume();
@@ -3025,6 +3048,7 @@
         const bub = document.getElementById('wt-qbub');
         if (bub) bub.remove();
         if (col) col.insertAdjacentHTML('beforeend', '<div class="calc-line">' + step.correct + '</div>');
+        if (col) _calcDidUpdate();
         markDiagramStepDone();
         _s.waiting = false;
         _setStatus('writing');
@@ -3035,6 +3059,7 @@
         if (bub) bub.remove();
         if (col) col.insertAdjacentHTML('beforeend',
           '<div class="calc-line" style="color:var(--text-secondary)">' + step.wrong + '</div>');
+        if (col) _calcDidUpdate();
         markDiagramStepDone();
         _s.waiting = false;
         _setStatus('writing');
