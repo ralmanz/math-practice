@@ -104,13 +104,39 @@
     return fallback;
   }
 
+  function isLessonFlowPage() {
+    var path = (window.location.pathname || '').split('/').pop() || '';
+    return path === 'lesson.html' || path === 'app.html';
+  }
+
+  function getCurriculumBackHref() {
+    if (window.NuvoNavBackHref) return window.NuvoNavBackHref;
+    if (!isLessonFlowPage()) return null;
+    var params = new URLSearchParams(window.location.search);
+    var curriculum = params.get('curriculum');
+    if (!curriculum) return null;
+    if (localStorage.getItem('nuvo_teacher') === 'true') return 'filter.html';
+    if (params.get('guest') === 'true') {
+      return 'home.html?curriculum=' + encodeURIComponent(curriculum) + '&guest=true';
+    }
+    return 'home.html?curriculum=' + encodeURIComponent(curriculum);
+  }
+
   function buildMenuPanel(isTeacher, isStudent, isGuest) {
     var accountHref = isTeacher ? 'teacher.html' : (isStudent ? 'home.html' : 'login.html');
     var accountLabel = menuLabel('nav_account', 'Account');
     var signLabel = isGuest
       ? menuLabel('nav_signin', 'Sign in')
       : menuLabel('nav_signout', 'Sign out');
-    var html =
+    var html = '';
+    var backHref = getCurriculumBackHref();
+    if (backHref) {
+      html +=
+        '<a href="' + backHref + '" class="nav-menu-item" id="nav-curriculum-back">' +
+        menuLabel('back_to_curriculum', '\u2190 Back to curriculum') +
+        '</a>';
+    }
+    html +=
       '<a href="' + accountHref + '" class="nav-menu-item" id="nav-account-link">' + accountLabel + '</a>';
     if (isGuest) {
       html += '<a href="login.html" class="nav-menu-item">' + signLabel + '</a>';
@@ -238,5 +264,33 @@
     initNav();
   }
 
+  function refreshMenu() {
+    var isTeacher = localStorage.getItem('nuvo_teacher') === 'true';
+    var nuvoStudent = localStorage.getItem('nuvo_student');
+    var isStudent = !isTeacher && !!nuvoStudent;
+    var isGuest = !isTeacher && !isStudent;
+    wireMenu(buildMenuPanel(isTeacher, isStudent, isGuest));
+    var signOutBtn = document.getElementById('nav-signout-btn');
+    if (signOutBtn && !signOutBtn.dataset.bound) {
+      signOutBtn.dataset.bound = '1';
+      signOutBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (isTeacher) {
+          localStorage.removeItem('nuvo_teacher');
+          sessionStorage.removeItem('teacherSecret');
+        } else {
+          localStorage.removeItem('nuvo_student');
+          localStorage.removeItem('studentId');
+        }
+        window.location.href = 'index.html';
+      });
+    }
+  }
+
   window.initNav = initNav;
+  window.refreshNavMenu = refreshMenu;
+  window.setNavCurriculumBack = function (href) {
+    window.NuvoNavBackHref = href || '';
+    refreshMenu();
+  };
 }());

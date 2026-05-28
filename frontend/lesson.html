@@ -1706,9 +1706,6 @@
 <body>
 <div id="nav-root"></div>
 <div class="lesson-page">
-  <div class="lesson-topnav">
-    <a href="home.html" class="back-link" data-i18n="back_to_curriculum">← Back to curriculum</a>
-  </div>
   <div class="lesson-phase-shell" id="lesson-phase-shell">
     <div id="lesson-phase-root"></div>
   </div>
@@ -1960,14 +1957,7 @@
     lessonMaxPhase = 1;
     lessonCurrentPhase = 1;
 
-    const backLink = document.querySelector('.back-link');
-    if (localStorage.getItem('nuvo_teacher') === 'true') {
-      backLink.href = 'filter.html';
-    } else if (guestMode) {
-      backLink.href = 'home.html?curriculum=' + encodeURIComponent(curriculum) + '&guest=true';
-    } else {
-      backLink.href = 'home.html?curriculum=' + encodeURIComponent(curriculum);
-    }
+    if (window.refreshNavMenu) window.refreshNavMenu();
 
     routeInitialLessonPhase();
   }
@@ -3667,6 +3657,6 @@
 
   init();
 </script>
-<script src="nav.js?v=20260528-phase-shell"></script>
+<script src="nav.js?v=20260531-menu-back"></script>
 </body>
 </html>

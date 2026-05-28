@@ -65,7 +65,6 @@
   }
 
   /* Phase bar must scroll away on practice (same as lesson.html) */
-  #lesson-page .lesson-topnav,
   #lesson-page .lesson-phase-shell,
   #lesson-page .lesson-phase-nav,
   #lesson-page .lesson-phase-step {
@@ -916,9 +915,6 @@
 
 <!-- ════════ PRACTICE / STUDENT MODE ════════ -->
 <div class="lesson-page" id="lesson-page" style="display:none;">
-  <div class="lesson-topnav" id="lesson-topnav">
-    <a href="home.html" class="back-link" id="lesson-back-link" data-i18n="back_to_curriculum">← Back to curriculum</a>
-  </div>
   <div class="lesson-phase-shell" id="lesson-phase-shell">
     <div id="lesson-phase-root"></div>
   </div>
@@ -1054,10 +1050,7 @@
     page.style.display = 'block';
     if (practice) practice.classList.add('curriculum-practice');
 
-    const back = document.getElementById('lesson-back-link');
-    if (back) {
-      back.href = PARAM_RETURN_TO || buildLessonPhaseUrl('concepts');
-    }
+    if (window.refreshNavMenu) window.refreshNavMenu();
 
     const breadcrumb = document.getElementById('curriculum-breadcrumb');
     if (breadcrumb) breadcrumb.style.display = 'none';
@@ -2401,6 +2394,6 @@
   checkTrialStatus();
 </script>
 
-<script src="nav.js?v=20260528-phase-shell"></script>
+<script src="nav.js?v=20260531-menu-back"></script>
 </body>
 </html>
