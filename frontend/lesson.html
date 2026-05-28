@@ -1230,9 +1230,10 @@
     background: var(--card);
     border: 1.5px solid var(--border);
     border-radius: 14px;
-    overflow: hidden;
+    overflow: visible;
     margin-bottom: 16px;
   }
+  body.has-walkthrough { --wt-stage-bp: 840px; }
   .wt-topbar {
     display: flex;
     align-items: center;
@@ -1254,11 +1255,143 @@
     transition: background 0.15s;
   }
   .wt-ctrl-btn:hover { background: var(--bg); }
-  .wt-columns {
-    display: grid;
-    grid-template-columns: minmax(168px, 1fr) 26px minmax(168px, 1fr) minmax(120px, 0.72fr);
-    height: max(300px, min(min(560px, 72vh), calc(100vh - 220px)));
+  /* ── Single-stage walkthrough layout ── */
+  .wt-stage {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .wt-rule-bar {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 1px 0 var(--border);
+    padding: 10px 14px;
+  }
+  .wt-rule-compact {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-family: var(--sans);
+    font-size: 0.82rem;
+    line-height: 1.45;
+    color: var(--text);
+  }
+  .wt-rule-chip {
+    flex-shrink: 0;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-family: var(--mono);
+    min-width: 2rem;
+    text-align: center;
+  }
+  .wt-rule-line {
+    flex: 1 1 12rem;
+    min-width: 0;
+    padding-top: 2px;
+  }
+  .wt-rule-toggle {
+    flex-shrink: 0;
+    margin-left: auto;
+    font-size: 0.72rem;
+    padding: 4px 10px;
+  }
+  .wt-rule-full-panel {
+    display: none;
+    background: #f5f4f0;
+    border-bottom: 1px solid var(--border);
+    padding: 10px 14px 14px;
+    max-height: min(50vh, 320px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .wt-rule-full-panel.is-open { display: block; }
+  .wt-rule-full-panel #wt-notes {
+    border-top: none;
+    padding: 0;
+    overflow: visible;
+    font-family: var(--sans);
+    font-size: 0.82rem;
+  }
+  .wt-stage-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 14px;
+    min-height: 240px;
+  }
+  .wt-equation-wrap {
+    position: relative;
+    display: flex;
+    flex-direction: row;
     align-items: stretch;
+    min-width: 0;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    min-height: 160px;
+  }
+  .wt-rail--eq {
+    flex: 0 0 26px;
+    width: 26px;
+    min-height: 100%;
+    background: transparent;
+    border: none;
+    align-self: stretch;
+  }
+  .wt-equation-col {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .wt-equation-col #wt-col-prob {
+    width: 100%;
+    overflow: visible;
+    border-top: none;
+    padding: 22px 18px 26px 10px;
+    text-align: center;
+    background: transparent;
+  }
+  .wt-equation-col .prob-line {
+    font-size: 1.02rem;
+    margin-bottom: 8px;
+  }
+  .wt-calc-dock {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 140px;
+    position: relative;
+  }
+  .wt-calc-dock #wt-col-calc {
+    flex: 1 1 auto;
+    min-height: 120px;
+  }
+  /* Wide layout: scratch beside equation (tune --wt-stage-bp on body.has-walkthrough) */
+  @media (min-width: 840px) {
+    .wt-stage-body {
+      flex-direction: row;
+      align-items: stretch;
+      gap: 18px;
+    }
+    .wt-equation-wrap {
+      flex: 1 1 58%;
+    }
+    .wt-calc-dock {
+      flex: 0 1 42%;
+      max-width: 420px;
+      min-width: 260px;
+      border-left: 1px solid var(--border);
+      padding-left: 14px;
+      margin-left: 0;
+    }
   }
   .wt-col {
     position: relative;
@@ -1267,14 +1400,8 @@
     display: flex;
     flex-direction: column;
   }
-  .col-theory { background: #f5f4f0; border-right: 1px solid var(--border); }
-  .col-prob   { border-right: 1px solid var(--border); }
-  .col-prob .wt-col-content,
   .col-calc .wt-col-content {
     background: var(--bg);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
   }
   /* Cálculos: horizontal filmstrip viewport (replaces vertical scratchpad) */
   .col-calc .wt-col-content#wt-col-calc {
@@ -1395,13 +1522,10 @@
     border-top: 1px solid rgba(0, 0, 0, 0.06);
   }
   .wt-rail {
-    background: var(--wt-theory-bg);
-    border-right: 1px solid var(--wt-border);
     padding: 14px 0;
     position: relative;
     min-width: 0;
     min-height: 0;
-    align-self: stretch;
   }
   .wt-rail-marker-wrap {
     position: absolute;
@@ -1612,7 +1736,6 @@
   }
   .wt-rail-marker:hover + .wt-rail-tooltip,
   .wt-rail-marker-wrap:hover .wt-rail-tooltip { display: block; }
-  #wt-rail { align-self: stretch; }
 </style>
 </head>
 <body>
@@ -2749,29 +2872,38 @@
           </div>
           <span id="wt-step-info" style="font-size:0.72rem;color:var(--text-secondary)"></span>
         </div>
-        <div class="wt-columns">
-          <div id="wt-col-theory" class="wt-col col-theory">
-            <div class="wt-col-label">TEOR&Iacute;A</div>
-            <div class="wt-col-content" id="wt-notes"></div>
+        <div class="wt-stage" id="wt-stage">
+          <div class="wt-rule-bar" id="wt-rule-bar">
+            <div class="wt-rule-compact" id="wt-rule-compact">
+              <span class="wt-rule-chip" id="wt-rule-chip" hidden></span>
+              <span class="wt-rule-line" id="wt-rule-line"></span>
+              <button type="button" class="wt-ctrl-btn wt-rule-toggle" id="wt-rule-toggle" onclick="wtToggleRuleFull()">ver regla completa</button>
+            </div>
           </div>
-          <div id="wt-rail" class="wt-rail">
-            <div style="position:absolute;top:14px;bottom:14px;left:50%;width:1px;background:var(--wt-border);transform:translateX(-50%);z-index:0;"></div>
+          <div class="wt-rule-full-panel" id="wt-rule-full" aria-hidden="true">
+            <div id="wt-notes"></div>
           </div>
-          <div class="wt-col col-prob">
-            ${gridSvg('prob')}
-            <div class="wt-col-label">problema</div>
-            <div class="wt-col-content" id="wt-col-prob"></div>
-          </div>
-          <div class="wt-col col-calc">
-            ${gridSvg('calc')}
-            <div class="wt-col-label wt-calc-head">
-              <span>c&aacute;lculos</span>
-              <div class="wt-calc-nav">
-                <button type="button" class="wt-ctrl-btn wt-calc-nav-btn" id="wt-calc-prev" onclick="wtCalcNav(-1)" aria-label="Tarjeta anterior" disabled>&#8592;</button>
-                <button type="button" class="wt-ctrl-btn wt-calc-nav-btn" id="wt-calc-next" onclick="wtCalcNav(1)" aria-label="Tarjeta siguiente" disabled>&#8594;</button>
+          <div class="wt-stage-body">
+            <div class="wt-equation-wrap">
+              ${gridSvg('prob')}
+              <div id="wt-rail" class="wt-rail wt-rail--eq">
+                <div style="position:absolute;top:14px;bottom:14px;left:50%;width:1px;background:var(--wt-border);transform:translateX(-50%);z-index:0;"></div>
+              </div>
+              <div class="wt-equation-col">
+                <div class="wt-col-content" id="wt-col-prob"></div>
               </div>
             </div>
-            <div class="wt-col-content" id="wt-col-calc"><div class="wt-calc-track" id="wt-calc-track"></div></div>
+            <div class="wt-calc-dock col-calc">
+              ${gridSvg('calc')}
+              <div class="wt-col-label wt-calc-head">
+                <span>c&aacute;lculos</span>
+                <div class="wt-calc-nav">
+                  <button type="button" class="wt-ctrl-btn wt-calc-nav-btn" id="wt-calc-prev" onclick="wtCalcNav(-1)" aria-label="Tarjeta anterior" disabled>&#8592;</button>
+                  <button type="button" class="wt-ctrl-btn wt-calc-nav-btn" id="wt-calc-next" onclick="wtCalcNav(1)" aria-label="Tarjeta siguiente" disabled>&#8594;</button>
+                </div>
+              </div>
+              <div class="wt-col-content" id="wt-col-calc"><div class="wt-calc-track" id="wt-calc-track"></div></div>
+            </div>
           </div>
         </div>
         <div class="wt-bottombar">
@@ -2820,6 +2952,62 @@
       }
       if (textNodes.length) tick();
     }
+
+    function _clearRuleBar() {
+      var chip = document.getElementById('wt-rule-chip');
+      var line = document.getElementById('wt-rule-line');
+      if (chip) { chip.textContent = ''; chip.hidden = true; chip.className = 'wt-rule-chip'; }
+      if (line) line.textContent = '';
+    }
+
+    function _updateRuleBarFromNote(note) {
+      if (!note) return;
+      var chipEl = document.getElementById('wt-rule-chip');
+      var lineEl = document.getElementById('wt-rule-line');
+      if (!chipEl || !lineEl) return;
+      if (note.type === 'diagram') {
+        var chip = note.active || '';
+        chipEl.hidden = !chip;
+        chipEl.className = 'wt-rule-chip wt-note-ds-item wt-note-ds-' + String(chip).replace('/', '');
+        chipEl.textContent = chip;
+        lineEl.textContent = note.text || note.hint || note.meaning || '';
+      } else if (note.type === 'rule') {
+        if (note.active) {
+          chipEl.hidden = false;
+          chipEl.className = 'wt-rule-chip wt-note-ds-item wt-note-ds-' + String(note.active).replace('/', '');
+          chipEl.textContent = note.active;
+        } else {
+          chipEl.hidden = true;
+        }
+        lineEl.textContent = note.content || '';
+      } else if (note.type === 'legend') {
+        chipEl.hidden = true;
+        lineEl.textContent = note.label ? (note.label + ' — toca «ver regla completa»') : '';
+      }
+    }
+
+    function _resetWtNotes() {
+      var notes = document.getElementById('wt-notes');
+      if (notes) notes.innerHTML = '';
+      var panel = document.getElementById('wt-rule-full');
+      if (panel) {
+        panel.classList.remove('is-open');
+        panel.setAttribute('aria-hidden', 'true');
+      }
+      var btn = document.getElementById('wt-rule-toggle');
+      if (btn) btn.textContent = 'ver regla completa';
+      _clearRuleBar();
+    }
+
+    window.wtToggleRuleFull = function () {
+      var panel = document.getElementById('wt-rule-full');
+      var btn = document.getElementById('wt-rule-toggle');
+      if (!panel) return;
+      var open = !panel.classList.contains('is-open');
+      panel.classList.toggle('is-open', open);
+      panel.setAttribute('aria-hidden', open ? 'false' : 'true');
+      if (btn) btn.textContent = open ? 'ocultar regla' : 'ver regla completa';
+    };
 
     function markDiagramStepDone(el) {
       if (!el) {
@@ -2876,6 +3064,9 @@
       }      if (!html) return;
       container.insertAdjacentHTML('beforeend', html);
       const noteEl = container.lastElementChild;
+      if (note.type === 'diagram' || note.type === 'rule' || note.type === 'legend') {
+        _updateRuleBarFromNote(note);
+      }
       if (!instant && noteEl) {
         if (note.type === 'diagram' && (note.text || note.hint || note.meaning)) {
           const textEl = noteEl.querySelector('.wt-note-diagram-text');
@@ -3095,8 +3286,7 @@
 
     function _onComplete() {
       window.removeEventListener('resize', onWtRailLayout);
-      const _probScrollEl = document.getElementById('wt-col-prob');
-      if (_probScrollEl) _probScrollEl.removeEventListener('scroll', onWtRailLayout);
+      window.removeEventListener('scroll', onWtRailLayout);
       /* Keep body.has-walkthrough so .container stays wide until navigation (e.g. Practicar). */
       document.querySelectorAll('audio').forEach(function(a) { a.pause(); a.currentTime = 0; });
       _setStatus('');
@@ -3130,8 +3320,7 @@
     window.wtRestart = function() {
       _clearContinueTimer();
       _s.idx = 0; _s.paused = false; _s.waiting = false; _s.tries = 0; _s.timer = null;
-      const theoryEl = document.getElementById('wt-col-theory');
-      if (theoryEl) theoryEl.innerHTML = '<div class="wt-col-label">TEOR\u00CDA</div><div class="wt-col-content" id="wt-notes"></div>';
+      _resetWtNotes();
       const probEl = document.getElementById('wt-col-prob');
       if (probEl) probEl.innerHTML = '';
       var calcTrack = _calcTrack();
@@ -3148,8 +3337,7 @@
     };
 
     function _jumpTo(targetIdx) {
-      const theoryEl = document.getElementById('wt-col-theory');
-      if (theoryEl) theoryEl.innerHTML = '<div class="wt-col-label">TEOR\u00CDA</div><div class="wt-col-content" id="wt-notes"></div>';
+      _resetWtNotes();
       const probEl = document.getElementById('wt-col-prob');
       if (probEl) probEl.innerHTML = '';
       var calcTrack = _calcTrack();
@@ -3304,8 +3492,7 @@
     window.addEventListener('resize', onWtRailLayout);
 
     const rail = document.getElementById('wt-rail');
-    const probCol = document.getElementById('wt-col-prob');
-    if (probCol) probCol.addEventListener('scroll', onWtRailLayout, { passive: true });
+    window.addEventListener('scroll', onWtRailLayout, { passive: true });
 
     if (rail) {
       railMarkers.forEach(function(rm) {
