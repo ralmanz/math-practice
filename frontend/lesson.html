@@ -1370,8 +1370,17 @@
     min-height: 140px;
     position: relative;
   }
-  .wt-calc-dock #wt-col-calc {
+  .wt-calc-strip {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
     flex: 1 1 auto;
+    min-height: 120px;
+    min-width: 0;
+  }
+  .wt-calc-strip #wt-col-calc {
+    flex: 1 1 auto;
+    min-width: 0;
     min-height: 120px;
   }
   /* Wide layout: scratch beside equation (tune --wt-stage-bp on body.has-walkthrough) */
@@ -1462,23 +1471,19 @@
     margin-top: 0;
     animation: wt-in 0.4s ease forwards;
   }
-  .wt-calc-head {
+  .wt-calc-nav-side {
+    flex: 0 0 auto;
     display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 6px;
-    width: 100%;
-  }
-  .wt-calc-nav {
-    display: flex;
-    gap: 4px;
-    flex-shrink: 0;
+    align-items: center;
+    align-self: stretch;
+    padding: 0 6px;
+    background: var(--bg);
   }
   .wt-calc-nav-btn {
-    padding: 3px 8px;
-    min-width: 28px;
+    padding: 8px 10px;
+    min-width: 32px;
     line-height: 1;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
   }
   .wt-calc-nav-btn:disabled {
     opacity: 0.35;
@@ -2895,14 +2900,16 @@
             </div>
             <div class="wt-calc-dock col-calc">
               ${gridSvg('calc')}
-              <div class="wt-col-label wt-calc-head">
-                <span>c&aacute;lculos</span>
-                <div class="wt-calc-nav">
+              <div class="wt-col-label">c&aacute;lculos</div>
+              <div class="wt-calc-strip">
+                <div class="wt-calc-nav-side">
                   <button type="button" class="wt-ctrl-btn wt-calc-nav-btn" id="wt-calc-prev" onclick="wtCalcNav(-1)" aria-label="Tarjeta anterior" disabled>&#8592;</button>
+                </div>
+                <div class="wt-col-content" id="wt-col-calc"><div class="wt-calc-track" id="wt-calc-track"></div></div>
+                <div class="wt-calc-nav-side">
                   <button type="button" class="wt-ctrl-btn wt-calc-nav-btn" id="wt-calc-next" onclick="wtCalcNav(1)" aria-label="Tarjeta siguiente" disabled>&#8594;</button>
                 </div>
               </div>
-              <div class="wt-col-content" id="wt-col-calc"><div class="wt-calc-track" id="wt-calc-track"></div></div>
             </div>
           </div>
         </div>
@@ -2916,10 +2923,49 @@
     // ── Closure state ──────────────────────────────────────────
     const _s = { idx: 0, paused: false, waiting: false, tries: 0, timer: null };
     let audioEnabled = true;
+    let _wtStepAudio = null;
+    /** Min dwell on Cálculos cards; also lifts old KV seeds that still have pause: 700. */
+    const WT_CALC_WRITE_PAUSE_MIN = 1800;
+    const WT_AFTER_ANSWER_OK_MS = 2400;
+    const WT_AFTER_ANSWER_HINT_MS = 2800;
+
+    function wtStopStepAudio() {
+      if (!_wtStepAudio) return;
+      _wtStepAudio.onended = null;
+      _wtStepAudio.onerror = null;
+      _wtStepAudio.pause();
+      _wtStepAudio.currentTime = 0;
+      _wtStepAudio = null;
+    }
+
+    function wtApplyAudioMute() {
+      if (_wtStepAudio) _wtStepAudio.muted = !audioEnabled;
+    }
+
+    /** Play step MP3; when muted, keeps timing (onended) but silent. */
+    function wtPlayStepAudio(file, onDone) {
+      wtStopStepAudio();
+      if (!file) {
+        if (onDone) onDone();
+        return;
+      }
+      const aud = new Audio(walkthroughAudioUrl(file));
+      aud.muted = !audioEnabled;
+      _wtStepAudio = aud;
+      var finished = false;
+      function finish() {
+        if (finished) return;
+        finished = true;
+        if (_wtStepAudio === aud) _wtStepAudio = null;
+        if (onDone) onDone();
+      }
+      aud.onended = finish;
+      aud.onerror = finish;
+      aud.play().catch(finish);
+    }
 
     function playStepAudio(file) {
-      if (!audioEnabled || !file) return;
-      new Audio(walkthroughAudioUrl(file)).play();
+      wtPlayStepAudio(file, null);
     }
 
     function typewriterReveal(rootEl) {
@@ -3259,18 +3305,14 @@
         _appendWrite(step);
         renderNote(step.note);
         _s.idx++;
-        const pause = step.pause != null ? step.pause : 0;
-        if (audioEnabled && step.audio) {
-          const aud = new Audio(walkthroughAudioUrl(step.audio));
-          var continued = false;
-          function continueOnce() {
-            if (continued) return;
-            continued = true;
+        var pause = step.pause != null ? step.pause : 0;
+        if (step.col === 'calc' && pause < WT_CALC_WRITE_PAUSE_MIN) {
+          pause = WT_CALC_WRITE_PAUSE_MIN;
+        }
+        if (step.audio) {
+          wtPlayStepAudio(step.audio, function () {
             _scheduleContinue(pause);
-          }
-          aud.onended = continueOnce;
-          aud.onerror = continueOnce;
-          aud.play().catch(continueOnce);
+          });
         } else {
           _scheduleContinue(pause);
         }
@@ -3288,7 +3330,7 @@
       window.removeEventListener('resize', onWtRailLayout);
       window.removeEventListener('scroll', onWtRailLayout);
       /* Keep body.has-walkthrough so .container stays wide until navigation (e.g. Practicar). */
-      document.querySelectorAll('audio').forEach(function(a) { a.pause(); a.currentTime = 0; });
+      wtStopStepAudio();
       _setStatus('');
       const fill = document.getElementById('wt-pfill');
       if (fill) fill.style.width = '100%';
@@ -3313,12 +3355,17 @@
       _s.paused = !_s.paused;
       const btn = document.getElementById('wt-pause-btn');
       if (btn) btn.textContent = _s.paused ? '\u25B6 Reanudar' : '&#9208; Pausar';
-      if (_s.paused) _clearContinueTimer();
-      else _resume();
+      if (_s.paused) {
+        _clearContinueTimer();
+        wtStopStepAudio();
+      } else {
+        _resume();
+      }
     };
 
     window.wtRestart = function() {
       _clearContinueTimer();
+      wtStopStepAudio();
       _s.idx = 0; _s.paused = false; _s.waiting = false; _s.tries = 0; _s.timer = null;
       _resetWtNotes();
       const probEl = document.getElementById('wt-col-prob');
@@ -3346,6 +3393,7 @@
         calcTrack.style.transform = '';
       }
       _clearContinueTimer();
+      wtStopStepAudio();
       var lastCalcIdx = null;
       for (var i = 0; i < targetIdx; i++) {
         var step = steps[i];
@@ -3376,7 +3424,7 @@
       audioEnabled = !audioEnabled;
       const btn = document.getElementById('wt-audio-toggle');
       if (btn) btn.textContent = audioEnabled ? '\uD83D\uDD0A' : '\uD83D\uDD07';
-      if (!audioEnabled) document.querySelectorAll('audio').forEach(function(a) { a.pause(); a.currentTime = 0; });
+      wtApplyAudioMute();
     };
 
     window.wtSubmitAnswer = function() {
@@ -3407,7 +3455,7 @@
         markDiagramStepDone();
         _s.waiting = false;
         _setStatus('writing');
-        _scheduleContinue(1200);
+        _scheduleContinue(WT_AFTER_ANSWER_OK_MS);
       } else if (_s.tries >= 2) {
         inp.disabled = true;
         _calcResolveQuestionCard(qStepIdx,
@@ -3415,7 +3463,7 @@
         markDiagramStepDone();
         _s.waiting = false;
         _setStatus('writing');
-        _scheduleContinue(1600);
+        _scheduleContinue(WT_AFTER_ANSWER_HINT_MS);
       } else {
         inp.classList.add('wrong');
         setTimeout(function() { inp.classList.remove('wrong'); inp.value = ''; inp.focus(); }, 320);

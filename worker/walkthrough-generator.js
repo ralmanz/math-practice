@@ -37,7 +37,8 @@
 
 'use strict';
 
-const DEFAULT_PAUSE = { write: 1400, calc: 700, prob: 2000, theory: 1800 };
+/** Post-step dwell (ms). calc: time to read the card before the next step (added after audio ends). */
+const DEFAULT_PAUSE = { write: 1400, calc: 1800, prob: 2200, theory: 2000 };
 
 function step(fields) {
   return {
@@ -180,7 +181,7 @@ function papomudasWalkthrough(opts = {}) {
     }),
     calcWrite({
       html: calcLine('(6 ÷ 3)', 'red'),
-      pause: 700,
+      pause: 1800,
       audio: aud(3),
       railLabel: 'Primero: paréntesis',
       note: diagramNote({
@@ -238,7 +239,7 @@ function papomudasWalkthrough(opts = {}) {
     probWrite({ html: '<span class="hl">11</span> − 2', audio: aud(8), railLabel: 'Suma = 11' }),
     calcWrite({
       html: calcLine('11 − 2', 'amb'),
-      pause: 700,
+      pause: 1800,
       audio: null,
       railLabel: 'Último: resta',
       note: diagramNote({
@@ -306,7 +307,7 @@ function linearSolveWalkthrough(opts = {}) {
     }),
     calcWrite({
       html: `<div class="calc-line">Restar ${subtractLabel} en ambos lados</div>`,
-      pause: 700,
+      pause: 1800,
       audio: aud(3),
       railLabel: 'Paso 1: restar',
       note: diagramNote({
@@ -399,7 +400,7 @@ function linearSolveBothSidesWalkthrough(opts = {}) {
     }),
     calcWrite({
       html: `<div class="calc-line">Restar <span class="blu">${subtractVarTerm}</span> en ambos lados</div>`,
-      pause: 700,
+      pause: 1800,
       audio: aud(3),
       railLabel: 'Paso 1: mover x',
       note: diagramNote({
