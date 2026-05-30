@@ -3483,7 +3483,7 @@
       if (_s.waiting) return;
       _s.paused = !_s.paused;
       const btn = document.getElementById('wt-pause-btn');
-      if (btn) btn.textContent = _s.paused ? '\u25B6 Reanudar' : '&#9208; Pausar';
+      if (btn) btn.textContent = _s.paused ? '\u25B6 Reanudar' : '\u23F8 Pausar';
       if (_s.paused) {
         _clearContinueTimer();
         wtStopStepAudio();
