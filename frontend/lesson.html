@@ -53,9 +53,11 @@
     padding: 24px 16px 48px;
   }
   body.has-walkthrough .container {
-    max-width: min(1400px, calc(100vw - 48px));
+    max-width: 640px;
     width: 100%;
-    padding: 28px clamp(14px, 2.5vw, 32px) 60px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 28px 16px 60px;
   }
 
   /* ── Badge ── */
@@ -1341,25 +1343,7 @@
     min-width: 0;
     min-height: 120px;
   }
-  /* Wide layout: scratch beside equation (tune --wt-stage-bp on body.has-walkthrough) */
-  @media (min-width: 840px) {
-    .wt-stage-body {
-      flex-direction: row;
-      align-items: stretch;
-      gap: 18px;
-    }
-    .wt-equation-wrap {
-      flex: 1 1 58%;
-    }
-    .wt-calc-dock {
-      flex: 0 1 42%;
-      max-width: 420px;
-      min-width: 260px;
-      border-left: 1px solid var(--border);
-      padding-left: 14px;
-      margin-left: 0;
-    }
-  }
+  /* Wide layout: always stacked column (side-by-side removed; centered via .container max-width) */
   .wt-col {
     position: relative;
     min-width: 0;
