@@ -1316,17 +1316,27 @@ P15 — Sucesiones geométricas
 Como los niveles ahora mezclan problemas paso a paso y MCQ, y como un MCQ es adivinable (25% de acierto
 al azar), los dos tipos se puntúan en **vías separadas** y NO se promedian directamente:
 
-- **Vía simbólica (paso a paso):** se puntúa por conteo de rechazos — Mastery (3, 0 rechazos),
-  Solid (2, 1–2), Shaky (1, 3+), Fail (0). Esta vía es la señal principal de dominio.
-- **Vía conceptual (MCQ):** se puntúa binario — correcto / incorrecto (con posible reintento único).
+- **Vía simbólica (paso a paso):** se puntúa por conteo de rechazos (los rechazos por notación `=` se
+  excluyen siempre). Las bandas son:
+  - **Mastery (3):** llegó a la respuesta con 0 rechazos.
+  - **Solid (2):** llegó a la respuesta con 1 rechazo.
+  - **Shaky (1):** llegó a la respuesta con 2–3 rechazos aislados (sin violar techo ni ventana).
+  - **Fail (0):** no llegó a la respuesta, **o** se activó un patrón duro — un solo paso con
+    **> 3 rechazos** (techo por paso), **o** **2 rechazos dentro de cualquier ventana de 3 pasos
+    consecutivos** (regla 2-en-3).
+
+  El techo-3 / ventana-2-en-3 es una única perilla global de ajuste, compartida por la prueba de
+  ubicación y las pruebas de unidad. Esta vía es la señal principal de dominio.
+- **Vía conceptual (MCQ):** se puntúa binario — correcto / incorrecto, sin reintento.
   Mide cobertura/exposición, no dominio manipulativo.
 
 Reglas:
 - En las pruebas de unidad, los resultados se REPORTAN por separado, p. ej.
   "Álgebra simbólica: Solid · Conceptos visuales: 3/4". Un acierto de MCQ por suerte NO debe contaminar
   la calificación de manipulación simbólica (que es la señal diagnóstica que más importa).
-- Se guardan ambas puntuaciones crudas. La fórmula para **agregarlas en una sola calificación** se define
-  MÁS ADELANTE, una vez que haya datos reales de estudiantes que indiquen el peso correcto.
+- Se guardan ambas puntuaciones crudas. **No se combinan en una sola calificación.** En el examen
+  final el criterio es por unidad (cada unidad debe superar su piso individual; no hay promedio global),
+  y cualquier agregación entre intentos queda **DIFERIDA** hasta tener datos reales de estudiantes.
   (Misma disciplina que el auto-flag: primero recolectar, luego decidir el criterio.)
 - Implicación de datos: el registro de intento de unidad debe almacenar las dos vías por separado
   (p. ej. perLevel con subcampos `stepScore` y `mcqScore`), no un único número combinado.

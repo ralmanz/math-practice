@@ -841,7 +841,7 @@
 <script src="lesson-phase-nav.js?v=20260518-grammar"></script>
 <script src="calculator.js?v=20260518-calc-hover"></script>
 <script src="https://cdn.jsdelivr.net/npm/algebrite@1.4.0/dist/algebrite.bundle-for-browser.js"></script>
-<script src="math-validation.js?v=20260518-ineq"></script>
+<script src="math-validation.js?v=20260602-formcheck"></script>
 </head>
 <body>
 <div id="nav-root"></div>
@@ -1030,8 +1030,6 @@
   const PARAM_MODE       = _urlParams.get('mode') || '';
   const PARAM_RETURN_TO  = _urlParams.get('returnTo') || '';
   const IS_UNIT_TEST     = PARAM_MODE === 'unit-test';
-  const UNIT_TEST_REJECTION_LIMIT = 5;
-
   const UNIT_LABELS = { aritmetica: 'Aritmética', algebra: 'Álgebra' };
 
   function buildLessonPhaseUrl(phaseSlug) {
@@ -1082,7 +1080,8 @@
     }
   }
 
-  let unitTestRejections = 0;
+  /** Per worked-line rejection counts (unit test only); =-notation misses are excluded. */
+  let unitTestStepRejections = [];
   let unitTestQuestionRecorded = false;
   let unitTestResults = [];
   let unitTestTakenAt = null;
@@ -1620,21 +1619,54 @@
     return 'fail';
   }
 
+  function unitTestCurrentStepIndex() {
+    return stepHistory.length;
+  }
+
+  function unitTestEnsureStepSlot(stepIdx) {
+    while (unitTestStepRejections.length <= stepIdx) {
+      unitTestStepRejections.push(0);
+    }
+  }
+
+  function unitTestTotalRejections() {
+    return unitTestStepRejections.reduce((sum, n) => sum + n, 0);
+  }
+
+  function unitTestPerStepCeilingExceeded() {
+    return unitTestStepRejections.some((n) => n > 3);
+  }
+
+  function unitTestTwoInThreeWindowExceeded() {
+    const arr = unitTestStepRejections;
+    for (let i = 0; i < arr.length; i++) {
+      const sum = arr.slice(i, i + 3).reduce((a, b) => a + b, 0);
+      if (sum >= 2) return true;
+    }
+    return false;
+  }
+
+  function unitTestHardFailPattern() {
+    return unitTestPerStepCeilingExceeded() || unitTestTwoInThreeWindowExceeded();
+  }
+
   function recordUnitTestQuestionResult(reached) {
     if (!IS_UNIT_TEST || unitTestQuestionRecorded) return;
     unitTestQuestionRecorded = true;
     const p = problems[currentIndex];
     const level = String(p._unitLevel || p.stage || '1');
+    const total = unitTestTotalRejections();
+    const hardFail = unitTestHardFailPattern();
     let points = 0;
     let rating = 'Fail';
-    if (reached) {
-      if (unitTestRejections === 0) {
+    if (reached && !hardFail) {
+      if (total === 0) {
         points = 3;
         rating = 'Mastery';
-      } else if (unitTestRejections <= 2) {
+      } else if (total === 1) {
         points = 2;
         rating = 'Solid';
-      } else {
+      } else if (total <= 3) {
         points = 1;
         rating = 'Shaky';
       }
@@ -1643,15 +1675,17 @@
       level,
       points,
       rating,
-      rejections: reached ? unitTestRejections : unitTestRejections,
+      rejections: total,
       problemId: p.id,
     });
   }
 
   function unitTestRecordRejection() {
     if (!IS_UNIT_TEST) return false;
-    unitTestRejections++;
-    if (unitTestRejections >= UNIT_TEST_REJECTION_LIMIT) {
+    const stepIdx = unitTestCurrentStepIndex();
+    unitTestEnsureStepSlot(stepIdx);
+    unitTestStepRejections[stepIdx]++;
+    if (unitTestHardFailPattern()) {
       recordUnitTestQuestionResult(false);
       document.getElementById('input-area').style.display = 'none';
       document.getElementById('completed-card').style.display = 'none';
@@ -1948,7 +1982,7 @@
     equalsNotationMissCount = 0;
     guestProblemAttempted = false;
     if (IS_UNIT_TEST) {
-      unitTestRejections = 0;
+      unitTestStepRejections = [];
       unitTestQuestionRecorded = false;
     }
 

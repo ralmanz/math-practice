@@ -259,6 +259,122 @@
       return { valid: false };
     }
 
+    function ineqUni(s) { return s.replace(/≤/g, '<=').replace(/≥/g, '>=').replace(/−/g, '-').replace(/\s+/g, ''); }
+    function fnum(s) { try { return Number(Algebrite.run(`float(${s})`)); } catch (e) { return NaN; } }
+    function isZeroNum(a, b) { return !Number.isNaN(a) && !Number.isNaN(b) && Math.abs(a - b) < 1e-9; }
+    function detectVar(s) {
+      const set = new Set(s.replace(/abs/g, '').replace(/[^a-zA-Z]/g, '').split(''));
+      return [...set];
+    }
+    function ineqLinearAB(expr, v) {
+      const a = fnum(`coeff((${expr}),${v},1)`);
+      const b = fnum(`coeff((${expr}),${v},0)`);
+      if (Number.isNaN(a) || Number.isNaN(b)) return null;
+      const hideg = fnum(`coeff((${expr}),${v},2)`);
+      if (Number.isNaN(hideg) || Math.abs(hideg) > 1e-9) return null;
+      return { a, b };
+    }
+    function ineqFlip(op) { return { '<': '>', '>': '<', '<=': '>=', '>=': '<=' }[op]; }
+    function ineqNormalize(raw) {
+      const s = ineqUni(raw);
+      const v = detectVar(s);
+      if (v.length !== 1) return { indeterminate: 'var-count' };
+      const x = v[0];
+      const comp = s.match(/^(.+?)(<=|<)([a-zA-Z])(<=|<)(.+)$/);
+      if (comp && comp[3] === x) {
+        const lo = fnum(comp[1]), hi = fnum(comp[5]);
+        if (Number.isNaN(lo) || Number.isNaN(hi)) return { indeterminate: 'interval-bound' };
+        return { kind: 'interval', var: x, loOp: comp[2], lo, hiOp: comp[4], hi };
+      }
+      const abs = s.match(/^abs\((.+?)\)(<=|>=|<|>)(.+)$/);
+      if (abs) {
+        const inner = abs[1], op = abs[2], k = fnum(abs[3]);
+        if (Number.isNaN(k)) return { indeterminate: 'abs-k' };
+        if (op === '>' || op === '>=') return { indeterminate: 'abs-union-deferred' };
+        if (k < 0) return { indeterminate: 'abs-empty' };
+        const ab = ineqLinearAB(inner, x); if (!ab) return { indeterminate: 'abs-nonlinear' };
+        let lo = (-k - ab.b) / ab.a, hi = (k - ab.b) / ab.a;
+        if (ab.a < 0) { const t = lo; lo = hi; hi = t; }
+        const bound = (op === '<') ? '<' : '<=';
+        return { kind: 'interval', var: x, loOp: bound, lo, hiOp: bound, hi };
+      }
+      const m = s.match(/^(.+?)(<=|>=|<|>)(.+)$/);
+      if (!m) return { indeterminate: 'no-relation' };
+      const ab = ineqLinearAB(`(${m[1]})-(${m[3]})`, x);
+      if (!ab) return { indeterminate: 'nonlinear-or-multivar' };
+      if (isZeroNum(ab.a, 0)) return { indeterminate: 'no-variable' };
+      let op2 = m[2], k = -ab.b / ab.a;
+      if (ab.a < 0) op2 = ineqFlip(m[2]);
+      return { kind: 'linear', var: x, op: op2, k };
+    }
+    function checkInequality(studentRaw, canonicalRaw) {
+      Algebrite.run('clearall');
+      const can = ineqNormalize(canonicalRaw);
+      const stu = ineqNormalize(studentRaw);
+      if (can.indeterminate) return { verdict: 'indeterminate', reason: 'canonical:' + can.indeterminate };
+      if (stu.indeterminate) return { verdict: 'indeterminate', reason: 'student:' + stu.indeterminate };
+      if (stu.kind !== can.kind) return { verdict: 'reject', reason: 'kind-mismatch' };
+      if (stu.var !== can.var) return { verdict: 'reject', reason: 'var-mismatch' };
+      if (stu.kind === 'linear') {
+        return { verdict: (stu.op === can.op && isZeroNum(stu.k, can.k)) ? 'accept' : 'reject' };
+      }
+      const ok = stu.loOp === can.loOp && stu.hiOp === can.hiOp &&
+        isZeroNum(stu.lo, can.lo) && isZeroNum(stu.hi, can.hi);
+      return { verdict: ok ? 'accept' : 'reject' };
+    }
+
+    function fcNorm(s) { return s.replace(/−/g, '-').replace(/\s+/g, ''); }
+    function fcSplitTopLevel(s) {
+      const terms = []; let depth = 0, cur = '';
+      for (const ch of s) {
+        if (ch === '(') depth++; else if (ch === ')') depth--;
+        if ((ch === '+' || ch === '-') && depth === 0 && cur.length > 0) { terms.push(cur); cur = ch; }
+        else cur += ch;
+      }
+      if (cur.length > 0) terms.push(cur);
+      return terms;
+    }
+    function fcSignature(term) {
+      let t = term.replace(/^[+-]/, '');
+      t = t.replace(/^[0-9]*\.?[0-9]*(?:\/[0-9]+)?/, '');
+      return t.split('').sort().join('');
+    }
+    function fcHasParens(s) { return /[()]/.test(s); }
+    function fcIsCollectedNoParens(s) {
+      if (fcHasParens(s)) return false;
+      const seen = new Set();
+      for (const sig of fcSplitTopLevel(s).map(fcSignature)) { if (seen.has(sig)) return false; seen.add(sig); }
+      return true;
+    }
+    function fcIsProductForm(s) { return fcSplitTopLevel(s).length === 1 && fcHasParens(s); }
+    function fcLeadingFactor(s) { const m = s.match(/^([+-]?[0-9]+(?:\/[0-9]+)?)\*?\(/); return m ? m[1] : null; }
+    function fcMulFix(s) { return s.replace(/([0-9])\(/g, '$1*(').replace(/\)([0-9a-zA-Z])/g, ')*$1'); }
+    function fcEquiv(a, b) {
+      try { return String(Algebrite.run(`simplify((${fcMulFix(a)})-(${fcMulFix(b)}))`)) === '0'; }
+      catch (e) { return null; }
+    }
+    function formCheck(op, studentRaw, canonicalRaw) {
+      Algebrite.run('clearall');
+      const student = fcNorm(studentRaw), canonical = fcNorm(canonicalRaw);
+      const eq = fcEquiv(student, canonical);
+      if (eq === null) return { verdict: 'indeterminate', reason: 'eval-fail' };
+      if (eq === false) return { verdict: 'reject', reason: 'not-equivalent' };
+      if (op === 'simplify' || op === 'expand') {
+        return fcIsCollectedNoParens(student) ? { verdict: 'accept' }
+          : { verdict: 'reject', reason: fcHasParens(student) ? 'form:has-parens' : 'form:not-collected' };
+      }
+      if (op === 'factor') {
+        if (!fcIsProductForm(student)) return { verdict: 'reject', reason: 'form:not-a-product' };
+        const sf = fcLeadingFactor(student), cf = fcLeadingFactor(canonical);
+        if (cf === null) return { verdict: 'indeterminate', reason: 'canonical-factor-parse' };
+        if (sf === null) return { verdict: 'reject', reason: 'form:no-factor-extracted' };
+        Algebrite.run('clearall');
+        return String(Algebrite.run(`(${sf})-(${cf})`)) === '0'
+          ? { verdict: 'accept' } : { verdict: 'reject', reason: 'form:not-greatest-factor' };
+      }
+      return { verdict: 'indeterminate', reason: 'unknown-op' };
+    }
+
     function hasBalancedParens(str) {
       let depth = 0;
       for (let i = 0; i < str.length; i++) {
@@ -269,7 +385,7 @@
       return depth === 0;
     }
 
-    function checkEquivalence(exprA, exprB, problemType) {
+    function checkEquivalenceInner(exprA, exprB, problemType) {
       const t0 = performance.now();
       console.log('[checkEquivalence] entry', { exprA, exprB, problemType });
 
@@ -289,7 +405,7 @@
         for (const pa of partsA) {
           let matched = false;
           for (let i = 0; i < partsB.length; i++) {
-            if (!usedB.has(i) && checkEquivalence(pa, partsB[i], problemType).valid === true) {
+            if (!usedB.has(i) && checkEquivalenceInner(pa, partsB[i], problemType).valid === true) {
               usedB.add(i);
               matched = true;
               break;
@@ -321,6 +437,10 @@
 
         const normA = normalize(exprA);
         const normB = normalize(exprB);
+        if (containsEquals(normA) !== containsEquals(normB)) {
+          console.log('[checkEquivalence] asymmetric = in Algebrite simplify path', { normA, normB });
+          return { valid: null, parseError: true };
+        }
         console.log('[checkEquivalence] Algebrite call', { normA, normB });
         const diffResult = Algebrite.run(`simplify((${normA}) - (${normB}))`);
         const diffTrimmed = diffResult.trim();
@@ -336,8 +456,36 @@
       }
     }
 
+    function checkEquivalence(exprA, exprB, problemType) {
+      Algebrite.run('clearall');
+      return checkEquivalenceInner(exprA, exprB, problemType);
+    }
+
     function checkIsFinal(studentStep, expectedAnswer, problemType) {
       return checkEquivalence(studentStep, expectedAnswer, problemType);
+    }
+
+    function mapVerdictToEquivResult(result) {
+      if (result.verdict === 'accept') return { valid: true };
+      if (result.verdict === 'reject') return { valid: false, reason: result.reason };
+      return { valid: null, indeterminate: true, reason: result.reason };
+    }
+
+    function validateAgainstSeed(studentInput, seed) {
+      const op = seed && seed.op;
+      switch (op) {
+        case 'inequality':
+          return mapVerdictToEquivResult(checkInequality(studentInput, seed.answer));
+        case 'simplify':
+        case 'expand':
+        case 'factor':
+          return mapVerdictToEquivResult(formCheck(op, studentInput, seed.answer));
+        case 'solve':
+        case 'evaluate':
+        case 'translate':
+        default:
+          return checkEquivalence(studentInput, seed.answer, seed.type || seed.problemType);
+      }
     }
 
     return {
@@ -347,6 +495,9 @@
       checkIsFinal,
       containsRelational,
       canonicalLinearInequality,
+      checkInequality,
+      formCheck,
+      validateAgainstSeed,
     };
   }
 

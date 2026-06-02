@@ -333,7 +333,12 @@ Rules:
         String(p.stage) === filterStage &&
         p.problemType === filterProblemType
       );
-      return jsonResponse(results);
+      const clientMode = url.searchParams.get('mode');
+      const stripHints = filterProblemType === 'test' || clientMode === 'test';
+      const payload = stripHints
+        ? results.map(({ hints, ...rest }) => rest)
+        : results;
+      return jsonResponse(payload);
     }
 
     // GET /problems — return full problem bank

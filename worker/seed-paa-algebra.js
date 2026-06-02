@@ -38,6 +38,49 @@ const os   = require('os');
 const NAMESPACE_ID = 'bd9a4b14857d4df993a2c065d0804b41';
 const CREATED_AT   = '2026-05-25T00:00:00.000Z';
 
+const {
+  subTopicEnum: PAA_ALGEBRA_SUB_TOPIC_ENUM,
+  seeds: PAA_ALGEBRA_AUTHORED_SEEDS,
+  draws: PAA_ALGEBRA_DRAWS,
+} = require('../frontend/content/seed-paa-algebra.js');
+
+const OP_TO_PROBLEM_TYPE = {
+  simplify: 'Simplify',
+  expand: 'Expand',
+  factor: 'Factorize',
+  solve: 'Solve',
+  evaluate: 'Evaluate',
+  translate: 'Translate',
+  inequality: 'Solve',
+};
+
+const LEVEL_TO_STAGE = { N1: '1', N2: '2', N3: '3' };
+
+function problemsFromAuthoredSeeds(seedMap) {
+  return Object.entries(seedMap).map(([seedId, s]) => ({
+    id: seedId,
+    curriculum: 'PAA',
+    unit: 'algebra',
+    unitId: s.unitId,
+    levelId: s.levelId,
+    stage: LEVEL_TO_STAGE[s.levelId] || '1',
+    problemType: 'practice',
+    type: OP_TO_PROBLEM_TYPE[s.op] || 'Simplify',
+    format: 'open',
+    track: s.track,
+    op: s.op,
+    subTopics: s.subTopics,
+    question: s.prompt,
+    answer: s.answer,
+    hints: s.hints,
+    options: [],
+    modules: ['equivalence'],
+    createdAt: CREATED_AT,
+  }));
+}
+
+const PAA_ALGEBRA_AUTHORED_PROBLEMS = problemsFromAuthoredSeeds(PAA_ALGEBRA_AUTHORED_SEEDS);
+
 // ── Problem data ──────────────────────────────────────────────────────────────
 
 const PAA_ALGEBRA_PROBLEMS = [
@@ -748,10 +791,15 @@ function main() {
   console.log('  Existing problems in bank:', bank.length);
 
   // Remove any existing PAA algebra problems to avoid duplicates
-  const newIds = new Set(PAA_ALGEBRA_PROBLEMS.map(p => p.id));
+  const allPaaAlgebra = PAA_ALGEBRA_PROBLEMS.concat(PAA_ALGEBRA_AUTHORED_PROBLEMS);
+  const newIds = new Set(allPaaAlgebra.map(p => p.id));
   const filtered = bank.filter(p => !newIds.has(p.id));
-  const merged = filtered.concat(PAA_ALGEBRA_PROBLEMS);
-  console.log('  After merge:', merged.length, 'problems (' + PAA_ALGEBRA_PROBLEMS.length + ' PAA Álgebra added)');
+  const merged = filtered.concat(allPaaAlgebra);
+  console.log('  After merge:', merged.length, 'problems (',
+    PAA_ALGEBRA_PROBLEMS.length, 'legacy +',
+    PAA_ALGEBRA_AUTHORED_PROBLEMS.length, 'authored seeds)');
+  console.log('  Authored draws:', Object.keys(PAA_ALGEBRA_DRAWS).length,
+    'levels; subTopicEnum units:', Object.keys(PAA_ALGEBRA_SUB_TOPIC_ENUM).join(', '));
 
   console.log('Writing __problem_bank__...');
   const ok = kvPut('__problem_bank__', JSON.stringify(merged));
