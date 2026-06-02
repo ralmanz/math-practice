@@ -841,6 +841,7 @@
 <script src="lesson-phase-nav.js?v=20260518-grammar"></script>
 <script src="calculator.js?v=20260518-calc-hover"></script>
 <script src="https://cdn.jsdelivr.net/npm/algebrite@1.4.0/dist/algebrite.bundle-for-browser.js"></script>
+<script src="content/seed-paa-algebra.js"></script>
 <script src="math-validation.js?v=20260602-formcheck"></script>
 </head>
 <body>
@@ -1599,6 +1600,31 @@
     document.getElementById('calc-grid').classList.remove('disabled');
   }
 
+  const CURRICULUM_SEED_MAP = {
+    'PAA': {
+      'algebra': {
+        '1': { unitId: 'U1', levelId: 'N1' },
+        '2': { unitId: 'U1', levelId: 'N2' },
+        '3': { unitId: 'U1', levelId: 'N3' },
+      }
+    }
+  };
+
+  function getLocalSeedProblems(unitId, levelId, mode) {
+    if (!window.SeedPAA) return [];
+    return Object.values(window.SeedPAA.seeds)
+      .filter(s => s.unitId === unitId && s.levelId === levelId)
+      .map(s => ({
+        question: s.prompt,
+        answer:   s.answer,
+        type:     s.op,
+        op:       s.op,
+        subTopics: s.subTopics,
+        unitId:   s.unitId,
+        levelId:  s.levelId,
+      }));
+  }
+
   // ── Unit test helpers ─────────────────────────────────────────
   function shuffleArray(arr) {
     const a = arr.slice();
@@ -1897,7 +1923,15 @@
     const levelVal = PARAM_STAGE || PARAM_LEVEL || '1';
     const problemType = PARAM_MODE === 'test' ? 'test' : 'practice';
 
-    problems = await fetchBankProblemsForLesson(PARAM_CURRICULUM, unitVal, levelVal, problemType);
+    problems = [];
+    const _seedCoords = (CURRICULUM_SEED_MAP[PARAM_CURRICULUM] || {})[unitVal]?.[levelVal];
+    if (_seedCoords) {
+      const _local = getLocalSeedProblems(_seedCoords.unitId, _seedCoords.levelId, problemType);
+      if (_local.length > 0) { problems = _local; }
+    }
+    if (problems.length === 0) {
+      problems = await fetchBankProblemsForLesson(PARAM_CURRICULUM, unitVal, levelVal, problemType);
+    }
 
     if (problems.length === 0) {
       document.getElementById('practice-screen').style.display = 'none';

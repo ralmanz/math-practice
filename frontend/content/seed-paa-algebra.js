@@ -138,4 +138,6 @@ const draws = {
   'U2-N3': { test: ['u2-n3-02', 'u2-n3-04', 'u2-n3-06'], final: ['u2-n3-03', 'u2-n3-05'] },
 };
 
-module.exports = { subTopicEnum, seeds, draws };
+const _seedExports = { subTopicEnum, seeds, draws };
+if (typeof module !== 'undefined') module.exports = _seedExports;
+if (typeof window !== 'undefined') window.SeedPAA = _seedExports;

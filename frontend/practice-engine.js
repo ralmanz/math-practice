@@ -185,7 +185,7 @@
   }
 
   // ── Shared validation (math-validation.js, load Algebrite + MathValidation before this file) ──
-  const { normalize, checkEquivalence, checkIsFinal } = MathValidation.create(Algebrite);
+  const { normalize, checkEquivalence, checkIsFinal, validateAgainstSeed } = MathValidation.create(Algebrite);
 
   function extractExpression(questionText) {
     const raw = String(questionText || '');
@@ -854,7 +854,7 @@
       let equiv;
       if (input.includes(',')) {
         console.log('[submitStep] comma answer — skipping step check, treating as final answer');
-        equiv = checkIsFinal(input, problem.answer, problem.type);
+        equiv = problem.op ? validateAgainstSeed(input, problem) : checkIsFinal(input, problem.answer, problem.type);
         console.log(`[submitStep] checkIsFinal (comma shortcut) in ${(performance.now()-t0).toFixed(1)}ms:`, equiv);
       } else {
         equiv = checkEquivalence(previousExpression, input, problem.type);
@@ -883,7 +883,7 @@
         logStep(input, true);
         elFeedback.style.display = 'none';
 
-        const isFinal = checkIsFinal(input, problem.answer, problem.type);
+        const isFinal = problem.op ? validateAgainstSeed(input, problem) : checkIsFinal(input, problem.answer, problem.type);
         console.log('[submitStep] checkIsFinal:', isFinal);
         if (isFinal.valid === true) {
           if (input.includes(',')) {
