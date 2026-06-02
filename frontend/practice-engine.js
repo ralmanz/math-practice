@@ -886,6 +886,15 @@
         const isFinal = problem.op ? validateAgainstSeed(input, problem) : checkIsFinal(input, problem.answer, problem.type);
         console.log('[submitStep] checkIsFinal:', isFinal);
         if (isFinal.valid === true) {
+          if (problem.op) {
+            markProblemComplete();
+            if (mode === 'test') testResults[currentIndex] = true;
+            elInputArea.style.display     = 'none';
+            elCompletedCard.style.display = 'block';
+            elNextBtn.style.display       = 'block';
+            elNextBtn.textContent = currentIndex < problems.length - 1 ? 'Next Problem \u2192' : 'Finish \u2713';
+            return;
+          }
           if (input.includes(',')) {
             console.log('[submitStep] comma answer — skipping form check, marking complete');
             markProblemComplete();
