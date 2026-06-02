@@ -471,7 +471,8 @@
       return { valid: null, indeterminate: true, reason: result.reason };
     }
 
-    function validateAgainstSeed(studentInput, seed) {
+    function validateAgainstSeed(studentRaw, seed) {
+      const studentInput = String(studentRaw).replace(/^\s*=\s*/, '');
       const op = seed && seed.op;
       switch (op) {
         case 'inequality':
