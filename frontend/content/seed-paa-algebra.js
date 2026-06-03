@@ -11,6 +11,9 @@ const subTopicEnum = {
     N2: ['both-sides', 'brackets', 'both-sides-brackets'],
     N3: ['inequality-positive', 'inequality-flip', 'absolute-value'],
   },
+  U3: {
+    N1: ['quadratic-factor', 'quadratic-any-root'],
+  },
 };
 
 const seeds = {
@@ -127,6 +130,21 @@ const seeds = {
   'u2-n3-06': { unitId: 'U2', levelId: 'N3', track: 'step', op: 'inequality', subTopics: ['absolute-value'],
     prompt: 'Una pieza mide x mm con tolerancia |x − 10| ≤ 2. ¿En qué intervalo debe estar x?', answer: '8 <= x <= 12',
     hints: ['|x − 10| ≤ 2 equivale a −2 ≤ x − 10 ≤ 2.', 'Suma 10 a los tres lados.', '8 ≤ x ≤ ?'] },
+
+  // U3 — reference seed for acceptAnyRoot (served when curriculum map includes U3)
+  'u3-n1-01': {
+    unitId: 'U3', levelId: 'N1', track: 'step', op: 'solve',
+    acceptAnyRoot: true,
+    sourceExpression: 'x^2-7*x+12=0',
+    subTopics: ['quadratic-any-root'],
+    prompt: '¿Cuál es una solución de x² − 7x + 12 = 0? (escribe x = N)',
+    answer: 'x = 3',
+    hints: [
+      'Factoriza o despeja; solo necesitas UNA raíz válida.',
+      'Las raíces enteras son 3 y 4.',
+      'Escribe x = 3 o x = 4.',
+    ],
+  },
 };
 
 const draws = {

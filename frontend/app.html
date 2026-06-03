@@ -1031,6 +1031,8 @@
   const PARAM_MODE       = _urlParams.get('mode') || '';
   const PARAM_RETURN_TO  = _urlParams.get('returnTo') || '';
   const IS_UNIT_TEST     = PARAM_MODE === 'unit-test';
+  const IS_PLACEMENT     = PARAM_MODE === 'placement';
+  const IS_ASSESSMENT    = IS_UNIT_TEST || IS_PLACEMENT;
   const UNIT_LABELS = { aritmetica: 'Aritmética', algebra: 'Álgebra' };
 
   function buildLessonPhaseUrl(phaseSlug) {
@@ -1081,11 +1083,15 @@
     }
   }
 
-  /** Per worked-line rejection counts (unit test only); =-notation misses are excluded. */
+  /** Per worked-line rejection counts (assessment modes); =-notation misses are excluded. */
+  const ASSESSMENT_REJECTION_LIMIT = 5; // UX backstop per question — not the band rubric (FIX-B)
   let unitTestStepRejections = [];
   let unitTestQuestionRecorded = false;
   let unitTestResults = [];
   let unitTestTakenAt = null;
+  let placementStepRejections = [];
+  let placementQuestionRecorded = false;
+  let placementResults = [];
 
   function currentProblemRowId() {
     if (PROBLEM_ID) return PROBLEM_ID;
@@ -1098,7 +1104,7 @@
   }
 
   function markProblemComplete() {
-    if (IS_UNIT_TEST) return;
+    if (IS_ASSESSMENT) return;
     const pid = currentProblemRowId();
     if (!STUDENT_ID || !pid) return;
     fetch(`${PROXY_URL}/student/${encodeURIComponent(STUDENT_ID)}/complete/${encodeURIComponent(pid)}`, {
@@ -1265,7 +1271,17 @@
     });
   }
 
-  const { normalize, isAlgebriteZero, checkEquivalence, checkIsFinal } = MathValidation.create(Algebrite);
+  const { normalize, isAlgebriteZero, checkEquivalence, checkIsFinal, validateAgainstSeed } = MathValidation.create(Algebrite);
+
+  function checkFinalAnswer(rawInput, equivInput, problem) {
+    if (problem.op) return validateAgainstSeed(rawInput, problem);
+    const stripped = String(equivInput).replace(/^\s*=\s*/, '');
+    const src = problem.sourceExpression || problem.sourceEquation;
+    const opts = problem.acceptAnyRoot && src
+      ? { acceptAnyRoot: true, sourceExpression: src }
+      : undefined;
+    return checkIsFinal(stripped, problem.answer, problem.type, opts);
+  }
 
   // ── Translate: submit handler ──
   async function submitTranslate(input, problem) {
@@ -1314,7 +1330,7 @@
       stepHistory.push(input);
       addStepToHistory(input);
       document.getElementById('feedback').style.display = 'none';
-      if (IS_UNIT_TEST) recordUnitTestQuestionResult(true);
+      assessmentRecordQuestionReached();
       markProblemComplete();
       document.getElementById('input-area').style.display = 'none';
       document.getElementById('completed-card').style.display = 'block';
@@ -1327,7 +1343,7 @@
       wrongCount++;
       studentCalc.clear();
       if (IS_UNIT_TEST) {
-        if (unitTestRecordRejection()) return;
+        if (assessmentRecordRejection()) return;
         showFeedback('wrong', 'No es correcto. Intenta de nuevo.');
         reenableInput();
         return;
@@ -1600,12 +1616,16 @@
     document.getElementById('calc-grid').classList.remove('disabled');
   }
 
+  // D-STRUCT (a): PAA algebra stages 1–3 → U1; stages 4–6 → U2 (see docs/curriculum_structure_authority.md)
   const CURRICULUM_SEED_MAP = {
     'PAA': {
       'algebra': {
         '1': { unitId: 'U1', levelId: 'N1' },
         '2': { unitId: 'U1', levelId: 'N2' },
         '3': { unitId: 'U1', levelId: 'N3' },
+        '4': { unitId: 'U2', levelId: 'N1' },
+        '5': { unitId: 'U2', levelId: 'N2' },
+        '6': { unitId: 'U2', levelId: 'N3' },
       }
     }
   };
@@ -1614,15 +1634,21 @@
     if (!window.SeedPAA) return [];
     return Object.values(window.SeedPAA.seeds)
       .filter(s => s.unitId === unitId && s.levelId === levelId)
-      .map(s => ({
-        question: s.prompt,
-        answer:   s.answer,
-        type:     s.op,
-        op:       s.op,
-        subTopics: s.subTopics,
-        unitId:   s.unitId,
-        levelId:  s.levelId,
-      }));
+      .map(s => {
+        const p = {
+          question: s.prompt,
+          answer: s.answer,
+          type: s.op,
+          op: s.op,
+          subTopics: s.subTopics,
+          unitId: s.unitId,
+          levelId: s.levelId,
+        };
+        if (s.acceptAnyRoot) p.acceptAnyRoot = true;
+        const src = s.sourceExpression || s.sourceEquation;
+        if (src) p.sourceExpression = src;
+        return p;
+      });
   }
 
   // ── Unit test helpers ─────────────────────────────────────────
@@ -1645,35 +1671,78 @@
     return 'fail';
   }
 
-  function unitTestCurrentStepIndex() {
-    return stepHistory.length;
+  function stepRejectionTotal(arr) {
+    return arr.reduce((sum, n) => sum + n, 0);
   }
 
-  function unitTestEnsureStepSlot(stepIdx) {
-    while (unitTestStepRejections.length <= stepIdx) {
-      unitTestStepRejections.push(0);
-    }
-  }
-
-  function unitTestTotalRejections() {
-    return unitTestStepRejections.reduce((sum, n) => sum + n, 0);
-  }
-
-  function unitTestPerStepCeilingExceeded() {
-    return unitTestStepRejections.some((n) => n > 3);
-  }
-
-  function unitTestTwoInThreeWindowExceeded() {
-    const arr = unitTestStepRejections;
+  function stepRejectionHardFail(arr) {
+    if (arr.some((n) => n > 3)) return true;
     for (let i = 0; i < arr.length; i++) {
-      const sum = arr.slice(i, i + 3).reduce((a, b) => a + b, 0);
-      if (sum >= 2) return true;
+      if (arr.slice(i, i + 3).reduce((a, b) => a + b, 0) >= 2) return true;
     }
     return false;
   }
 
-  function unitTestHardFailPattern() {
-    return unitTestPerStepCeilingExceeded() || unitTestTwoInThreeWindowExceeded();
+  function stepRejectionIncrement(arr) {
+    const stepIdx = stepHistory.length;
+    while (arr.length <= stepIdx) arr.push(0);
+    arr[stepIdx]++;
+    return stepRejectionHardFail(arr) || stepRejectionTotal(arr) >= ASSESSMENT_REJECTION_LIMIT;
+  }
+
+  /** B2: placement ace — reached and no per-step ceiling / 2-in-3 violation. */
+  function placementQuestionWouldAce(reached) {
+    return !!reached && !stepRejectionHardFail(placementStepRejections);
+  }
+
+  function recordPlacementQuestionResult(reached) {
+    if (!IS_PLACEMENT || placementQuestionRecorded) return;
+    placementQuestionRecorded = true;
+    const p = problems[currentIndex];
+    placementResults.push({
+      problemId: p.id,
+      level: String(p._unitLevel || p.stage || '1'),
+      aced: placementQuestionWouldAce(reached),
+      rejections: stepRejectionTotal(placementStepRejections),
+    });
+  }
+
+  function placementRecordRejection() {
+    if (!IS_PLACEMENT) return false;
+    if (stepRejectionIncrement(placementStepRejections)) {
+      recordPlacementQuestionResult(false);
+      document.getElementById('input-area').style.display = 'none';
+      document.getElementById('completed-card').style.display = 'none';
+      document.getElementById('next-problem-btn').style.display = 'block';
+      document.getElementById('next-problem-btn').textContent = 'Siguiente →';
+      showFeedback('wrong', 'Límite de intentos en esta pregunta. Continúa…');
+      studentCalc.clear();
+      setTimeout(() => advancePlacementQuestion(), 1500);
+      return true;
+    }
+    return false;
+  }
+
+  function advancePlacementQuestion() {
+    document.getElementById('feedback').style.display = 'none';
+    if (currentIndex < problems.length - 1) {
+      loadProblem(currentIndex + 1);
+    } else {
+      console.log('[placement] complete', placementResults);
+      document.getElementById('practice-screen').style.display = 'none';
+      showFeedback('unsure', 'Colocación registrada (flujo completo pendiente de UI).');
+    }
+  }
+
+  function assessmentRecordRejection() {
+    if (IS_UNIT_TEST) return unitTestRecordRejection();
+    if (IS_PLACEMENT) return placementRecordRejection();
+    return false;
+  }
+
+  function assessmentRecordQuestionReached() {
+    if (IS_UNIT_TEST) recordUnitTestQuestionResult(true);
+    if (IS_PLACEMENT) recordPlacementQuestionResult(true);
   }
 
   function recordUnitTestQuestionResult(reached) {
@@ -1681,8 +1750,8 @@
     unitTestQuestionRecorded = true;
     const p = problems[currentIndex];
     const level = String(p._unitLevel || p.stage || '1');
-    const total = unitTestTotalRejections();
-    const hardFail = unitTestHardFailPattern();
+    const total = stepRejectionTotal(unitTestStepRejections);
+    const hardFail = stepRejectionHardFail(unitTestStepRejections);
     let points = 0;
     let rating = 'Fail';
     if (reached && !hardFail) {
@@ -1708,10 +1777,7 @@
 
   function unitTestRecordRejection() {
     if (!IS_UNIT_TEST) return false;
-    const stepIdx = unitTestCurrentStepIndex();
-    unitTestEnsureStepSlot(stepIdx);
-    unitTestStepRejections[stepIdx]++;
-    if (unitTestHardFailPattern()) {
+    if (stepRejectionIncrement(unitTestStepRejections)) {
       recordUnitTestQuestionResult(false);
       document.getElementById('input-area').style.display = 'none';
       document.getElementById('completed-card').style.display = 'none';
@@ -2019,6 +2085,10 @@
       unitTestStepRejections = [];
       unitTestQuestionRecorded = false;
     }
+    if (IS_PLACEMENT) {
+      placementStepRejections = [];
+      placementQuestionRecorded = false;
+    }
 
     const p = problems[index];
     const typeStr = (!IS_UNIT_TEST && p.type) ? ` · ${p.type}` : '';
@@ -2057,6 +2127,16 @@
     document.getElementById('input-area').style.display = 'flex';
     studentCalc.clear();
     studentCalc.closePanels();
+    if (studentCalc.setAnswerFormMode) {
+      const solveLike = p.op === 'solve' || p.type === 'Solve';
+      const ansNorm = String(p.answer || '').replace(/\s+/g, '').replace(/≥/g, '>=').replace(/≤/g, '<=');
+      const absGeUnion = p.op === 'inequality' && /^abs\([^)]+\)(>=|>)/i.test(ansNorm);
+      let formMode = 'default';
+      if (p.acceptAnyRoot) formMode = 'any-root';
+      else if (absGeUnion) formMode = 'union';
+      else if (solveLike) formMode = 'multi-root';
+      studentCalc.setAnswerFormMode(formMode);
+    }
     document.getElementById('calc-grid').classList.remove('disabled');
     updateProgress();
   }
@@ -2122,7 +2202,7 @@
     let equiv;
     if (input.includes(',')) {
       console.log('[submitStep] comma answer — skipping step check, treating as final answer');
-      equiv = checkIsFinal(equivInput, problem.answer, problem.type);
+      equiv = checkFinalAnswer(input, equivInput, problem);
       console.log(`[submitStep] checkIsFinal (comma shortcut) in ${(performance.now()-t0).toFixed(1)}ms:`, equiv);
     } else {
       equiv = checkEquivalence(previousExpression, equivInput, problem.type);
@@ -2135,10 +2215,10 @@
         const interpreted = await askClaudeToInterpret(input);
         console.log(`[submitStep] Claude interpret returned in ${(performance.now()-tI).toFixed(1)}ms:`, interpreted);
         hideLoading();
-        if (interpreted) equiv = checkEquivalence(previousExpression, interpreted, problem.type);
+        if (interpreted) { equivInput = interpreted; equiv = checkEquivalence(previousExpression, equivInput, problem.type); }
         if (equiv.valid === null) {
-          if (IS_UNIT_TEST) {
-            if (unitTestRecordRejection()) return;
+          if (IS_ASSESSMENT) {
+            if (assessmentRecordRejection()) return;
             showFeedback('wrong', 'No se pudo interpretar tu respuesta. Intenta de nuevo.');
             reenableInput();
             return;
@@ -2158,12 +2238,24 @@
       logStep(input, true);
       document.getElementById('feedback').style.display = 'none';
 
-      const isFinal = checkIsFinal(equivInput, problem.answer, problem.type);
+      const isFinal = checkFinalAnswer(input, equivInput, problem);
       console.log('[submitStep] checkIsFinal:', isFinal);
       if (isFinal.valid === true) {
+        if (problem.op) {
+          assessmentRecordQuestionReached();
+          markProblemComplete();
+          document.getElementById('input-area').style.display = 'none';
+          document.getElementById('completed-card').style.display = 'block';
+          document.getElementById('next-problem-btn').style.display = 'block';
+          document.getElementById('next-problem-btn').textContent =
+            currentIndex < problems.length - 1
+              ? (IS_UNIT_TEST ? 'Siguiente pregunta →' : 'Next Problem →')
+              : (IS_UNIT_TEST ? 'Ver resultados ✓' : 'Finish ✓');
+          return;
+        }
         if (input.includes(',')) {
           console.log('[submitStep] comma answer — skipping form check, marking complete');
-          if (IS_UNIT_TEST) recordUnitTestQuestionResult(true);
+          assessmentRecordQuestionReached();
           markProblemComplete();
           document.getElementById('input-area').style.display = 'none';
           document.getElementById('completed-card').style.display = 'block';
@@ -2189,8 +2281,8 @@
             console.log(`[submitStep] askClaudeFormCheck returned in ${(performance.now()-tF).toFixed(1)}ms:`, formCheck);
             hideLoading();
             if (formCheck === null) {
-              if (IS_UNIT_TEST) {
-                if (unitTestRecordRejection()) return;
+              if (IS_ASSESSMENT) {
+                if (assessmentRecordRejection()) return;
                 showFeedback('wrong', 'No se pudo verificar tu respuesta. Intenta de nuevo.');
                 studentCalc.clear();
                 reenableInput();
@@ -2208,7 +2300,7 @@
 
           if (formMatches) {
             console.log('[submitStep] problem complete — updating DOM');
-            if (IS_UNIT_TEST) recordUnitTestQuestionResult(true);
+            assessmentRecordQuestionReached();
             markProblemComplete();
             document.getElementById('input-area').style.display = 'none';
             document.getElementById('completed-card').style.display = 'block';
@@ -2219,8 +2311,8 @@
                 : (IS_UNIT_TEST ? 'Ver resultados ✓' : 'Finish ✓');
           } else {
             formCheckAttempts++;
-            if (IS_UNIT_TEST) {
-              if (unitTestRecordRejection()) return;
+            if (IS_ASSESSMENT) {
+              if (assessmentRecordRejection()) return;
               showFeedback('wrong', 'Valor correcto, pero simplifica o factoriza más.');
               studentCalc.clear();
               reenableInput();
@@ -2240,8 +2332,8 @@
       logStep(input, false);
       studentCalc.clear();
 
-      if (IS_UNIT_TEST) {
-        if (unitTestRecordRejection()) return;
+      if (IS_ASSESSMENT) {
+        if (assessmentRecordRejection()) return;
         showFeedback('wrong', 'Ese paso no es válido. Intenta de nuevo.');
         reenableInput();
         return;

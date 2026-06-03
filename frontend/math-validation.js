@@ -275,6 +275,24 @@
       return { a, b };
     }
     function ineqFlip(op) { return { '<': '>', '>': '<', '<=': '>=', '>=': '<=' }[op]; }
+    function linearBranch(varName, op, k) {
+      return { kind: 'linear', var: varName, op, k };
+    }
+    function absGeUnionBranches(inner, x, k, strict) {
+      const ab = ineqLinearAB(inner, x);
+      if (!ab) return { indeterminate: 'abs-nonlinear' };
+      if (isZeroNum(k, 0)) return { kind: 'all', var: x };
+      let lo = (-k - ab.b) / ab.a;
+      let hi = (k - ab.b) / ab.a;
+      if (ab.a < 0) { const t = lo; lo = hi; hi = t; }
+      const leftOp = strict ? '<' : '<=';
+      const rightOp = strict ? '>' : '>=';
+      return {
+        kind: 'union',
+        var: x,
+        branches: [linearBranch(x, leftOp, lo), linearBranch(x, rightOp, hi)],
+      };
+    }
     function ineqNormalize(raw) {
       const s = ineqUni(raw);
       const v = detectVar(s);
@@ -290,7 +308,10 @@
       if (abs) {
         const inner = abs[1], op = abs[2], k = fnum(abs[3]);
         if (Number.isNaN(k)) return { indeterminate: 'abs-k' };
-        if (op === '>' || op === '>=') return { indeterminate: 'abs-union-deferred' };
+        if (op === '>' || op === '>=') {
+          if (k < 0) return { kind: 'all', var: x };
+          return absGeUnionBranches(inner, x, k, op === '>');
+        }
         if (k < 0) return { indeterminate: 'abs-empty' };
         const ab = ineqLinearAB(inner, x); if (!ab) return { indeterminate: 'abs-nonlinear' };
         let lo = (-k - ab.b) / ab.a, hi = (k - ab.b) / ab.a;
@@ -307,16 +328,65 @@
       if (ab.a < 0) op2 = ineqFlip(m[2]);
       return { kind: 'linear', var: x, op: op2, k };
     }
+    function ineqUnionPreSplit(raw) {
+      return String(raw)
+        .replace(/\s+or\s+/gi, ',')
+        .replace(/\s+o\s+/gi, ',');
+    }
+    function ineqNormalizeStudent(raw) {
+      const pre = ineqUnionPreSplit(raw);
+      const s = ineqUni(pre);
+      if (!s.includes(',')) return ineqNormalize(pre);
+      const parts = s.split(',').map((p) => p.trim()).filter(Boolean);
+      const branches = [];
+      let varName = null;
+      for (const part of parts) {
+        const n = ineqNormalize(part);
+        if (n.indeterminate) return n;
+        if (n.kind !== 'linear') return { indeterminate: 'student-union-part' };
+        if (varName && n.var !== varName) return { indeterminate: 'var-mismatch' };
+        varName = n.var;
+        branches.push(n);
+      }
+      if (!branches.length) return { indeterminate: 'empty-union' };
+      return { kind: 'union', var: varName, branches };
+    }
+    function linearBranchesMatch(a, b) {
+      return a.op === b.op && isZeroNum(a.k, b.k);
+    }
+    function unionFormsMatch(u1, u2) {
+      if (u1.kind !== 'union' || u2.kind !== 'union') return false;
+      if (u1.var !== u2.var) return false;
+      if (u1.branches.length !== u2.branches.length) return false;
+      const used = new Set();
+      for (const b1 of u1.branches) {
+        let matched = false;
+        for (let i = 0; i < u2.branches.length; i++) {
+          if (used.has(i)) continue;
+          if (linearBranchesMatch(b1, u2.branches[i])) {
+            used.add(i);
+            matched = true;
+            break;
+          }
+        }
+        if (!matched) return false;
+      }
+      return true;
+    }
     function checkInequality(studentRaw, canonicalRaw) {
       Algebrite.run('clearall');
       const can = ineqNormalize(canonicalRaw);
-      const stu = ineqNormalize(studentRaw);
+      const stu = ineqNormalizeStudent(studentRaw);
       if (can.indeterminate) return { verdict: 'indeterminate', reason: 'canonical:' + can.indeterminate };
       if (stu.indeterminate) return { verdict: 'indeterminate', reason: 'student:' + stu.indeterminate };
+      if (can.kind === 'all') return { verdict: 'accept' };
       if (stu.kind !== can.kind) return { verdict: 'reject', reason: 'kind-mismatch' };
       if (stu.var !== can.var) return { verdict: 'reject', reason: 'var-mismatch' };
       if (stu.kind === 'linear') {
         return { verdict: (stu.op === can.op && isZeroNum(stu.k, can.k)) ? 'accept' : 'reject' };
+      }
+      if (stu.kind === 'union') {
+        return { verdict: unionFormsMatch(stu, can) ? 'accept' : 'reject' };
       }
       const ok = stu.loOp === can.loOp && stu.hiOp === can.hiOp &&
         isZeroNum(stu.lo, can.lo) && isZeroNum(stu.hi, can.hi);
@@ -461,8 +531,44 @@
       return checkEquivalenceInner(exprA, exprB, problemType);
     }
 
-    function checkIsFinal(studentStep, expectedAnswer, problemType) {
+    function checkIsFinal(studentStep, expectedAnswer, problemType, options) {
+      const opts = options || {};
+      const src = opts.sourceExpression || opts.sourceEquation;
+      if (opts.acceptAnyRoot && src) {
+        const ok = satisfiesEquation(studentStep, src);
+        if (ok === null) return { valid: null, parseError: true };
+        return ok ? { valid: true } : { valid: false };
+      }
       return checkEquivalence(studentStep, expectedAnswer, problemType);
+    }
+
+    function parseVarEqualsValue(str) {
+      const s = String(str).trim();
+      for (let i = 0; i < s.length; i++) {
+        if (s[i] === '=' &&
+            s[i - 1] !== '!' && s[i - 1] !== '<' && s[i - 1] !== '>' &&
+            s[i + 1] !== '=') {
+          const varPart = s.slice(0, i).trim();
+          const valPart = s.slice(i + 1).trim();
+          if (/^[a-zA-Z]$/.test(varPart)) {
+            return { varName: varPart, value: normalize(valPart) };
+          }
+          return null;
+        }
+      }
+      return null;
+    }
+
+    function satisfiesEquation(studentStep, sourceExpression) {
+      Algebrite.run('clearall');
+      const parsed = parseVarEqualsValue(String(studentStep).replace(/^\s*=\s*/, ''));
+      if (!parsed) return false;
+      const expr = normalize(equationToExpr(sourceExpression));
+      const subResult = Algebrite.run(`simplify(subst(${parsed.value}, ${parsed.varName}, ${expr}))`).trim();
+      if (!subResult || subResult.toLowerCase().includes('stop') || subResult.toLowerCase().includes('error')) {
+        return null;
+      }
+      return isAlgebriteZero(subResult);
     }
 
     function mapVerdictToEquivResult(result) {
@@ -481,11 +587,20 @@
         case 'expand':
         case 'factor':
           return mapVerdictToEquivResult(formCheck(op, studentInput, seed.answer));
-        case 'solve':
+        case 'solve': {
+          const src = seed.sourceExpression || seed.sourceEquation;
+          if (seed.acceptAnyRoot && src) {
+            const ok = satisfiesEquation(studentInput, src);
+            if (ok === null) return { valid: null, indeterminate: true, reason: 'accept-any-root-eval-fail' };
+            return ok ? { valid: true } : { valid: false };
+          }
+          return checkEquivalence(studentInput, seed.answer, seed.type || seed.problemType || 'Solve');
+        }
         case 'evaluate':
         case 'translate':
-        default:
           return checkEquivalence(studentInput, seed.answer, seed.type || seed.problemType);
+        default:
+          return { valid: null, indeterminate: true, reason: 'unknown-op:' + String(op) };
       }
     }
 

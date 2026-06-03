@@ -262,10 +262,13 @@
 
 <div class="calc-panel" data-panel="ans">
   <div class="panel-buttons">
-    <button class="calc-btn op" data-insert="x = " style="flex:1 1 auto;">x =</button>
-    <button class="calc-btn op" data-insert="y = " style="flex:1 1 auto;">y =</button>
-    <button class="calc-btn op" data-insert=", " style="flex:1 1 auto;">,</button>
-    <button class="calc-btn op" data-insert="x = , x = " style="flex:1 1 100%;">x = N, x = N</button>
+    <button class="calc-btn op" data-insert="x = " data-ans-single style="flex:1 1 auto;">x =</button>
+    <button class="calc-btn op" data-insert="y = " data-ans-single style="flex:1 1 auto;">y =</button>
+    <button class="calc-btn op" data-insert=" <= " data-ans-union-op style="flex:1 1 auto; display:none;">≤</button>
+    <button class="calc-btn op" data-insert=" >= " data-ans-union-op style="flex:1 1 auto; display:none;">≥</button>
+    <button class="calc-btn op" data-insert=", " data-ans-comma style="flex:1 1 auto;">,</button>
+    <button class="calc-btn op" data-insert="x <= , x >= " data-ans-union style="flex:1 1 100%; display:none;">x ≤ N, x ≥ N</button>
+    <button class="calc-btn op" data-insert="x = , x = " data-ans-dual style="flex:1 1 100%;">x = N, x = N</button>
   </div>
 </div>
 `;
@@ -370,10 +373,32 @@
       });
     });
 
+    function setAnswerFormMode(mode) {
+      var panel = containerEl.querySelector('[data-panel="ans"]');
+      if (!panel) return;
+      var dual = panel.querySelector('[data-ans-dual]');
+      var comma = panel.querySelector('[data-ans-comma]');
+      var single = panel.querySelectorAll('[data-ans-single]');
+      var unionTpl = panel.querySelector('[data-ans-union]');
+      var unionOps = panel.querySelectorAll('[data-ans-union-op]');
+      var isUnion = mode === 'union';
+      var isAnyRoot = mode === 'any-root';
+      if (dual) dual.style.display = (isAnyRoot || isUnion) ? 'none' : '';
+      if (comma) comma.style.display = isAnyRoot ? 'none' : '';
+      if (unionTpl) unionTpl.style.display = isUnion ? '' : 'none';
+      unionOps.forEach(function (btn) {
+        btn.style.display = isUnion ? '' : 'none';
+      });
+      single.forEach(function (btn) {
+        btn.style.display = (isAnyRoot || isUnion) ? 'none' : '';
+      });
+    }
+
     return {
       setTarget: function (el) { target = el; },
       clear:     function ()   { if (target) target.value = ''; },
       closePanels: closePanels,
+      setAnswerFormMode: setAnswerFormMode,
     };
   };
 }());
