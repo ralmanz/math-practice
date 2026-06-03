@@ -1083,15 +1083,40 @@
   let wrongCount = 0;
   let formCheckAttempts = 0;
   let stepEqGateOn = false;
-  const EXPRESSION_CHAIN_OPS = new Set([
-    'simplify', 'expand', 'factor',
-    'Simplify', 'Expand', 'Factorize',
-  ]);
+  /** Step-by-step equivalence on expressions only (not solve / inecuación / translate). */
+  const EXPRESSION_CHAIN_OPS = new Set(['simplify', 'expand', 'factor', 'evaluate']);
+  const EXPRESSION_CHAIN_TYPES = new Set(['Simplify', 'Expand', 'Factorize', 'Evaluate', 'Rearrange']);
+
+  function hasInequalityOrEquationMarker(str) {
+    const s = String(str || '');
+    if (!s.trim()) return false;
+    if (containsEquals(s) || containsRelational(s)) return true;
+    return /<=|>=/.test(s);
+  }
+
+  /** True when work is a relation (2x=8, x<4), not a bare expression line. */
+  function workSurfaceIsEquationLike(problem) {
+    const work = getInitialWorkExpression(problem);
+    if (hasInequalityOrEquationMarker(work)) return true;
+    const ans = String(problem.answer || '').trim();
+    if (hasInequalityOrEquationMarker(ans)) return true;
+    if (/^[a-zA-Z]\s*=/.test(ans.replace(/\s+/g, ''))) return true;
+    return false;
+  }
 
   function usesExpressionChainGate(problem) {
     if (!problem) return false;
-    const t = problem.op || problem.type;
-    return EXPRESSION_CHAIN_OPS.has(t);
+    if (problem.format === 'mcq' || problem.type === 'MCQ') return false;
+    if (problem.op === 'translate' || problem.type === 'Translate') return false;
+    if (problem.op === 'solve' || problem.op === 'inequality' || problem.type === 'Solve') return false;
+
+    if (problem.op && EXPRESSION_CHAIN_OPS.has(problem.op)) return true;
+    if (problem.type && EXPRESSION_CHAIN_TYPES.has(problem.type)) return true;
+
+    // Legacy KV / teacher bank: gate when the chain is expression lines, not equations
+    if (workSurfaceIsEquationLike(problem)) return false;
+    const work = getInitialWorkExpression(problem);
+    return !!work.trim();
   }
 
   function useSpanishPracticeCopy() {
@@ -1443,7 +1468,10 @@
     });
   }
 
-  const { normalize, isAlgebriteZero, checkEquivalence, checkIsFinal, validateAgainstSeed } = MathValidation.create(Algebrite);
+  const {
+    normalize, isAlgebriteZero, checkEquivalence, checkIsFinal, validateAgainstSeed,
+    containsRelational, containsEquals,
+  } = MathValidation.create(Algebrite);
 
   function checkFinalAnswer(rawInput, equivInput, problem) {
     if (problem.op) return validateAgainstSeed(rawInput, problem);
@@ -2357,8 +2385,10 @@
       return;
     }
 
-    const previousExpression = (problem.type === 'Evaluate' || problem.type === 'Rearrange')
-      ? problem.answer
+    const evaluateLike = problem.type === 'Evaluate' || problem.type === 'Rearrange' ||
+      problem.op === 'evaluate';
+    const previousExpression = evaluateLike && stepHistory.length === 0
+      ? getInitialWorkExpression(problem)
       : stepHistory.length > 0
         ? stepHistory[stepHistory.length - 1]
         : getInitialWorkExpression(problem);

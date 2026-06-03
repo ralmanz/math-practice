@@ -41,7 +41,7 @@ Requiring students to type a leading `=` on every step is keyboard-hostile and c
 1. **Visual:** `=` gate button (dashed → solid when on).
 2. **History:** `stepHistory` stores bare expr; UI shows decorative `=`.
 3. **Interpret:** Claude receives/stores bare; `stepExprForValidator` strips any `=`.
-4. **Scope:** `simplify` / `expand` / `factor` (op or legacy type). Solve/evaluate/translate unchanged.
+4. **Scope:** Any **expression-chain** step (not equation/inequality): `op` ∈ simplify, expand, factor, evaluate; legacy types Simplify, Expand, Factorize, Evaluate, Rearrange; KV/teacher bank inferred when work surface has no `=`, `<`, `>`, `<=`, `>=`. **No gate** on solve, inequality, translate, MCQ.
 5. **Undo:** deferred.
 
 ## Acceptance

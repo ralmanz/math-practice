@@ -611,6 +611,7 @@
       checkEquivalence,
       checkIsFinal,
       containsRelational,
+      containsEquals,
       canonicalLinearInequality,
       checkInequality,
       formCheck,
