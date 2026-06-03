@@ -72,6 +72,10 @@ function problemsFromAuthoredSeeds(seedMap) {
     subTopics: s.subTopics,
     question: s.prompt,
     answer: s.answer,
+    ...(s.acceptAnyRoot ? { acceptAnyRoot: true } : {}),
+    ...(s.sourceExpression || s.sourceEquation
+      ? { sourceExpression: s.sourceExpression || s.sourceEquation }
+      : {}),
     hints: s.hints,
     options: [],
     modules: ['equivalence'],
