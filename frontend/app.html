@@ -1836,6 +1836,16 @@
     }
   };
 
+  const OP_TO_PROBLEM_TYPE = {
+    simplify: 'Simplify',
+    expand: 'Expand',
+    factor: 'Factorize',
+    solve: 'Solve',
+    evaluate: 'Evaluate',
+    translate: 'Translate',
+    inequality: 'Solve',
+  };
+
   function getLocalSeedProblems(unitId, levelId, mode) {
     if (!window.SeedPAA) return [];
     return Object.values(window.SeedPAA.seeds)
@@ -1844,7 +1854,7 @@
         const p = {
           question: s.prompt,
           answer: s.answer,
-          type: s.op,
+          type: OP_TO_PROBLEM_TYPE[s.op] || 'Simplify',
           op: s.op,
           subTopics: s.subTopics,
           unitId: s.unitId,
@@ -2390,7 +2400,7 @@
     document.getElementById('feedback').style.display = 'none';
 
     // ── Translate: single-step, Algebrite.compare + Claude fallback, no form check ──
-    if (problem.type === 'Translate') {
+    if (problem.type === 'Translate' || problem.op === 'translate') {
       await submitTranslate(bareInput, problem);
       return;
     }
