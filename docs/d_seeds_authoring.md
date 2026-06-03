@@ -13,6 +13,7 @@
 2. Set `op` from allowed list for that level.
 3. Choose 1–3 `subTopics` from `subTopicEnum[unitId][levelId]`.
 4. Validate `answer` with Algebrite (worker audit or manual).
+4b. **Word problems / narrative prompts:** set `expression` to the pure math surface the step engine compares (e.g. `(5x+3)+(2x+4)`). Without it, `extractExpression(prompt)` may feed prose into `checkEquivalence` → “couldn’t understand.”
 5. For “una solución” quadratics: `acceptAnyRoot: true` + `sourceExpression`.
 6. For `\|inner\| ≥ k` (or `>`): store canonical **`answer` as `abs(inner) >= k`** (or `>`). Do **not** pre-split into a comma union on the seed — the comparator expands to two branches. Students may answer with a comma union (`x<=a,x>=b`) or spaced **`or` / `o`** (`x <= a or x >= b`); keypad **`union`** mode for these seeds. Requires FIX-ABSGE ✅.
 7. Ronel sign-off against `curriculum_brain.md` vocab/errors for that level.

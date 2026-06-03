@@ -76,6 +76,9 @@ function problemsFromAuthoredSeeds(seedMap) {
     ...(s.sourceExpression || s.sourceEquation
       ? { sourceExpression: s.sourceExpression || s.sourceEquation }
       : {}),
+    ...(s.expression != null && String(s.expression).trim() !== ''
+      ? { expression: String(s.expression).trim() }
+      : {}),
     hints: s.hints,
     options: [],
     modules: ['equivalence'],

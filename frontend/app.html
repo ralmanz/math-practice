@@ -1647,6 +1647,9 @@
         if (s.acceptAnyRoot) p.acceptAnyRoot = true;
         const src = s.sourceExpression || s.sourceEquation;
         if (src) p.sourceExpression = src;
+        if (s.expression != null && String(s.expression).trim() !== '') {
+          p.expression = String(s.expression).trim();
+        }
         return p;
       });
   }
