@@ -670,16 +670,9 @@ Algunos niveles usan el **mismo tablero** que Aritmética N1 (TEORÍA · PROBLEM
 
 #### Estructura autoritativa — PAA Álgebra en plataforma (D-STRUCT 2026-05-18)
 
-La práctica paso a paso ya no usa un solo bloque de “3 niveles” mezclados. En código y seeds (`seed-paa-algebra.js`) el temario motor-validable de Álgebra PAA se reparte en **dos unidades de plataforma** con tres niveles cada una (U1–U2). La tabla canónica (temas, `op`, `subTopic`) está en `docs/curriculum_structure_authority.md`.
+La práctica paso a paso ya no usa un solo bloque de “3 niveles” mezclados. En código y seeds (`seed-paa-algebra.js`) el temario motor-validable de Álgebra PAA se reparte en **cinco unidades de plataforma (U1–U5)** con tres niveles cada una. La tabla canónica (temas, `op`, `subTopic`) está en `docs/curriculum_structure_authority.md` y, para autoría de contenido, en **§7 abajo — “PAA Álgebra — Plataforma U1–U5”** (no usar tablas compactas obsoletas).
 
-| Plataforma | Nivel | Temas (motor) | `op` |
-|------------|-------|---------------|------|
-| **U1** Expresiones | N1 | Términos semejantes / simplificar | simplify |
-| | N2 | Evaluar; traducir a expresión | evaluate, translate |
-| | N3 | Expandir; factor común | expand, factor |
-| **U2** Ecuaciones e inecuaciones | N1 | Ecuaciones lineales (un lado / dos pasos) | solve |
-| | N2 | Ambos lados; paréntesis | solve |
-| | N3 | Inecuaciones; \|x−a\| ≤ k | inequality |
+> **DEPRECADO (2026-05-18):** Se eliminó la tabla compacta U1–U2 de esta sección (omitía proporciones/`translate` en U2-N1 y `\|·\| ≥ k` en U2-N3). **Autoría y seeds:** usar únicamente las tablas U1–U5 en la subsección siguiente (desde “#### U1 — Expresiones algebraicas”) y `docs/curriculum_structure_authority.md`.
 
 **URL transitoria:** `unit=algebra&stage=1|2|3` → U1 N1–N3; `stage=4|5|6` → U2 N1–N3. La tarjeta PAA en `home.html` sigue mostrando 3 niveles hasta actualización de producto.
 
