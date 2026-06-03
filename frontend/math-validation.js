@@ -572,6 +572,92 @@
       return isAlgebriteZero(subResult);
     }
 
+    /** Parse "cuando x = 4" (or seed substVar/substValue) for evaluate problems. */
+    function parseEvaluateSubst(seed) {
+      if (!seed) return null;
+      if (seed.substVar && seed.substValue != null) {
+        const varName = String(seed.substVar).trim();
+        if (/^[a-zA-Z]$/.test(varName)) {
+          return { varName, value: normalize(String(seed.substValue)) };
+        }
+      }
+      const prompt = String(seed.prompt || seed.question || '');
+      const cuando = prompt.match(/cuando\s+([a-zA-Z])\s*=\s*([^\n?,]+)/i);
+      if (cuando) {
+        return { varName: cuando[1], value: normalize(cuando[2].trim()) };
+      }
+      const gb = prompt.match(/(?:de|para)\s+(\d+)\s*GB/i);
+      const expr = seed.expression != null ? String(seed.expression) : '';
+      const varMatch = expr.match(/[a-zA-Z]/);
+      if (gb && varMatch) {
+        return { varName: varMatch[0], value: normalize(gb[1]) };
+      }
+      return null;
+    }
+
+    function substitutedForm(expr, varName, value) {
+      if (!expr || !/^[a-zA-Z]$/.test(varName)) return null;
+      try {
+        Algebrite.run('clearall');
+        const norm = normalize(expr);
+        const result = Algebrite.run(`simplify(subst(${value}, ${varName}, (${norm})))`).trim();
+        if (!result || result.toLowerCase().includes('stop') || result.toLowerCase().includes('error')) {
+          return null;
+        }
+        return result;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    /**
+     * Evaluate steps are substitution/simplification, not equivalence to the prior line.
+     * Accept: full subst of current line, subst of seed expression, arithmetic simplify, or final answer.
+     */
+    function checkEvaluateStep(previousExpr, studentExpr, seed) {
+      const student = String(studentExpr).replace(/^\s*=\s*/, '').trim();
+      if (!student) return { valid: false };
+
+      const answer = seed && seed.answer != null ? String(seed.answer) : '';
+      if (answer) {
+        const finalCheck = checkEquivalence(student, answer, 'Evaluate');
+        if (finalCheck.valid === true) return { valid: true };
+        if (finalCheck.valid === null) return { valid: null, parseError: true };
+      }
+
+      const substSpec = parseEvaluateSubst(seed || {});
+      if (!substSpec) {
+        return checkEquivalence(previousExpr, student, 'Evaluate');
+      }
+
+      const prev = String(previousExpr || '').trim();
+      const srcExpr = (seed && seed.expression != null && String(seed.expression).trim() !== '')
+        ? String(seed.expression).trim()
+        : prev;
+
+      const subbedPrev = substitutedForm(prev, substSpec.varName, substSpec.value);
+      if (subbedPrev) {
+        const subCheck = checkEquivalence(student, subbedPrev, 'Evaluate');
+        if (subCheck.valid === true) return { valid: true };
+        if (subCheck.valid === null) return { valid: null, parseError: true };
+      }
+
+      if (srcExpr !== prev) {
+        const subbedSrc = substitutedForm(srcExpr, substSpec.varName, substSpec.value);
+        if (subbedSrc) {
+          const srcCheck = checkEquivalence(student, subbedSrc, 'Evaluate');
+          if (srcCheck.valid === true) return { valid: true };
+          if (srcCheck.valid === null) return { valid: null, parseError: true };
+        }
+      }
+
+      const simpCheck = checkEquivalence(prev, student, 'Evaluate');
+      if (simpCheck.valid === true) return { valid: true };
+      if (simpCheck.valid === null) return { valid: null, parseError: true };
+
+      return { valid: false };
+    }
+
     function mapVerdictToEquivResult(result) {
       if (result.verdict === 'accept') return { valid: true };
       if (result.verdict === 'reject') return { valid: false, reason: result.reason };
@@ -616,6 +702,9 @@
       checkInequality,
       formCheck,
       validateAgainstSeed,
+      parseEvaluateSubst,
+      substitutedForm,
+      checkEvaluateStep,
     };
   }
 

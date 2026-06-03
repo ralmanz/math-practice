@@ -79,6 +79,9 @@ function problemsFromAuthoredSeeds(seedMap) {
     ...(s.expression != null && String(s.expression).trim() !== ''
       ? { expression: String(s.expression).trim() }
       : {}),
+    ...(s.substVar && s.substValue != null
+      ? { substVar: String(s.substVar).trim(), substValue: String(s.substValue).trim() }
+      : {}),
     hints: s.hints,
     options: [],
     modules: ['equivalence'],

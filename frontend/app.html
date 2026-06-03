@@ -1470,6 +1470,7 @@
 
   const {
     normalize, isAlgebriteZero, checkEquivalence, checkIsFinal, validateAgainstSeed,
+    checkEvaluateStep,
     containsRelational, containsEquals,
   } = MathValidation.create(Algebrite);
 
@@ -1851,6 +1852,11 @@
         if (s.expression != null && String(s.expression).trim() !== '') {
           p.expression = String(s.expression).trim();
         }
+        if (s.substVar && s.substValue != null) {
+          p.substVar = String(s.substVar).trim();
+          p.substValue = String(s.substValue).trim();
+        }
+        if (s.prompt) p.prompt = s.prompt;
         return p;
       });
   }
@@ -2405,8 +2411,14 @@
       equiv = checkFinalAnswer(bareInput, equivInput, problem);
       console.log(`[submitStep] checkIsFinal (comma shortcut) in ${(performance.now()-t0).toFixed(1)}ms:`, equiv);
     } else {
-      equiv = checkEquivalence(previousExpression, equivInput, problem.type);
-      console.log(`[submitStep] checkEquivalence result in ${(performance.now()-t0).toFixed(1)}ms:`, equiv);
+      const isEvaluateStep = problem.op === 'evaluate' || problem.type === 'Evaluate';
+      if (isEvaluateStep) {
+        equiv = checkEvaluateStep(previousExpression, equivInput, problem);
+        console.log(`[submitStep] checkEvaluateStep result in ${(performance.now()-t0).toFixed(1)}ms:`, equiv);
+      } else {
+        equiv = checkEquivalence(previousExpression, equivInput, problem.type);
+        console.log(`[submitStep] checkEquivalence result in ${(performance.now()-t0).toFixed(1)}ms:`, equiv);
+      }
 
       if (equiv.valid === null) {
         showLoading('Interpreting your input...');
@@ -2418,7 +2430,11 @@
         if (interpreted) {
           const interpretedBare = stepExprForValidator(interpreted);
           equivInput = interpretedBare;
-          equiv = checkEquivalence(previousExpression, interpretedBare, problem.type);
+          if (isEvaluateStep) {
+            equiv = checkEvaluateStep(previousExpression, interpretedBare, problem);
+          } else {
+            equiv = checkEquivalence(previousExpression, interpretedBare, problem.type);
+          }
         }
         if (equiv.valid === null) {
           if (IS_ASSESSMENT) {
