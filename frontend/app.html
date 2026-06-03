@@ -1600,7 +1600,7 @@
     let s = raw
       .replace(/^(expand and simplify|expand|factorise|factorize|simplify|solve|evaluate|find|calculate)\s+/i, '')
       .trim();
-    s = s.replace(/^simplifica:\s*/i, '').trim();
+    s = s.replace(/^(?:expande|expandir|factoriza(?:r)?|simplifica(?:r)?|evalúa|evalua):\s*/i, '').trim();
 
     let m = s.match(/^¿?\s*cu[aá]nto es el\s+(\d+)\s*%\s+de\s+(\d+)\s*\??\s*$/i);
     if (m) return `${m[1]}/100*${m[2]}`;
