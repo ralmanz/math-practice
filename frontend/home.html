@@ -219,8 +219,16 @@
       text-decoration: none;
       transition: opacity 0.15s, transform 0.1s;
       white-space: nowrap;
-      cursor: default;
       user-select: none;
+    }
+
+    span.level-pill { cursor: default; }
+
+    a.level-pill { cursor: pointer; }
+
+    a.level-pill:hover {
+      opacity: 0.88;
+      transform: translateY(-1px);
     }
 
     /* Completed */
@@ -233,12 +241,6 @@
     .level-pill.available {
       background: var(--blue);
       color: #fff;
-      cursor: pointer;
-    }
-
-    .level-pill.available:hover {
-      opacity: 0.88;
-      transform: translateY(-1px);
     }
 
     /* Locked */
@@ -574,17 +576,21 @@
     return 'locked';
   }
 
+  function paaLevelLessonUrl(stage, studentId, guest) {
+    let url = 'lesson.html?curriculum=PAA&unit=algebra&stage=' + encodeURIComponent(stage);
+    if (guest) url += '&guest=true';
+    else if (studentId) url += '&student=' + encodeURIComponent(studentId);
+    return url;
+  }
+
   function renderPAAPlatformLevelPill(displayLevel, stage, unitDef, progress, studentId, guest) {
     const state = getPAAPlatformLevelState(displayLevel, stage, unitDef, progress);
     const label = Lang.t('level_label') + ' ' + displayLevel;
-    if (state === 'complete') {
-      return '<span class="level-pill complete">&#x2713; ' + label + '</span>';
-    }
-    if (state === 'available') {
-      let url = 'lesson.html?curriculum=PAA&unit=algebra&stage=' + encodeURIComponent(stage);
-      if (guest) url += '&guest=true';
-      else if (studentId) url += '&student=' + encodeURIComponent(studentId);
-      return '<a href="' + url + '" class="level-pill available">' + label + '</a>';
+    if ((state === 'complete' || state === 'available') && stage != null) {
+      const url = paaLevelLessonUrl(stage, studentId, guest);
+      const cls = state === 'complete' ? 'level-pill complete' : 'level-pill available';
+      const prefix = state === 'complete' ? '&#x2713; ' : '';
+      return '<a href="' + url + '" class="' + cls + '">' + prefix + label + '</a>';
     }
     return '<span class="level-pill locked">&#x1F512; ' + label + '</span>';
   }
@@ -637,12 +643,11 @@
         const state = getLevelState(u, l, progress || {}, hasProgress);
         const label = `${Lang.t('level_label')} ${l}`;
 
-        if (state === 'complete') {
-          return `<span class="level-pill complete">&#x2713; ${label}</span>`;
-        }
-        if (state === 'available') {
+        if (state === 'complete' || state === 'available') {
           const url = lessonUrl(curriculum, u, l, studentId);
-          return `<a href="${url}" class="level-pill available">${label}</a>`;
+          const cls = state === 'complete' ? 'level-pill complete' : 'level-pill available';
+          const prefix = state === 'complete' ? '&#x2713; ' : '';
+          return `<a href="${url}" class="${cls}">${prefix}${label}</a>`;
         }
         // locked
         return `<span class="level-pill locked">&#x1F512; ${label}</span>`;
