@@ -34,30 +34,34 @@
 
 ### Level inventory (3 levels per unit, N1 → N3)
 
-**U1 — Expresiones algebraicas**
-- N1: Traducción verbal → algebraica; simplificación de expresiones
-- N2: Leyes de exponentes (producto, potencia, cociente); notación científica
-- N3: Sucesiones aritméticas (término general, valor dado n, encontrar n dado el término)
+**U1 — Expresiones algebraicas** *(level topics locked to deployed seeds — see `docs/curriculum_structure_authority.md`, D-STRUCT 2026-05-18)*
+- N1: Simplificación — términos semejantes (`op`: simplify)
+- N2: Evaluar expresiones; traducción verbal → expresión (`op`: evaluate, translate)
+- N3: Expandir un factor; factorizar factor común (`op`: expand, factor)
+- *Orphans re-homed per `docs/curriculum_structure_authority.md` D-STRUCT-2 — not in U1 seeds.*
 
-**U2 — Ecuaciones e inecuaciones lineales**
-- N1: Ecuaciones lineales de una variable (incluyendo proporciones)
-- N2: Inecuaciones lineales; representación gráfica en recta numérica
-- N3: Variación inversa; ecuaciones con expresiones racionales lineales simples
+**U2 — Ecuaciones e inecuaciones lineales** *(locked to deployed seeds — D-STRUCT 2026-05-18)*
+- N1: Ecuaciones lineales — un lado / dos pasos; **proporciones y razón** → ecuación (`op`: solve, translate)
+- N2: Ambos lados; paréntesis (`op`: solve)
+- N3: Inecuaciones lineales; valor absoluto (`op`: inequality, incl. `|·|≥k` union)
+- *Orphans re-homed:* variación inversa → **U3-N2**; recta numérica / región sombreada → **U5-N1 MCQ**
 
-**U3 — Cuadráticas, racionales y radicales**
-- N1: Ecuaciones cuadráticas (factorización, raíces enteras)
-- N2: Ecuaciones racionales (denominador lineal); expresiones radicales
-- N3: Ecuaciones radicales; problemas combinados cuadrático/racional
+**U3 — Cuadráticas, racionales, exponentes** *(topic slots locked D-STRUCT-2; seeds pending)*
+- N1: Cuadráticas factorizables; `acceptAnyRoot` opcional; residuo en (x+a) (`op`: solve, evaluate)
+- N2: Ecuaciones racionales (denominador lineal); variación inversa (`op`: solve)
+- N3: **Leyes de exponentes** (simbólicas); **notación científica** (`op`: simplify, evaluate + `scientific` TBD)
+- *Out of step delivery:* radical como respuesta final PAA (intermedio OK en N2)
 
-**U4 — Sistemas de ecuaciones**
-- N1: Sistemas 2×2 por sustitución (solución entera)
-- N2: Sistemas 2×2 por eliminación
-- N3: Sistemas expresados como problemas verbales (modelado + resolución)
+**U4 — Sistemas de ecuaciones** *(unchanged)*
+- N1: 2×2 sustitución (solución entera) (`op`: solve)
+- N2: 2×2 eliminación (`op`: solve)
+- N3: Modelado verbal → sistema (`op`: translate, solve)
 
 **U5 — Rectas, funciones y gráficas** *(MCQ-only)*
-- N1: Pendiente; ecuación de la recta; interpretación gráfica
-- N2: Dominio y rango; evaluación de funciones; notación f(x)
-- N3: Lectura de gráficas; coordenadas; desplazamientos de puntos en el plano
+- N1: Pendiente; recta; lectura gráfica; recta numérica / inecuación gráfica (MCQ + SVG)
+- N2: Dominio, rango, f(x); **sucesiones / patrones** (MCQ, no step)
+- N3: Gráficas, coordenadas, funciones desde gráfica (MCQ)
+- *Orphans re-homed:* sucesiones aritméticas → **N2 MCQ** (no U1-N3 step)
 
 ### Prerequisite DAG (within Algebra)
 
@@ -319,18 +323,20 @@ seed[seedId] = {
   unitId,            // U1–U5
   levelId,           // N1–N3
   track,             // "step" (U1–U4) | "mcq" (U5)
+  op,                // simplify | evaluate | expand | factor | translate | solve | inequality — drives validation routing
   subTopics,         // [tag] — 1–3, from the closed per-level enum (level-scoped; Section 6)
-
-  // step seeds (U1–U4):
-  prompt,            // problem statement
+  prompt,            // problem statement (step seeds)
   answer,            // Algebrite-validated canonical answer / solve-path
+  acceptAnyRoot?,    // optional; solve-only — any single root of sourceExpression (PAA "una solución")
+  sourceExpression?, // required when acceptAnyRoot
 
-  // mcq seeds (U5):
-  // prompt, options[], correctOption
+  // mcq seeds (U5): options[], correctOption (prompt/answer shape as authored)
 
   // DEFERRED (regeneration engine, Section 3): paramSlots, validParameterSpace, difficultyConstraints
 }
 ```
+
+**Routing contract:** `op` selects the validator in `validateAgainstSeed` (`math-validation.js`). An indeterminate or unknown `op` returns an ask-Ronel fail-safe (`{ valid: null }`), **never** a false accept. In `app.html`, seeds with `op` skip Claude form-check and complete when the validator accepts.
 
 ```
 ejemplos[levelId] = {            // authored aid, per level (Section 2)
