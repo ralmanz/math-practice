@@ -658,6 +658,27 @@
       return { valid: false };
     }
 
+    /** Evaluate finals must be the simplified numeric answer (e.g. 27), not 5(6)-3 or 12+2. */
+    function checkEvaluateFinal(studentExpr, seed) {
+      const student = String(studentExpr).replace(/^\s*=\s*/, '').trim();
+      if (!student) return { valid: false };
+      const answer = seed && seed.answer != null ? String(seed.answer).trim() : '';
+      if (!answer) return { valid: false };
+
+      const equiv = checkEquivalence(student, answer, 'Evaluate');
+      if (equiv.valid !== true) return equiv;
+      if (equiv.valid === null) return { valid: null, parseError: true };
+
+      const normS = normalize(student).replace(/\s/g, '');
+      const normA = normalize(answer).replace(/\s/g, '');
+      if (normS === normA) return { valid: true };
+
+      if (/^[+-]?\d+(\.\d+)?$/.test(normS) || /^[+-]?\d+\/\d+$/.test(normS)) {
+        return { valid: true };
+      }
+      return { valid: false };
+    }
+
     function mapVerdictToEquivResult(result) {
       if (result.verdict === 'accept') return { valid: true };
       if (result.verdict === 'reject') return { valid: false, reason: result.reason };
@@ -684,6 +705,7 @@
           return checkEquivalence(studentInput, seed.answer, seed.type || seed.problemType || 'Solve');
         }
         case 'evaluate':
+          return checkEvaluateFinal(studentInput, seed);
         case 'translate':
           return checkEquivalence(studentInput, seed.answer, seed.type || seed.problemType);
         default:
@@ -705,6 +727,7 @@
       parseEvaluateSubst,
       substitutedForm,
       checkEvaluateStep,
+      checkEvaluateFinal,
     };
   }
 

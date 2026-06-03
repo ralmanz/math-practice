@@ -1471,10 +1471,14 @@
   const {
     normalize, isAlgebriteZero, checkEquivalence, checkIsFinal, validateAgainstSeed,
     checkEvaluateStep,
+    checkEvaluateFinal,
     containsRelational, containsEquals,
   } = MathValidation.create(Algebrite);
 
   function checkFinalAnswer(rawInput, equivInput, problem) {
+    if (problem.op === 'evaluate' || problem.type === 'Evaluate') {
+      return checkEvaluateFinal(equivInput, problem);
+    }
     if (problem.op) return validateAgainstSeed(rawInput, problem);
     const stripped = String(equivInput).replace(/^\s*=\s*/, '');
     const src = problem.sourceExpression || problem.sourceEquation;
@@ -2545,6 +2549,11 @@
       } else {
         studentCalc.clear();
         if (gateRequired) setStepEqGate(false);
+        if (problem.op === 'evaluate' || problem.type === 'Evaluate') {
+          showFeedback('nudge', useSpanishPracticeCopy()
+            ? 'Buen paso. Escribe el valor numérico final.'
+            : 'Good step. Enter the final numeric value.');
+        }
         reenableInput();
       }
     } else {
