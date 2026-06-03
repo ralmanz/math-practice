@@ -1,6 +1,6 @@
 # B-TOGGLE — `=` as structured UI state (design brief)
 
-**Status:** DESIGN ONLY — do not implement in `app.html` until Ronel locks this wireframe.
+**Status:** IMPLEMENTED 2026-06-03 — gate UI in `frontend/app.html` + `calculator.js` `setEqualsGateMode`.
 
 ## Problem
 
@@ -36,13 +36,15 @@ Requiring students to type a leading `=` on every step is keyboard-hostile and c
 | Solve, Evaluate, Translate | Final answer may use `ans` keypad (`x =`) | Comma / union answers unchanged |
 | Assessment modes | Same rules; notation misses still excluded from rejection budget |
 
-## Open questions (resolve before CODE prompt)
+## Locked decisions (v2 prototype)
 
-1. Visual: chip vs switch vs “=” key that latches?
-2. Does toggle state persist when editing a line in step history?
-3. How does toggle interact with Claude interpret fallback (interpret bare or prefixed)?
+1. **Visual:** `=` gate button (dashed → solid when on).
+2. **History:** `stepHistory` stores bare expr; UI shows decorative `=`.
+3. **Interpret:** Claude receives/stores bare; `stepExprForValidator` strips any `=`.
+4. **Scope:** `simplify` / `expand` / `factor` (op or legacy type). Solve/evaluate/translate unchanged.
+5. **Undo:** deferred.
 
-## Acceptance (for future CODE prompt)
+## Acceptance
 
 - One `normalizedStepInput(uiState)` used everywhere before validation.
 - Unit tests: toggle on → equivalence sees stripped RHS; toggle off on notation types → same nudge as today.

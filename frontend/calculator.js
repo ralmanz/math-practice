@@ -282,6 +282,8 @@
     containerEl.innerHTML = buildHTML(!!options.onSubmit);
 
     var target = inputEl;
+    var equalsGateMode = false;
+    var onEqualsKey = null;
 
     function insert(symbol) {
       if (!target) return;
@@ -336,7 +338,13 @@
 
     // Insert buttons
     containerEl.querySelectorAll('[data-insert]').forEach(function (btn) {
-      btn.addEventListener('click', function () { insert(btn.dataset.insert); });
+      btn.addEventListener('click', function () {
+        if (equalsGateMode && btn.dataset.insert === ' = ' && onEqualsKey) {
+          onEqualsKey();
+          return;
+        }
+        insert(btn.dataset.insert);
+      });
     });
 
     // Fraction template button
@@ -394,11 +402,17 @@
       });
     }
 
+    function setEqualsGateMode(enabled, callback) {
+      equalsGateMode = !!enabled;
+      onEqualsKey = typeof callback === 'function' ? callback : null;
+    }
+
     return {
       setTarget: function (el) { target = el; },
       clear:     function ()   { if (target) target.value = ''; },
       closePanels: closePanels,
       setAnswerFormMode: setAnswerFormMode,
+      setEqualsGateMode: setEqualsGateMode,
     };
   };
 }());

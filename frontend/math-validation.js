@@ -19,6 +19,7 @@
             str[i + 1] !== '=') {
           const left  = str.slice(0, i).trim();
           const right = str.slice(i + 1).trim();
+          if (!left) return right;
           return `(${left}) - (${right})`;
         }
       }
