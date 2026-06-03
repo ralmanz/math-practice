@@ -9,7 +9,7 @@ See **[audit_fixes_status.md](audit_fixes_status.md)** for full Part 3 snapshot.
 | **B-TOGGLE** | DESIGN → CODE | `design-equals-toggle.md` — wireframe then single normalize entry |
 | **B1 placement flow** | CODE | Full UI, 2 Q/level, regression, KV (`placementResults` scaffold exists) |
 | **FIX-SCINOT** | CODE | Only when a level locks graded `a×10^n` form (`op` TBD) |
-| **D-SEEDS-map** | CODE | `home.html` 6 stages or split Álgebra U1/U2 cards |
+| **D-SEEDS-map** | CODE | U3–U5 `home.html` links when seeds exist; optional aritmética footnote |
 | **Post-pass destination** | PRODUCT | B8 |
 | **Regeneration / B10 roll-up** | DEFERRED | Per architecture |
 

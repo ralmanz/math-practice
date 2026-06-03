@@ -527,63 +527,90 @@
     return url;
   }
 
-  // ── PAA unlock logic (3-level, single unit) ──
-  function getPAALevelState(levelNum, unitKey, progress) {
-    if (levelNum === 1) return 'available';  // always unlocked
-    const prevStatus = (progress[unitKey] || {})[String(levelNum - 1)];
-    if (prevStatus === 'complete') return 'available';
-    if (prevStatus === 'current')  return 'available';
+  // PAA platform units U1–U5 (assessment_architecture §0). Stages 1–6 → U1/U2 seeds.
+  // Aritmética remains in worker/seed-paa.js + lesson?unit=aritmetica (not on this grid).
+  const PAA_PLATFORM_UNITS = [
+    { num: 1, id: 'U1', nameKey: 'paa_u1_name', stages: [1, 2, 3], prereq: null, authored: true },
+    { num: 2, id: 'U2', nameKey: 'paa_u2_name', stages: [4, 5, 6], prereq: 'U1', authored: true },
+    { num: 3, id: 'U3', nameKey: 'paa_u3_name', stages: null, prereq: 'U2', authored: false },
+    { num: 4, id: 'U4', nameKey: 'paa_u4_name', stages: null, prereq: 'U2', authored: false },
+    { num: 5, id: 'U5', nameKey: 'paa_u5_name', stages: null, prereq: 'U2+U3', authored: false }
+  ];
+
+  function paaPlatformPrereqIds(unitDef) {
+    if (unitDef.prereq === 'U2+U3') return ['U2', 'U3'];
+    if (unitDef.prereq) return [unitDef.prereq];
+    return [];
+  }
+
+  function isPAAPlatformUnitPassed(unitId, progress) {
+    const u = PAA_PLATFORM_UNITS.find(function(x) { return x.id === unitId; });
+    if (!u || !u.stages || !u.authored) return false;
+    const alg = progress.algebra || {};
+    return u.stages.every(function(s) { return alg[String(s)] === 'complete'; });
+  }
+
+  function isPAAPlatformUnitUnlocked(unitDef, progress) {
+    if (IS_TEACHER) return true;
+    return paaPlatformPrereqIds(unitDef).every(function(id) {
+      return isPAAPlatformUnitPassed(id, progress);
+    });
+  }
+
+  function getPAAPlatformLevelState(displayLevel, stage, unitDef, progress) {
+    if (!unitDef.authored || !unitDef.stages) return 'locked';
+    if (!isPAAPlatformUnitUnlocked(unitDef, progress)) return 'locked';
+
+    const alg = progress.algebra || {};
+    const st = alg[String(stage)];
+    if (st === 'complete') return 'complete';
+    if (st === 'current') return 'available';
+
+    if (displayLevel === 1) return 'available';
+    const prevStage = unitDef.stages[displayLevel - 2];
+    const prevSt = alg[String(prevStage)];
+    if (prevSt === 'complete' || prevSt === 'current') return 'available';
     if (IS_TEACHER) return 'available';
     return 'locked';
   }
 
-  // ── Render PAA curriculum (Álgebra Unit 1 + Aritmética Unit 2) ──
-  // STEP 5 HIDE: to hide Aritmética after Álgebra is confirmed working,
-  // delete the "── Unit 2: Aritmética ──" block below (clearly marked).
+  function renderPAAPlatformLevelPill(displayLevel, stage, unitDef, progress, studentId, guest) {
+    const state = getPAAPlatformLevelState(displayLevel, stage, unitDef, progress);
+    const label = Lang.t('level_label') + ' ' + displayLevel;
+    if (state === 'complete') {
+      return '<span class="level-pill complete">&#x2713; ' + label + '</span>';
+    }
+    if (state === 'available') {
+      let url = 'lesson.html?curriculum=PAA&unit=algebra&stage=' + encodeURIComponent(stage);
+      if (guest) url += '&guest=true';
+      else if (studentId) url += '&student=' + encodeURIComponent(studentId);
+      return '<a href="' + url + '" class="level-pill available">' + label + '</a>';
+    }
+    return '<span class="level-pill locked">&#x1F512; ' + label + '</span>';
+  }
+
   function renderPAACurriculum(student, studentId) {
     const progress = student.progress || {};
     const grid = document.getElementById('units-grid');
     grid.innerHTML = '';
 
-    function makePAAUnitCard(unitKey, unitName, unitNumber) {
+    PAA_PLATFORM_UNITS.forEach(function(unitDef) {
       const card = document.createElement('div');
       card.className = 'unit-card';
-      const pillsHtml = [1, 2, 3].map(function(l) {
-        const st = (progress[unitKey] || {})[String(l)];
-        let state;
-        if (st === 'complete') {
-          state = 'complete';
-        } else if (st === 'current') {
-          state = 'available';
-        } else {
-          state = getPAALevelState(l, unitKey, progress);
-        }
-        const label = Lang.t('level_label') + ' ' + l;
-        if (state === 'complete') {
-          return '<span class="level-pill complete">&#x2713; ' + label + '</span>';
-        }
-        if (state === 'available') {
-          const url = 'lesson.html?curriculum=PAA&unit=' + encodeURIComponent(unitKey) +
-                      '&stage=' + l + (studentId ? '&student=' + encodeURIComponent(studentId) : '');
-          return '<a href="' + url + '" class="level-pill available">' + label + '</a>';
-        }
-        return '<span class="level-pill locked">&#x1F512; ' + label + '</span>';
+      const pillsHtml = [1, 2, 3].map(function(displayLevel) {
+        const stage = unitDef.stages ? unitDef.stages[displayLevel - 1] : null;
+        return renderPAAPlatformLevelPill(
+          displayLevel, stage, unitDef, progress, studentId, false
+        );
       }).join('');
       card.innerHTML =
         '<div class="unit-card-header">' +
-          '<span class="unit-number-badge">' + Lang.t('unit_label') + ' ' + unitNumber + '</span>' +
-          '<span class="unit-name">' + unitName + '</span>' +
+          '<span class="unit-number-badge">' + Lang.t('unit_label') + ' ' + unitDef.num + '</span>' +
+          '<span class="unit-name">' + Lang.t(unitDef.nameKey) + '</span>' +
         '</div>' +
         '<div class="level-pills">' + pillsHtml + '</div>';
-      return card;
-    }
-
-    // ── Unit 1: Álgebra (active unit) ──
-    grid.appendChild(makePAAUnitCard('algebra', '\u00C1lgebra', 1));
-
-    // ── Unit 2: Aritmética (legacy — BEGIN STEP 5 HIDE BLOCK) ──
-    grid.appendChild(makePAAUnitCard('aritmetica', Lang.t('paa_unit_aritmetica'), 2));
-    // ── END STEP 5 HIDE BLOCK ──
+      grid.appendChild(card);
+    });
   }
 
   // ── Render the unit cards ──
@@ -655,55 +682,25 @@
     guestBanner.style.display = 'block';
     guestBanner.textContent = Lang.t('guest_paa_trial_banner');
 
-    const cards = [
-      {
-        number: '1',
-        title: Lang.t('guest_unit_arit_title'),
-        desc: Lang.t('guest_unit_arit_desc'),
-        status: Lang.t('guest_unit_available'),
-        href: 'lesson.html?curriculum=PAA&unit=aritmetica&level=1&guest=true',
-        locked: false
-      },
-      {
-        number: '2',
-        title: Lang.t('guest_unit_algebra_title'),
-        desc: Lang.t('guest_unit_algebra_desc'),
-        status: Lang.t('guest_unit_locked'),
-        locked: true
-      },
-      {
-        number: '3',
-        title: Lang.t('guest_unit_geo_title'),
-        desc: Lang.t('guest_unit_geo_desc'),
-        status: Lang.t('guest_unit_locked'),
-        locked: true
-      },
-      {
-        number: '4',
-        title: Lang.t('guest_unit_data_title'),
-        desc: Lang.t('guest_unit_data_desc'),
-        status: Lang.t('guest_unit_locked'),
-        locked: true
-      }
-    ];
-
-    grid.innerHTML = cards.map((card) => {
-      const cardClass = card.locked ? 'unit-card guest-locked' : 'unit-card';
-      const statusClass = card.locked ? 'level-pill locked' : 'level-pill available';
-      const statusPill = `<span class="${statusClass}">${card.locked ? '&#x1F512; ' : ''}${card.status}</span>`;
-      const levelsPill = `<span class="level-pill complete">${Lang.t('level_label')} 1-3</span>`;
-      const cardBody = `
-        <div class="unit-card-header">
-          <span class="unit-number-badge">${Lang.t('unit_label')} ${card.number}</span>
-          <span class="unit-name">${card.title}</span>
-        </div>
-        <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:14px;line-height:1.5;">${card.desc}</p>
-        <div class="level-pills" style="margin-bottom:8px;">${levelsPill}</div>
-        <div class="level-pills">${statusPill}</div>
-      `;
-      if (card.locked) return `<div class="${cardClass}">${cardBody}</div>`;
-      return `<a href="${card.href}" class="${cardClass}" style="display:block;text-decoration:none;color:inherit;">${cardBody}</a>`;
-    }).join('');
+    const guestProgress = {};
+    grid.innerHTML = '';
+    PAA_PLATFORM_UNITS.forEach(function(unitDef) {
+      const card = document.createElement('div');
+      card.className = 'unit-card';
+      const pillsHtml = [1, 2, 3].map(function(displayLevel) {
+        const stage = unitDef.stages ? unitDef.stages[displayLevel - 1] : null;
+        return renderPAAPlatformLevelPill(
+          displayLevel, stage, unitDef, guestProgress, null, true
+        );
+      }).join('');
+      card.innerHTML =
+        '<div class="unit-card-header">' +
+          '<span class="unit-number-badge">' + Lang.t('unit_label') + ' ' + unitDef.num + '</span>' +
+          '<span class="unit-name">' + Lang.t(unitDef.nameKey) + '</span>' +
+        '</div>' +
+        '<div class="level-pills">' + pillsHtml + '</div>';
+      grid.appendChild(card);
+    });
   }
 
   function renderGuestSecondaryHome() {
