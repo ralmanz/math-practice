@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="nuvo-tokens.css">
   <style>
     /* ── Reset & Base ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -186,13 +187,13 @@
     ───────────────────────────────────────── */
     #hero {
       background: var(--white);
-      padding: 108px 24px 96px;
+      padding: 108px 24px 64px;
       text-align: left;
     }
 
     .hero-layout {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(260px, 440px);
+      grid-template-columns: minmax(0, 1fr) auto;
       gap: 48px 56px;
       /* start: keeps headline/copy anchored; center would shift the left column when demo height changes */
       align-items: start;
@@ -223,6 +224,131 @@
 
     .hero-demo-wrap {
       position: relative;
+      --hero-try-card-min-width: 348px;
+      width: max-content;
+      min-width: min(var(--hero-try-card-min-width), 100%);
+      max-width: 100%;
+    }
+
+    #hero-try.hero-demo {
+      width: 100%;
+      min-width: var(--hero-try-card-min-width);
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+
+    #hero-try .hero-try-body {
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    /* ── Product preview animations (above “Sound familiar?”) ── */
+    #product-previews {
+      --preview-chrome-h: 38px;
+      --preview-body-h: 400px;
+      --preview-card-height: calc(var(--preview-chrome-h) + var(--preview-body-h));
+      background: var(--white);
+      padding: 40px 24px 48px;
+      /* Reserve vertical space so animations never push #problem */
+      min-height: calc(var(--preview-card-height) + 88px);
+    }
+
+    #product-previews .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    #product-previews .hero-previews-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+      align-items: stretch;
+      min-height: var(--preview-card-height);
+      width: 100%;
+    }
+
+    #product-previews .hero-preview {
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: var(--white);
+      box-shadow:
+        0 1px 2px rgba(15, 23, 42, 0.04),
+        0 12px 32px rgba(15, 23, 42, 0.06);
+      overflow: hidden;
+      text-align: left;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      height: var(--preview-card-height);
+      max-height: var(--preview-card-height);
+    }
+
+    #product-previews .hero-preview .hero-demo-chrome {
+      padding: 10px 12px;
+      flex-shrink: 0;
+      height: var(--preview-chrome-h);
+      box-sizing: border-box;
+    }
+
+    #product-previews .hero-preview .hero-demo-chrome-title {
+      font-size: 0.72rem;
+    }
+
+    #product-previews .hero-preview .hero-demo-body {
+      padding: 16px 14px 18px;
+      flex: 1 1 auto;
+      min-height: 0;
+      height: var(--preview-body-h);
+      max-height: var(--preview-body-h);
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+
+    .hero-preview .hero-demo-prompt {
+      font-size: 0.88rem;
+      margin-bottom: 12px;
+    }
+
+    .hero-preview .hero-demo-step-q {
+      font-size: 0.82rem;
+    }
+
+    .hero-preview .hero-engine-expr {
+      font-size: 0.95rem;
+    }
+
+    .hero-preview .hero-engine-shell {
+      padding: 12px 12px 14px;
+    }
+
+    .hero-preview .hero-tutor-body {
+      padding: 12px;
+    }
+
+    .hero-preview .hero-tutor-title {
+      font-size: 0.88rem;
+    }
+
+    .hero-preview .hero-tutor-sub {
+      font-size: 0.78rem;
+      margin-bottom: 10px;
+    }
+
+    .hero-preview .hero-tutor-initials-circle {
+      width: 40px;
+      height: 40px;
+      font-size: 1rem;
+    }
+
+    #product-previews .hero-preview .hero-tutor-panel,
+    #product-previews .hero-preview .hero-unified-engine {
+      max-height: 100%;
+      overflow: hidden;
+    }
+
+    #product-previews .hero-preview .hero-tutor-tile {
+      aspect-ratio: 16 / 11;
     }
 
     .sr-only {
@@ -282,7 +408,146 @@
     }
 
     .hero-demo-body {
+      position: relative;
       padding: 22px 20px 24px;
+    }
+
+    /* ── Hero live try (real engine) ── */
+    .hero-try-body { display: flex; flex-direction: column; gap: 10px; }
+    .hero-try-meta {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--blue-dark);
+    }
+    .hero-try-question {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      line-height: 1.35;
+    }
+    .hero-try-work-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .hero-try-work {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-mid);
+      font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+      letter-spacing: 0.02em;
+    }
+    .hero-try-steps { display: flex; flex-direction: column; gap: 6px; min-height: 0; }
+    .hero-try-step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem;
+      color: #065F46;
+    }
+    .hero-try-step-check {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #10B981;
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .hero-try-step-text { font-family: ui-monospace, 'SF Mono', Menlo, monospace; }
+    .hero-try-feedback.feedback {
+      font-size: 0.88rem;
+      line-height: 1.45;
+      padding: 10px 12px;
+      border-radius: 8px;
+      margin: 0;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    /* Incorrect steps + keep-going: amber (same as app.html .feedback.nudge) */
+    .hero-try-feedback.feedback.nudge,
+    .hero-try-feedback.feedback.wrong,
+    .hero-try-feedback.feedback.unsure {
+      background: var(--nuvo-keepgoing-bg);
+      color: var(--nuvo-keepgoing);
+      border: 1px solid var(--nuvo-keepgoing-border);
+    }
+    .hero-try-hint { margin-top: 2px; }
+    .hero-try-input-row {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 8px;
+      margin-top: 6px;
+      align-items: center;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .hero-try-input {
+      flex: 1 1 auto;
+      width: auto;
+      min-width: 18ch;
+      max-width: 100%;
+      padding: 10px 12px;
+      box-sizing: border-box;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    }
+    .hero-try-input:focus {
+      outline: none;
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px var(--blue-light);
+    }
+    .hero-try-btn {
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+    }
+    .hero-try-btn--primary {
+      background: var(--blue);
+      color: #fff;
+    }
+    .hero-try-btn--primary:hover { background: var(--blue-dark); }
+    .hero-try-btn--primary:disabled { opacity: 0.6; cursor: default; }
+    .hero-try-btn--ghost {
+      background: var(--bg);
+      color: var(--text-mid);
+      border: 1px solid var(--border);
+    }
+    .hero-try-btn--ghost:hover { background: var(--blue-xlight); border-color: var(--blue-light); }
+    .hero-try-complete {
+      margin-top: 8px;
+      padding: 14px;
+      background: #ECFDF5;
+      border: 1px solid #A7F3D0;
+      border-radius: 12px;
+      text-align: center;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .hero-try-complete-msg {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: #065F46;
+      margin-bottom: 12px;
+    }
+    .hero-try-complete-cta {
+      display: inline-block;
+      font-size: 0.9rem;
+      padding: 10px 18px;
     }
 
     .hero-demo-prompt {
@@ -294,24 +559,119 @@
       margin-bottom: 0;
     }
 
-    #hero-demo [data-demo-part="prompt"] {
+    /* ── Preview panel phase animations (3 separate boxes) ── */
+    .hero-preview [data-demo-part="step"],
+    .hero-preview [data-demo-part="hint"],
+    .hero-preview [data-demo-part="feedback"],
+    .hero-preview [data-engine-part],
+    .hero-preview [data-demo-part="tutor-extra"] {
+      max-height: 0;
+      opacity: 0;
       overflow: hidden;
+      transform: translateY(8px);
+      margin-top: 0;
+      margin-bottom: 0;
+      transition:
+        max-height 0.55s ease,
+        opacity 0.45s ease,
+        transform 0.45s ease,
+        margin-top 0.45s ease,
+        margin-bottom 0.45s ease;
+    }
+
+    #product-previews #hero-preview-guided:is([data-phase="1"], [data-phase="2"], [data-phase="3"], [data-phase="full"])
+      [data-demo-part="step"] {
       max-height: 120px;
       opacity: 1;
       transform: none;
-      margin-bottom: 18px;
-      transition:
-        max-height 0.5s ease,
-        opacity 0.4s ease,
-        margin-bottom 0.4s ease,
-        transform 0.4s ease;
+      margin-top: 4px;
     }
 
-    #hero-demo:is([data-phase="10"], [data-phase="11"], [data-phase="12"], [data-phase="reset"]) [data-demo-part="prompt"] {
+    #product-previews #hero-preview-guided:is([data-phase="2"], [data-phase="3"], [data-phase="full"])
+      [data-demo-part="hint"] {
+      max-height: 100px;
+      opacity: 1;
+      transform: none;
+      margin-top: 10px;
+    }
+
+    #product-previews #hero-preview-guided:is([data-phase="3"], [data-phase="full"])
+      [data-demo-part="feedback"] {
+      max-height: 88px;
+      opacity: 1;
+      transform: none;
+      margin-top: 10px;
+    }
+
+    #product-previews #hero-preview-engine:is([data-phase="1"], [data-phase="2"], [data-phase="3"], [data-phase="4"], [data-phase="full"])
+      [data-engine-part="l1"] {
+      max-height: 72px;
+      opacity: 1;
+      transform: none;
+      margin-bottom: 8px;
+    }
+
+    #product-previews #hero-preview-engine:is([data-phase="2"], [data-phase="3"], [data-phase="4"], [data-phase="full"])
+      [data-engine-part="l2"] {
+      max-height: 72px;
+      opacity: 1;
+      transform: none;
+      margin-bottom: 8px;
+    }
+
+    #product-previews #hero-preview-engine:is([data-phase="3"], [data-phase="4"], [data-phase="full"])
+      [data-engine-part="nudge"] {
+      max-height: 88px;
+      opacity: 1;
+      transform: none;
+      margin-bottom: 10px;
+    }
+
+    #product-previews #hero-preview-engine:is([data-phase="4"], [data-phase="full"])
+      [data-engine-part="inp"] {
+      max-height: 56px;
+      opacity: 1;
+      transform: none;
+    }
+
+    #hero-preview-engine[data-phase="4"] .hero-engine-caret {
+      opacity: 1;
+      animation: hero-engine-caret-blink 1.05s step-end infinite;
+    }
+
+    #hero-preview-engine[data-phase="full"] .hero-engine-caret {
+      opacity: 1;
+      animation: none;
+    }
+
+    #product-previews #hero-preview-tutor:is([data-phase="1"], [data-phase="full"])
+      [data-demo-part="tutor-extra"] {
+      max-height: 72px;
+      opacity: 1;
+      transform: none;
+      margin-top: 10px;
+    }
+
+    .hero-preview[data-phase="reset"] [data-demo-part="step"],
+    .hero-preview[data-phase="reset"] [data-demo-part="hint"],
+    .hero-preview[data-phase="reset"] [data-demo-part="feedback"],
+    .hero-preview[data-phase="reset"] [data-engine-part],
+    .hero-preview[data-phase="reset"] [data-demo-part="tutor-extra"] {
       max-height: 0;
       opacity: 0;
-      margin-bottom: 0;
       transform: translateY(8px);
+      transition: none;
+    }
+
+    .hero-preview[data-phase="full"] [data-demo-part="step"],
+    .hero-preview[data-phase="full"] [data-demo-part="hint"],
+    .hero-preview[data-phase="full"] [data-demo-part="feedback"],
+    .hero-preview[data-phase="full"] [data-engine-part],
+    .hero-preview[data-phase="full"] [data-demo-part="tutor-extra"] {
+      max-height: 280px;
+      opacity: 1;
+      transform: none;
+      transition: none;
     }
 
     .hero-demo-block {
@@ -535,19 +895,21 @@
       to   { opacity: 1; transform: none; }
     }
 
-    #hero-demo:is([data-phase="11"], [data-phase="12"]) .hero-tutor-tile:nth-child(1),
-    #hero-demo[data-phase="full"] .hero-tutor-tile:nth-child(1) {
+    #hero-preview-tutor:is([data-phase="0"], [data-phase="1"], [data-phase="full"]) .hero-tutor-tile:nth-child(1) {
       animation: hero-tile-enter 0.35s ease both;
     }
 
-    #hero-demo:is([data-phase="11"], [data-phase="12"]) .hero-tutor-tile:nth-child(2),
-    #hero-demo[data-phase="full"] .hero-tutor-tile:nth-child(2) {
+    #hero-preview-tutor:is([data-phase="0"], [data-phase="1"], [data-phase="full"]) .hero-tutor-tile:nth-child(2) {
       animation: hero-tile-enter 0.35s ease 0.12s both;
     }
 
     @media (prefers-reduced-motion: reduce) {
       .hero-tutor-live-pill { animation: none; }
-      #hero-demo .hero-tutor-tile { animation: none; }
+      .hero-preview .hero-tutor-tile { animation: none; }
+      #hero-preview-engine[data-phase="full"] .hero-engine-caret {
+        animation: none;
+        opacity: 1;
+      }
     }
 
     .hero-tutor-tile-cap {
@@ -578,123 +940,6 @@
       font-weight: 600;
       color: var(--blue-dark);
       line-height: 1.4;
-    }
-
-    #hero-demo [data-demo-part="step"],
-    #hero-demo [data-demo-part="hint"],
-    #hero-demo [data-demo-part="feedback"] {
-      max-height: 0;
-      opacity: 0;
-      overflow: hidden;
-      transform: translateY(8px);
-      margin-top: 0;
-      margin-bottom: 0;
-      transition:
-        max-height 0.55s ease,
-        opacity 0.45s ease,
-        transform 0.45s ease,
-        margin-top 0.45s ease,
-        margin-bottom 0.45s ease;
-    }
-
-    #hero-demo:is([data-phase="1"], [data-phase="2"], [data-phase="3"]) [data-demo-part="step"] {
-      max-height: 220px;
-      opacity: 1;
-      transform: none;
-      margin-top: 4px;
-      margin-bottom: 0;
-    }
-
-    #hero-demo:is([data-phase="2"], [data-phase="3"]) [data-demo-part="hint"] {
-      max-height: 200px;
-      opacity: 1;
-      transform: none;
-      margin-top: 14px;
-      margin-bottom: 0;
-    }
-
-    #hero-demo[data-phase="3"] [data-demo-part="feedback"] {
-      max-height: 160px;
-      opacity: 1;
-      transform: none;
-      margin-top: 14px;
-      margin-bottom: 0;
-    }
-
-    #hero-demo [data-demo-part="bridge-engine"],
-    #hero-demo [data-demo-part="bridge-tutor"],
-    #hero-demo [data-demo-part="tutor-wrap"],
-    #hero-demo [data-demo-part="tutor-extra"] {
-      max-height: 0;
-      opacity: 0;
-      overflow: hidden;
-      transform: translateY(8px);
-      margin-top: 0;
-      margin-bottom: 0;
-      transition:
-        max-height 0.55s ease,
-        opacity 0.45s ease,
-        transform 0.45s ease,
-        margin-top 0.45s ease,
-        margin-bottom 0.45s ease;
-    }
-
-    #hero-demo[data-phase="4"] [data-demo-part="bridge-engine"] {
-      max-height: 80px;
-      opacity: 1;
-      transform: none;
-      margin-top: 18px;
-      margin-bottom: 6px;
-    }
-
-    #hero-demo [data-demo-part="engine-wrap"] {
-      max-height: 0;
-      opacity: 0;
-      overflow: hidden;
-      transform: translateY(10px);
-      margin-top: 0;
-      margin-bottom: 0;
-      border: 1px solid transparent;
-      transition:
-        max-height 0.6s ease,
-        opacity 0.48s ease,
-        transform 0.48s ease,
-        margin-top 0.48s ease,
-        border-color 0.35s ease;
-    }
-
-    #hero-demo:is([data-phase="5"], [data-phase="6"], [data-phase="7"], [data-phase="8"], [data-phase="9"]) [data-demo-part="engine-wrap"] {
-      max-height: 1200px;
-      opacity: 1;
-      transform: none;
-      margin-top: 12px;
-      margin-bottom: 0;
-      border-color: #D1D9D4;
-    }
-
-    #hero-demo[data-phase="10"] [data-demo-part="bridge-tutor"] {
-      max-height: 80px;
-      opacity: 1;
-      transform: none;
-      margin-top: 20px;
-      margin-bottom: 6px;
-    }
-
-    #hero-demo:is([data-phase="11"], [data-phase="12"]) [data-demo-part="tutor-wrap"] {
-      max-height: 560px;
-      opacity: 1;
-      transform: none;
-      margin-top: 10px;
-      margin-bottom: 0;
-    }
-
-    #hero-demo[data-phase="12"] [data-demo-part="tutor-extra"],
-    #hero-demo[data-phase="full"] [data-demo-part="tutor-extra"] {
-      max-height: 120px;
-      opacity: 1;
-      transform: none;
-      margin-top: 12px;
-      margin-bottom: 0;
     }
 
     .hero-unified-engine {
@@ -838,174 +1083,6 @@
       50%, 100% { opacity: 0; }
     }
 
-    #hero-demo[data-phase="9"] .hero-engine-caret {
-      opacity: 1;
-      animation: hero-engine-caret-blink 1.05s step-end infinite;
-    }
-
-    #hero-demo[data-phase="full"] .hero-engine-caret {
-      opacity: 1;
-      animation: none;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      #hero-demo[data-phase="full"] .hero-engine-caret {
-        animation: none;
-        opacity: 1;
-      }
-    }
-
-    #hero-demo [data-engine-part] {
-      max-height: 0;
-      opacity: 0;
-      overflow: hidden;
-      transform: translateY(8px);
-      margin-top: 0;
-      margin-bottom: 0;
-      transition:
-        max-height 0.55s ease,
-        opacity 0.45s ease,
-        transform 0.45s ease,
-        margin-top 0.45s ease,
-        margin-bottom 0.45s ease;
-    }
-
-    #hero-demo:is([data-phase="6"], [data-phase="7"], [data-phase="8"], [data-phase="9"]) [data-engine-part="l1"] {
-      max-height: 100px;
-      opacity: 1;
-      transform: none;
-      margin-top: 0;
-      margin-bottom: 10px;
-    }
-
-    #hero-demo:is([data-phase="7"], [data-phase="8"], [data-phase="9"]) [data-engine-part="l2"] {
-      max-height: 100px;
-      opacity: 1;
-      transform: none;
-      margin-top: 0;
-      margin-bottom: 10px;
-    }
-
-    #hero-demo:is([data-phase="8"], [data-phase="9"]) [data-engine-part="nudge"] {
-      max-height: 120px;
-      opacity: 1;
-      transform: none;
-      margin-top: 0;
-      margin-bottom: 12px;
-    }
-
-    #hero-demo[data-phase="9"] [data-engine-part="inp"] {
-      max-height: 80px;
-      opacity: 1;
-      transform: none;
-      margin-top: 0;
-      margin-bottom: 0;
-    }
-
-    #hero-demo[data-phase="full"] [data-demo-part="bridge-engine"],
-    #hero-demo[data-phase="full"] [data-demo-part="bridge-tutor"],
-    #hero-demo[data-phase="full"] [data-demo-part="tutor-wrap"],
-    #hero-demo[data-phase="full"] [data-demo-part="tutor-extra"] {
-      max-height: 560px;
-      opacity: 1;
-      transform: none;
-      transition: none;
-      margin-top: 16px;
-      margin-bottom: 0;
-    }
-
-    #hero-demo[data-phase="full"] [data-demo-part="bridge-engine"] {
-      margin-top: 18px;
-      margin-bottom: 6px;
-    }
-
-    #hero-demo[data-phase="full"] [data-demo-part="bridge-tutor"] {
-      margin-top: 20px;
-    }
-
-    #hero-demo[data-phase="full"] [data-demo-part="tutor-wrap"] {
-      margin-top: 10px;
-    }
-
-    #hero-demo[data-phase="full"] [data-demo-part="tutor-extra"] {
-      margin-top: 12px;
-    }
-
-    #hero-demo[data-phase="full"] [data-demo-part="prompt"] {
-      max-height: 120px;
-      opacity: 1;
-      margin-bottom: 18px;
-      transform: none;
-      transition: none;
-    }
-
-    #hero-demo[data-phase="full"] [data-demo-part="step"],
-    #hero-demo[data-phase="full"] [data-demo-part="hint"],
-    #hero-demo[data-phase="full"] [data-demo-part="feedback"] {
-      max-height: 280px;
-      opacity: 1;
-      transform: none;
-      margin-top: 14px;
-      margin-bottom: 0;
-      transition: none;
-    }
-
-    #hero-demo[data-phase="full"] [data-demo-part="step"] {
-      margin-top: 4px;
-    }
-
-    #hero-demo[data-phase="full"] [data-demo-part="engine-wrap"] {
-      max-height: 1200px;
-      opacity: 1;
-      transform: none;
-      margin-top: 12px;
-      margin-bottom: 0;
-      border-color: #D1D9D4;
-      transition: none;
-    }
-
-    #hero-demo[data-phase="full"] [data-engine-part="l1"],
-    #hero-demo[data-phase="full"] [data-engine-part="l2"],
-    #hero-demo[data-phase="full"] [data-engine-part="nudge"],
-    #hero-demo[data-phase="full"] [data-engine-part="inp"] {
-      max-height: 200px;
-      opacity: 1;
-      transform: none;
-      transition: none;
-      margin-top: 0;
-    }
-
-    #hero-demo[data-phase="full"] [data-engine-part="l1"] {
-      margin-bottom: 10px;
-    }
-
-    #hero-demo[data-phase="full"] [data-engine-part="l2"] {
-      margin-bottom: 10px;
-    }
-
-    #hero-demo[data-phase="full"] [data-engine-part="nudge"] {
-      margin-bottom: 12px;
-    }
-
-    #hero-demo[data-phase="reset"] [data-demo-part="prompt"],
-    #hero-demo[data-phase="reset"] [data-demo-part="step"],
-    #hero-demo[data-phase="reset"] [data-demo-part="hint"],
-    #hero-demo[data-phase="reset"] [data-demo-part="feedback"],
-    #hero-demo[data-phase="reset"] [data-demo-part="bridge-engine"],
-    #hero-demo[data-phase="reset"] [data-demo-part="bridge-tutor"],
-    #hero-demo[data-phase="reset"] [data-demo-part="engine-wrap"],
-    #hero-demo[data-phase="reset"] [data-demo-part="tutor-wrap"],
-    #hero-demo[data-phase="reset"] [data-demo-part="tutor-extra"],
-    #hero-demo[data-phase="reset"] [data-engine-part] {
-      max-height: 0;
-      opacity: 0;
-      transform: translateY(8px);
-      margin-top: 0;
-      margin-bottom: 0;
-      transition: none;
-      border-color: transparent;
-    }
-
     .hero-eyebrow {
       display: inline-block;
       background: var(--blue-light);
@@ -1070,7 +1147,10 @@
     /* ─────────────────────────────────────────
        PROBLEM SECTION
     ───────────────────────────────────────── */
-    #problem { background: var(--bg); }
+    #problem {
+      background: var(--bg);
+      padding: 72px 24px 88px;
+    }
 
     .problem-grid {
       display: grid;
@@ -1483,9 +1563,48 @@
       }
 
       .hero-demo-wrap {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        margin: 0 auto;
+      }
+
+      #hero-try.hero-demo {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+      }
+
+      .hero-try-input-row {
+        width: 100%;
+      }
+
+      .hero-try-input {
+        flex: 1 1 auto;
+        width: auto;
+        min-width: 0;
+        box-sizing: border-box;
+      }
+
+      #product-previews {
+        padding: 32px 20px 48px;
+        --preview-body-h: 380px;
+        min-height: calc(var(--preview-card-height) + 80px);
+      }
+
+      #product-previews .hero-previews-row {
+        grid-template-columns: 1fr;
+        gap: 16px;
         max-width: 440px;
         margin: 0 auto;
-        width: 100%;
+        /* stacked: fixed per card; section height is stable while each animates */
+        min-height: calc(var(--preview-card-height) * 3 + 32px);
+      }
+    }
+
+    @media (min-width: 961px) and (max-width: 1100px) {
+      .hero-previews-row {
+        gap: 14px;
       }
     }
 
@@ -1536,107 +1655,154 @@
       <div class="hero-copy">
         <p class="hero-eyebrow" data-i18n="hero_eyebrow">Guided math + live tutoring</p>
         <h1 class="hero-headline" data-i18n-html="hero_headline">Prepare for the UTP exam.</h1>
-        <p class="hero-sub" data-i18n-html="hero_sub"><strong>Practice anytime.</strong> Step-by-step guided practice with hints, examples, and immediate feedback — so you arrive at the exam with confidence.</p>
+        <p class="hero-sub" data-i18n-html="hero_sub"><strong>Practice algebra anytime.</strong> Step-by-step guided practice with hints, examples, and immediate feedback — so you arrive at the exam with confidence.</p>
         <div class="hero-ctas">
           <a href="filter.html" class="btn btn-primary" data-i18n="hero_cta_primary">Start Practicing</a>
         </div>
         <p class="hero-signin-note"><span data-i18n="hero_signin_note">Already enrolled?</span> <a href="login.html" data-i18n="hero_signin_link">Sign in &rarr;</a></p>
       </div>
       <div class="hero-demo-wrap">
-        <p class="sr-only" data-i18n="hero_demo_aria">Animated preview: guided practice with a hint and instant feedback</p>
-        <p class="sr-only" data-i18n="hero_engine_aria">Animated preview: each line is checked before you continue</p>
-        <p class="sr-only" data-i18n="hero_tutor_aria">Animated preview: weekly live tutoring on Google Meet</p>
-        <div class="hero-demo" id="hero-demo" data-phase="0" aria-hidden="true">
+        <p class="sr-only" data-i18n="hero_try_aria">Try the practice engine: one problem with step-by-step checking</p>
+        <div class="hero-demo" id="hero-try" role="region" aria-labelledby="hero-try-title">
           <div class="hero-demo-chrome">
             <div class="hero-demo-dots" aria-hidden="true"><span></span><span></span><span></span></div>
-            <span class="hero-demo-chrome-title" data-i18n="hero_demo_title">Guided practice</span>
+            <span class="hero-demo-chrome-title" id="hero-try-title" data-i18n="hero_try_title">Nuvo Math</span>
           </div>
-          <div class="hero-demo-body">
-            <p class="hero-demo-prompt" data-demo-part="prompt" data-i18n="hero_demo_prompt">Solve for x: 2x + 3 = 11</p>
-            <div class="hero-demo-block" data-demo-part="step">
-              <span class="hero-demo-badge" data-i18n="hero_demo_step_label">Step 1 of 3</span>
-              <p class="hero-demo-step-q" data-i18n="hero_demo_step_q">What should you do first to isolate the term with x?</p>
+          <div class="hero-demo-body hero-try-body">
+            <p class="hero-try-meta" data-i18n="hero_try_meta">Simplify</p>
+            <p class="hero-try-question" id="hero-try-question" data-i18n-html="hero_try_question">Simplify 4x + 3x</p>
+            <p class="hero-try-work-label" data-i18n="hero_try_work_label">Expression</p>
+            <p class="hero-try-work" id="hero-try-work">4x + 3x</p>
+            <div class="hero-try-steps" id="hero-try-steps" aria-live="polite"></div>
+            <p class="hero-try-feedback feedback" id="hero-try-feedback" hidden></p>
+            <div class="hero-try-hint hero-demo-hint" id="hero-try-hint" hidden>
+              <span class="hero-demo-hint-tag" data-i18n="hero_try_hint_tag">Hint</span>
+              <p id="hero-try-hint-text"></p>
             </div>
-            <div class="hero-demo-block hero-demo-hint" data-demo-part="hint">
-              <span class="hero-demo-hint-tag" data-i18n="hero_demo_hint_tag">Hint</span>
-              <p data-i18n="hero_demo_hint_text">Subtract 3 from both sides.</p>
+            <div class="hero-try-input-row" id="hero-try-input-area">
+              <input type="text" class="hero-try-input" id="hero-try-input" autocomplete="off" spellcheck="false"
+                data-i18n-placeholder="hero_try_placeholder" placeholder="Next step…" aria-label="Your step">
+              <button type="button" class="hero-try-btn hero-try-btn--primary" id="hero-try-submit" data-i18n="hero_try_submit">Check step</button>
+              <button type="button" class="hero-try-btn hero-try-btn--ghost" id="hero-try-hint-btn" data-i18n="hero_try_hint_btn">Hint</button>
             </div>
-            <div class="hero-demo-block hero-demo-feedback" data-demo-part="feedback">
-              <span class="hero-demo-check" aria-hidden="true">&#10003;</span>
-              <p data-i18n="hero_demo_feedback">Nice &mdash; that keeps the equation balanced.</p>
-            </div>
-
-            <div class="hero-demo-bridge" data-demo-part="bridge-engine">
-              <p data-i18n="hero_bridge_engine">Next — in the practice workspace, every line is checked.</p>
-            </div>
-
-            <div class="hero-unified-engine" data-demo-part="engine-wrap">
-              <div class="hero-engine-shell">
-                <div class="hero-engine-progress-row">
-                  <div class="hero-engine-progress-track" aria-hidden="true">
-                    <div class="hero-engine-progress-bar"></div>
-                  </div>
-                  <span class="hero-engine-progress-count" data-i18n="hero_engine_count">1/1</span>
-                </div>
-                <div class="hero-engine-problem-card">
-                  <div class="hero-engine-meta" data-i18n="hero_engine_meta">Problem 1 of 1 · Simplify</div>
-                  <div class="hero-engine-expr" data-i18n="hero_engine_expr">3x − 2y + 6x + 9y</div>
-                </div>
-                <div class="hero-engine-work">
-                  <div class="hero-engine-line" data-engine-part="l1">
-                    <span class="hero-engine-line-check" aria-hidden="true">&#10003;</span>
-                    <span class="hero-engine-mono" data-i18n="hero_engine_line1">(3x + 6x) + (−2y + 9y)</span>
-                  </div>
-                  <div class="hero-engine-line" data-engine-part="l2">
-                    <span class="hero-engine-line-check" aria-hidden="true">&#10003;</span>
-                    <span class="hero-engine-mono" data-i18n="hero_engine_line2">9x + (−2y + 9y)</span>
-                  </div>
-                  <div class="hero-engine-nudge" data-engine-part="nudge">
-                    <p data-i18n="hero_engine_nudge">Correct value, but try to simplify or factor further!</p>
-                  </div>
-                  <div class="hero-engine-input-faux" data-engine-part="inp">
-                    <span class="hero-engine-caret" aria-hidden="true"></span>
-                    <span data-i18n="hero_engine_placeholder">Type or tap buttons to enter your answer...</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="hero-demo-bridge hero-demo-bridge--tutor" data-demo-part="bridge-tutor">
-              <p data-i18n="hero_bridge_tutor">Then — connect live with a tutor on Google Meet.</p>
-            </div>
-
-            <div class="hero-tutor-panel" data-demo-part="tutor-wrap">
-              <div class="hero-tutor-chrome">
-                <div class="hero-tutor-chrome-brand">
-                  <span aria-hidden="true">&#128247;</span>
-                  <span data-i18n="hero_tutor_meet_label">Google Meet</span>
-                </div>
-                <span class="hero-tutor-live-pill" data-i18n="hero_tutor_live_badge">Live</span>
-              </div>
-              <div class="hero-tutor-body">
-                <p class="hero-tutor-title" data-i18n="hero_tutor_title">Weekly live session</p>
-                <p class="hero-tutor-sub" data-i18n="hero_tutor_sub">Review progress, work through harder problems, and stay on track with a real teacher.</p>
-                <div class="hero-tutor-video-row">
-                  <div class="hero-tutor-tile hero-tutor-tile--student">
-                    <div class="hero-tutor-avatar" aria-hidden="true">
-                      <div class="hero-tutor-initials-circle hero-tutor-initials-circle--student">A</div>
-                    </div>
-                    <span class="hero-tutor-tile-cap" data-i18n="hero_tutor_tile_you">You</span>
-                  </div>
-                  <div class="hero-tutor-tile hero-tutor-tile--host">
-                    <div class="hero-tutor-avatar" aria-hidden="true">
-                      <div class="hero-tutor-initials-circle hero-tutor-initials-circle--tutor">R</div>
-                    </div>
-                    <span class="hero-tutor-tile-cap" data-i18n="hero_tutor_tile_tutor">Tutor</span>
-                  </div>
-                </div>
-                <div class="hero-tutor-extra" data-demo-part="tutor-extra" data-i18n="hero_tutor_extra">Bring questions from this week’s practice →</div>
-              </div>
+            <div class="hero-try-complete" id="hero-try-complete" hidden>
+              <p class="hero-try-complete-msg" data-i18n="hero_try_complete">Nice! - Correct answer</p>
+              <a href="filter.html" class="btn btn-primary hero-try-complete-cta" data-i18n="hero_try_cta">Start practicing</a>
             </div>
           </div>
         </div>
       </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════ PRODUCT PREVIEWS (animated) ════════ -->
+<section id="product-previews" aria-hidden="true">
+  <div class="container">
+    <div class="hero-previews-row">
+      <p class="sr-only" data-i18n="hero_demo_aria">Animated preview: guided practice with a hint and instant feedback</p>
+      <p class="sr-only" data-i18n="hero_engine_aria">Animated preview: each line is checked before you continue</p>
+      <p class="sr-only" data-i18n="hero_tutor_aria">Animated preview: weekly live tutoring on Google Meet</p>
+
+      <div class="hero-preview" id="hero-preview-guided" data-phase="0">
+            <div class="hero-demo-chrome">
+              <div class="hero-demo-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+              <span class="hero-demo-chrome-title" data-i18n="hero_demo_title">Guided practice</span>
+            </div>
+            <div class="hero-demo-body">
+              <p class="hero-demo-prompt" data-i18n="hero_demo_prompt">Solve for x: 2x + 3 = 11</p>
+              <div class="hero-demo-block" data-demo-part="step">
+                <span class="hero-demo-badge" data-i18n="hero_demo_step_label">Step 1 of 3</span>
+                <p class="hero-demo-step-q" data-i18n="hero_demo_step_q">What should you do first to isolate the term with x?</p>
+              </div>
+              <div class="hero-demo-block hero-demo-hint" data-demo-part="hint">
+                <span class="hero-demo-hint-tag" data-i18n="hero_demo_hint_tag">Hint</span>
+                <p data-i18n="hero_demo_hint_text">Subtract 3 from both sides.</p>
+              </div>
+              <div class="hero-demo-block hero-demo-feedback" data-demo-part="feedback">
+                <span class="hero-demo-check" aria-hidden="true">&#10003;</span>
+                <p data-i18n="hero_demo_feedback">Nice &mdash; that keeps the equation balanced.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-preview" id="hero-preview-engine" data-phase="0">
+            <div class="hero-demo-chrome">
+              <div class="hero-demo-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+              <span class="hero-demo-chrome-title" data-i18n="hero_engine_meta">Problem 1 of 1 · Simplify</span>
+            </div>
+            <div class="hero-demo-body">
+              <div class="hero-unified-engine" data-demo-part="engine-wrap">
+                <div class="hero-engine-shell">
+                  <div class="hero-engine-progress-row">
+                    <div class="hero-engine-progress-track" aria-hidden="true">
+                      <div class="hero-engine-progress-bar"></div>
+                    </div>
+                    <span class="hero-engine-progress-count" data-i18n="hero_engine_count">1/1</span>
+                  </div>
+                  <div class="hero-engine-problem-card">
+                    <div class="hero-engine-expr" data-i18n="hero_engine_expr">3x − 2y + 6x + 9y</div>
+                  </div>
+                  <div class="hero-engine-work">
+                    <div class="hero-engine-line" data-engine-part="l1">
+                      <span class="hero-engine-line-check" aria-hidden="true">&#10003;</span>
+                      <span class="hero-engine-mono" data-i18n="hero_engine_line1">(3x + 6x) + (−2y + 9y)</span>
+                    </div>
+                    <div class="hero-engine-line" data-engine-part="l2">
+                      <span class="hero-engine-line-check" aria-hidden="true">&#10003;</span>
+                      <span class="hero-engine-mono" data-i18n="hero_engine_line2">9x + (−2y + 9y)</span>
+                    </div>
+                    <div class="hero-engine-nudge" data-engine-part="nudge">
+                      <p data-i18n="hero_engine_nudge">Correct value, but try to simplify or factor further!</p>
+                    </div>
+                    <div class="hero-engine-input-faux" data-engine-part="inp">
+                      <span class="hero-engine-caret" aria-hidden="true"></span>
+                      <span data-i18n="hero_engine_placeholder">Type or tap buttons to enter your answer...</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-preview" id="hero-preview-tutor" data-phase="0">
+            <div class="hero-demo-chrome">
+              <div class="hero-demo-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+              <span class="hero-demo-chrome-title" data-i18n="hero_tutor_meet_label">Google Meet</span>
+            </div>
+            <div class="hero-demo-body">
+              <div class="hero-tutor-panel" data-demo-part="tutor-wrap">
+                <div class="hero-tutor-chrome">
+                  <div class="hero-tutor-chrome-brand">
+                    <span aria-hidden="true">&#128247;</span>
+                    <span data-i18n="hero_tutor_meet_label">Google Meet</span>
+                  </div>
+                  <span class="hero-tutor-live-pill" data-i18n="hero_tutor_live_badge">Live</span>
+                </div>
+                <div class="hero-tutor-body">
+                  <p class="hero-tutor-title" data-i18n="hero_tutor_title">Weekly live session</p>
+                  <p class="hero-tutor-sub" data-i18n="hero_tutor_sub">Review progress, work through harder problems, and stay on track with a real teacher.</p>
+                  <div class="hero-tutor-video-row">
+                    <div class="hero-tutor-tile hero-tutor-tile--student">
+                      <div class="hero-tutor-avatar" aria-hidden="true">
+                        <div class="hero-tutor-initials-circle hero-tutor-initials-circle--student">A</div>
+                      </div>
+                      <span class="hero-tutor-tile-cap" data-i18n="hero_tutor_tile_you">You</span>
+                    </div>
+                    <div class="hero-tutor-tile hero-tutor-tile--host">
+                      <div class="hero-tutor-avatar" aria-hidden="true">
+                        <div class="hero-tutor-initials-circle hero-tutor-initials-circle--tutor">R</div>
+                      </div>
+                      <span class="hero-tutor-tile-cap" data-i18n="hero_tutor_tile_tutor">Tutor</span>
+                    </div>
+                  </div>
+                  <div class="hero-tutor-extra" data-demo-part="tutor-extra" data-i18n="hero_tutor_extra">Bring questions from this week’s practice →</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
     </div>
   </div>
 </section>
@@ -1652,7 +1818,7 @@
       <div class="problem-card">
         <div class="problem-icon">&#x1F630;</div>
         <h3 data-i18n="problem_1_h3">Nobody to ask for help</h3>
-        <p data-i18n="problem_1_p">Your student gets stuck on homework and has no one to turn to. They wait until the next session — or worse, give up. Algebra doesn't pause for anyone.</p>
+        <p data-i18n="problem_1_p">You get stuck on homework and have no one to turn to. You wait until the next session — or worse, give up. Algebra doesn't pause for anyone.</p>
       </div>
 
       <div class="problem-card">
@@ -1846,61 +2012,11 @@
 </footer>
 
 
-<script src="lang.js?v=20260514-practicar"></script>
+<script src="lang.js?v=20260603-landing-try"></script>
+<script src="https://cdn.jsdelivr.net/npm/algebrite@1.4.0/dist/algebrite.bundle-for-browser.js"></script>
+<script src="math-validation.js?v=20260602-formcheck"></script>
 <script>
   Lang.apply();
-
-  // ── Hero unified demo: guided 0–3, bridge 4, engine 5–9, tutor 10–12, reset ──
-  (function () {
-    var el = document.getElementById('hero-demo');
-    if (!el) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      el.setAttribute('data-phase', 'full');
-      return;
-    }
-    var sleep = function (ms) {
-      return new Promise(function (resolve) {
-        setTimeout(resolve, ms);
-      });
-    };
-    /* ~0.75× playback speed → hold each beat ~4/3 as long */
-    var HERO_DEMO_PACE = 4 / 3;
-    function wait(ms) {
-      return sleep(Math.round(ms * HERO_DEMO_PACE));
-    }
-    (async function loop() {
-      for (;;) {
-        el.setAttribute('data-phase', '0');
-        await wait(1000);
-        el.setAttribute('data-phase', '1');
-        await wait(1200);
-        el.setAttribute('data-phase', '2');
-        await wait(1300);
-        el.setAttribute('data-phase', '3');
-        await wait(2200);
-        el.setAttribute('data-phase', '4');
-        await wait(900);
-        el.setAttribute('data-phase', '5');
-        await wait(750);
-        el.setAttribute('data-phase', '6');
-        await wait(1000);
-        el.setAttribute('data-phase', '7');
-        await wait(1150);
-        el.setAttribute('data-phase', '8');
-        await wait(1500);
-        el.setAttribute('data-phase', '9');
-        await wait(2200);
-        el.setAttribute('data-phase', '10');
-        await wait(850);
-        el.setAttribute('data-phase', '11');
-        await wait(750);
-        el.setAttribute('data-phase', '12');
-        await wait(1800);
-        el.setAttribute('data-phase', 'reset');
-        await wait(500);
-      }
-    })();
-  })();
 
   // ── Scroll fade-in ──
   const observer = new IntersectionObserver((entries) => {
@@ -1915,6 +2031,8 @@
   document.querySelectorAll('.fade-in, .fade-in-group').forEach(el => observer.observe(el));
 </script>
 
+<script src="landing-try.js?v=20260603-landing-try"></script>
+<script src="landing-previews.js?v=20260603-landing-previews"></script>
 <script src="nav.js?v=20260515-teacher-filter"></script>
 </body>
 </html>
