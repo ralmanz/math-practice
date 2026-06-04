@@ -524,7 +524,7 @@ and must be REJECTED if they appear in any proposed content:
 **Calculadora:** NO permitida
 **Áreas evaluadas:** Aritmética · Álgebra · Geometría · Análisis de datos y Probabilidad
 **Audiencia Nuvo Math:** Estudiantes panameños preparándose para el examen de admisión a la UTP y otras universidades · Idioma: Español
-**Niveles Nuvo Math:** PAA **Aritmética** = 3 niveles (`unit=aritmetica`). PAA **Álgebra** en la plataforma = **unidades U1–U5** (3 niveles N1–N3 cada una); la tarjeta `unit=algebra` en la app puede seguir mostrando 3 escalones legacy hasta actualización de UI (ver D-STRUCT).
+**Niveles Nuvo Math:** 3 niveles por unidad (en lugar de 4) — el examen tiene una sola progresión de dificultad
 
 ---
 
@@ -630,9 +630,15 @@ Reglas para los MCQ visuales:
 - **Tipo de problema:** usar el tipo MCQ existente (mismo camino de validación de letra que los MCQ de
   Aritmética: n2-p4, n3-p1, n3-p7). NO pasa por Algebrite.
 
+#### Conceptos vs. Ejemplos (modelo de nivel — SEPARADOS, no se fusionan)
+
+- **Conceptos** = la enseñanza **+ uno o más problemas resueltos paso a paso**, elegidos para cubrir lo que pide la Práctica. Conceptos es **dueño del ejemplo resuelto** y es la **única compuerta** para pasar a Práctica.
+- **Ejemplos** = apoyo complementario **solamente**: representaciones visuales, fórmulas, casos. **Nunca** es la solución principal (esa vive en Conceptos), y **no es compuerta**.
+- **Orden de autoría:** primero se siembra y despliega la **Práctica**; luego se eligen los problemas a resolver paso a paso en **Conceptos** para cubrir esa práctica (como en Unidad 1 Nivel 1); después se añaden **Ejemplos** (visual / fórmula / casos) como apoyo opcional.
+
 #### Lección guiada: tablero de tres columnas (walkthrough)
 
-Algunos niveles usan el **mismo tablero** que Aritmética N1 (TEORÍA · PROBLEMA · CÁLCULOS en `lesson.html`), no la pantalla con pestañas "Conceptos clave".
+El tablero (TEORÍA · PROBLEMA · CÁLCULOS en `lesson.html`) es **una forma de renderizar los problemas resueltos de Conceptos** paso a paso — no una sección aparte ni un "Ejemplos". Los 6 problemas de práctica siguen en `app.html` con el motor Algebrite.
 
 | Qué | Dónde |
 |-----|--------|
@@ -640,9 +646,9 @@ Algunos niveles usan el **mismo tablero** que Aritmética N1 (TEORÍA · PROBLEM
 | Generador de pasos | `worker/walkthrough-generator.js` |
 | Datos en KV | `lesson:PAA:{unit}:level{n}` → `subtopics[].walkthrough` |
 
-**Cuándo usar walkthrough:** un ejemplo narrativo fuerte por nivel (orden de operaciones, despejar una ecuación, ambos lados, etc.). Los 6 problemas de práctica siguen en `app.html` con el motor Algebrite.
+**Cuándo usar el tablero:** cuando el problema resuelto de Conceptos tiene un procedimiento narrativo fuerte (orden de operaciones, despejar una ecuación, ambos lados, etc.).
 
-**Cuándo NO hace falta:** si el nivel solo necesita reglas cortas + ejemplo tabulado; el flujo con pestañas sigue siendo válido.
+**Cuándo basta lo tabulado:** si el problema resuelto es corto, el paso-a-paso tabulado dentro de Conceptos es suficiente. En ambos casos el ejemplo resuelto pertenece a **Conceptos**, nunca a Ejemplos.
 
 **Cómo añadir un nivel nuevo:**
 
@@ -668,73 +674,18 @@ Algunos niveles usan el **mismo tablero** que Aritmética N1 (TEORÍA · PROBLEM
 | 2 | `linearSolveBothSidesWalkthrough` — `4x − 5 = 2x + 7` | pendiente (`paa-algebra-n2-wt-01` … `08`) | 6 problemas (inecuaciones en práctica; tablero de inecuaciones pendiente) |
 | 3 | Pendiente (cuadrática o sistema — una receta) | — | 6 problemas |
 
-#### Estructura autoritativa — PAA Álgebra en plataforma (D-STRUCT 2026-05-18)
-
-La práctica paso a paso ya no usa un solo bloque de “3 niveles” mezclados. En código y seeds (`seed-paa-algebra.js`) el temario motor-validable de Álgebra PAA se reparte en **cinco unidades de plataforma (U1–U5)** con tres niveles cada una. La tabla canónica (temas, `op`, `subTopic`) está en `docs/curriculum_structure_authority.md` y, para autoría de contenido, en **§7 abajo — “PAA Álgebra — Plataforma U1–U5”** (no usar tablas compactas obsoletas).
-
-> **DEPRECADO (2026-05-18):** Se eliminó la tabla compacta U1–U2 de esta sección (omitía proporciones/`translate` en U2-N1 y `\|·\| ≥ k` en U2-N3). **Autoría y seeds:** usar únicamente las tablas U1–U5 en la subsección siguiente (desde “#### U1 — Expresiones algebraicas”) y `docs/curriculum_structure_authority.md`.
-
-**URL transitoria:** `unit=algebra&stage=1|2|3` → U1 N1–N3; `stage=4|5|6` → U2 N1–N3. La tarjeta PAA en `home.html` sigue mostrando 3 niveles hasta actualización de producto.
-
-**U3–U5:** slots de temas fijados en **D-STRUCT-2** (`docs/curriculum_structure_authority.md`); seeds pendientes (referencia `u3-n1-01`).
-
----
-
-### PAA Álgebra — Plataforma U1–U5 (autoritativa, D-BRAIN + D-STRUCT-2)
-
-Sincronizado con `docs/curriculum_structure_authority.md` y `frontend/content/seed-paa-algebra.js`. **Los enunciados y respuestas canónicas de práctica viven en los seeds**, no en las subsecciones “Nivel 1/2/3” más abajo (deprecadas).
-
-#### U1 — Expresiones algebraicas
-
-| Nivel | Temas | `op` | Vocabulario clave | Errores comunes |
-|-------|--------|------|-------------------|-----------------|
-| **N1** | Términos semejantes; simplificar | simplify | término semejante, coeficiente, simplificar | Sumar términos no semejantes; signos al combinar |
-| **N2** | Evaluar; traducir enunciado → expresión | evaluate, translate | evaluar, sustituir, expresión, traducir | Signos al sustituir negativos; confundir “por” con suma |
-| **N3** | Expandir un factor; factor común | expand, factor | expandir, distribuir, factor común | Distribuir mal el signo; factor no máximo |
-
-#### U2 — Ecuaciones e inecuaciones lineales
-
-| Nivel | Temas | `op` | Vocabulario clave | Errores comunes |
-|-------|--------|------|-------------------|-----------------|
-| **N1** | Ecuaciones lineales (un lado / dos pasos); **proporciones y razón** | solve, translate | ecuación, despejar, proporción, razón | Confundir proporción con resta; operación solo en un lado |
-| **N2** | Ambos lados; paréntesis | solve | miembro, paréntesis | No cambiar signo al mover términos; expandir mal |
-| **N3** | Inecuaciones; \|x−a\| ≤ k (banda); \|x−a\| ≥ k (unión, dos ramas) | inequality | inecuación, valor absoluto, invertir sentido | Olvidar invertir al ×/÷ por negativo; confundir ≤ con ≥ en abs |
-
-#### U3 — Cuadráticas, racionales, exponentes *(D-STRUCT-2 — seeds en curso)*
-
-| Nivel | Temas | `op` (previsto) | Notas |
-|-------|--------|-----------------|--------|
-| **N1** | Cuadráticas factorizables; “una solución”; residuo (x+a) | solve, evaluate, `acceptAnyRoot` | Sin radical como respuesta final |
-| **N2** | Racionales (denominador lineal); **variación inversa** | solve | Radical solo paso intermedio |
-| **N3** | **Leyes de exponentes**; **notación científica** | simplify, evaluate, `scientific` TBD | FIX-SCINOT; vocab: ley de exponentes, notación científica |
-
-#### U4 — Sistemas de ecuaciones *(planificado)*
-
-| Nivel | Temas | `op` (previsto) | Notas |
-|-------|--------|-----------------|--------|
-| **N1** | 2×2 sustitución, solución entera | solve (comma `x=…, y=…`) | Un solo par ordenado |
-| **N2** | 2×2 eliminación | solve | Coeficientes sencillos |
-| **N3** | Modelado verbal → sistema | translate, solve | Traducción + resolución |
-
-#### U5 — Rectas, funciones y gráficas *(MCQ-only)*
-
-| Nivel | Temas | Formato | Notas |
-|-------|--------|---------|--------|
-| **N1** | Pendiente; recta; lectura gráfica; **recta numérica / región** | MCQ + SVG | Inecuación gráfica fuera del motor paso |
-| **N2** | Dominio, rango, f(x); **sucesiones / patrones** | MCQ | Sucesiones: reconocimiento, no término general paso a paso |
-| **N3** | Gráficas, coordenadas, funciones desde gráfica | MCQ | |
-
-#### Fuera de entrega Álgebra paso a paso (PAA sigue en examen)
-
-Radical como respuesta final · logaritmos · complejos · trig avanzada · matrices · 3+ incógnitas · unidades PAA Geometría/Datos (producto distinto). Ver tabla D-STRUCT-2 en `docs/curriculum_structure_authority.md`.
-
-#### Calibración histórica (3 niveles únicos — DEPRECADO, no usar para seeds nuevos)
-
-La lista siguiente mezclaba U1+U2 en tres escalones; se conserva solo como referencia de cobertura PAA global hasta reescribir walkthroughs:
-
-- **Nivel 1 (legacy):** Expresiones + lineales un lado + traducción.
-- **Nivel 2 (legacy):** Ambos lados, inecuaciones, exponentes, polinomios, racionales sencillas.
-- **Nivel 3 (legacy):** Cuadráticas factorizables, sistemas 2×2, residuo polinómico.
+#### Calibración de dificultad para los 3 niveles (solo temas dentro del alcance del motor):
+- **Nivel 1 — Expresiones y lineales de un lado:** Simplificar (términos semejantes), evaluar
+  (incluyendo sustitución de negativos), expandir un factor sobre un paréntesis, factorizar factor común,
+  resolver ecuaciones lineales con incógnita en UN solo lado (p. ej. 2x=8, 3x+5=14, 9−2x=7),
+  traducir enunciados sencillos a expresiones.
+- **Nivel 2 — Lineales de ambos lados, inecuaciones, exponentes:** Ecuaciones lineales con incógnita
+  en AMBOS lados y con paréntesis, inecuaciones lineales, inecuaciones con valor absoluto, leyes de
+  exponentes (incluyendo simbólicas), operaciones con polinomios, evaluación de polinomios con negativos
+  [f(−2)], ecuaciones racionales sencillas.
+- **Nivel 3 — Cuadráticas y sistemas:** Resolver cuadráticas factorizables, residuo de división polinómica
+  (p. ej. 4x²+6x+k entre x+1), sistemas 2×2 por sustitución y por eliminación, traducción de problemas
+  de contexto a sistemas.
 
 #### Profundidad calibrada a partir de los ejercicios reales de la guía (qué tan a fondo):
 - **Sistemas:** SOLO 2×2, coeficientes enteros/sencillos, AMBOS métodos (sustitución y eliminación).
@@ -781,7 +732,7 @@ ecuación racional, sistema de ecuaciones, sustitución, eliminación, pendiente
 
 ---
 
-### PAA · Álgebra · Nivel 1 *(DEPRECADO — ver U1 N1–N3 y U2 N1 en sección U1–U5 arriba; problemas en `seed-paa-algebra.js`)*
+### PAA · Álgebra · Nivel 1
 **Tema:** Expresiones y ecuaciones lineales de un solo lado
 
 #### Tarjeta de concepto:
@@ -851,7 +802,7 @@ P6
 
 ---
 
-### PAA · Álgebra · Nivel 2 *(DEPRECADO — ver U2 N2–N3 y temas futuros U3+)*
+### PAA · Álgebra · Nivel 2
 **Tema:** Ecuaciones de ambos lados, inecuaciones, exponentes y polinomios
 
 #### Tarjeta de concepto:
@@ -921,7 +872,7 @@ P6
 
 ---
 
-### PAA · Álgebra · Nivel 3 *(DEPRECADO — ver U3–U5 planificados)*
+### PAA · Álgebra · Nivel 3
 **Tema:** Cuadráticas factorizables y sistemas 2×2
 
 #### Tarjeta de concepto:

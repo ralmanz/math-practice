@@ -34,34 +34,30 @@
 
 ### Level inventory (3 levels per unit, N1 → N3)
 
-**U1 — Expresiones algebraicas** *(level topics locked to deployed seeds — see `docs/curriculum_structure_authority.md`, D-STRUCT 2026-05-18)*
-- N1: Simplificación — términos semejantes (`op`: simplify)
-- N2: Evaluar expresiones; traducción verbal → expresión (`op`: evaluate, translate)
-- N3: Expandir un factor; factorizar factor común (`op`: expand, factor)
-- *Orphans re-homed per `docs/curriculum_structure_authority.md` D-STRUCT-2 — not in U1 seeds.*
+**U1 — Expresiones algebraicas**
+- N1: Traducción verbal → algebraica; simplificación de expresiones
+- N2: Leyes de exponentes (producto, potencia, cociente); notación científica
+- N3: Sucesiones aritméticas (término general, valor dado n, encontrar n dado el término)
 
-**U2 — Ecuaciones e inecuaciones lineales** *(locked to deployed seeds — D-STRUCT 2026-05-18)*
-- N1: Ecuaciones lineales — un lado / dos pasos; **proporciones y razón** → ecuación (`op`: solve, translate)
-- N2: Ambos lados; paréntesis (`op`: solve)
-- N3: Inecuaciones lineales; valor absoluto (`op`: inequality, incl. `|·|≥k` union)
-- *Orphans re-homed:* variación inversa → **U3-N2**; recta numérica / región sombreada → **U5-N1 MCQ**
+**U2 — Ecuaciones e inecuaciones lineales**
+- N1: Ecuaciones lineales de una variable (incluyendo proporciones)
+- N2: Inecuaciones lineales; representación gráfica en recta numérica
+- N3: Variación inversa; ecuaciones con expresiones racionales lineales simples
 
-**U3 — Cuadráticas, racionales, exponentes** *(topic slots locked D-STRUCT-2; seeds pending)*
-- N1: Cuadráticas factorizables; `acceptAnyRoot` opcional; residuo en (x+a) (`op`: solve, evaluate)
-- N2: Ecuaciones racionales (denominador lineal); variación inversa (`op`: solve)
-- N3: **Leyes de exponentes** (simbólicas); **notación científica** (`op`: simplify, evaluate + `scientific` TBD)
-- *Out of step delivery:* radical como respuesta final PAA (intermedio OK en N2)
+**U3 — Cuadráticas, racionales y radicales**
+- N1: Ecuaciones cuadráticas (factorización, raíces enteras)
+- N2: Ecuaciones racionales (denominador lineal); expresiones radicales
+- N3: Ecuaciones radicales; problemas combinados cuadrático/racional
 
-**U4 — Sistemas de ecuaciones** *(unchanged)*
-- N1: 2×2 sustitución (solución entera) (`op`: solve)
-- N2: 2×2 eliminación (`op`: solve)
-- N3: Modelado verbal → sistema (`op`: translate, solve)
+**U4 — Sistemas de ecuaciones**
+- N1: Sistemas 2×2 por sustitución (solución entera)
+- N2: Sistemas 2×2 por eliminación
+- N3: Sistemas expresados como problemas verbales (modelado + resolución)
 
 **U5 — Rectas, funciones y gráficas** *(MCQ-only)*
-- N1: Pendiente; recta; lectura gráfica; recta numérica / inecuación gráfica (MCQ + SVG)
-- N2: Dominio, rango, f(x); **sucesiones / patrones** (MCQ, no step)
-- N3: Gráficas, coordenadas, funciones desde gráfica (MCQ)
-- *Orphans re-homed:* sucesiones aritméticas → **N2 MCQ** (no U1-N3 step)
+- N1: Pendiente; ecuación de la recta; interpretación gráfica
+- N2: Dominio y rango; evaluación de funciones; notación f(x)
+- N3: Lectura de gráficas; coordenadas; desplazamientos de puntos en el plano
 
 ### Prerequisite DAG (within Algebra)
 
@@ -142,20 +138,21 @@ Gate strictness biases toward false-fails (redo a known unit) over false-aces (s
 - A unit = 3 progressive levels (N1 → N2 → N3) **+ one unit test** (9 questions, 3 per level) administered after the level content. *(Unit-test scoring & completion = Section 3.)*
 
 ### Single level content stages
-`Conceptos → Práctica`, with **Ejemplos as an always-available, non-gating aid** alongside.
+`Conceptos → Práctica`, with **Ejemplos as an always-available, non-gating complementary aid** alongside.
 
-- **Conceptos** — the rule / teaching. **Soft-gates Práctica**: completing it once unlocks practice; does not re-lock for returning students.
-- **Ejemplos** — voluntary aided supplement, *not* a gate and *not* a sequential locked step. On-demand worked example(s) the student can consult before or **during** Práctica. Suppressed in all assessment contexts (see cross-cutting rule).
-  - Owns the worked example (removes the prior Conceptos/Ejemplo duplication).
-  - Representation tracks are optional/per-content: **Simbólico is the always-present default**; Visual / Fórmula / Voz are authored only where they add value. UI shows only the tabs with authored content for that level.
+- **Conceptos** — the teaching **plus one or more fully worked, step-by-step problems**, chosen to cover what the Práctica set requires. **Conceptos owns the worked example(s).** It is the **only gate**: completing it once sets `conceptosDone` and unlocks Práctica; does not re-lock for returning students.
+- **Ejemplos** — voluntary **complementary aid only**: visual representations, formulas, worked-case variants. It is **never the primary worked solution** (that lives in Conceptos), **not a gate**, and not a sequential locked step. Consultable before or **during** Práctica. Suppressed in all assessment contexts (see cross-cutting rule).
+  - Representation tracks are optional/per-content: **Visual / Fórmula / Casos**, authored only where they add value. UI shows only the tabs with authored content for that level. (Audio narration attaches to the Conceptos worked walkthrough, not here.)
 - **Práctica** — **fixed authored set of 4–6 problems** (no runtime generation). Completion bar = **clear most (N–1 of N)** to mark the level `content_complete`.
+
+**Authoring order (workflow, load-bearing):** seed + deploy the **Práctica** problems first → then author **Conceptos** by selecting the problem(s) to solve step-by-step so they cover the Práctica set → then add **Ejemplos** as complementary aid (visual / fórmula / casos) where it helps. Conceptos is *derived from* Práctica; Ejemplos is supplementary to both.
 
 ### Cross-cutting rule — aid availability
 Aid (Ejemplos, and hints generally) is available during **learning** (Conceptos, Práctica) and **suppressed in every assessment**: placement, unit test, final. Keeps "measure unaided ability" consistent everywhere.
 
 ### Level lifecycle states
 `not_started → in_progress → content_complete → { passed | borderline | failed }`
-- `content_complete` = Conceptos done **+** Práctica cleared to the N–1 bar. Ejemplos never affects status.
+- `content_complete` = Conceptos done (teaching + its worked examples) **+** Práctica cleared to the N–1 bar. Ejemplos never affects status.
 - `placedOut: true` from placement sets status directly to `passed`.
 
 ---
@@ -323,29 +320,34 @@ seed[seedId] = {
   unitId,            // U1–U5
   levelId,           // N1–N3
   track,             // "step" (U1–U4) | "mcq" (U5)
-  op,                // simplify | evaluate | expand | factor | translate | solve | inequality — drives validation routing
   subTopics,         // [tag] — 1–3, from the closed per-level enum (level-scoped; Section 6)
-  prompt,            // problem statement (step seeds)
-  answer,            // Algebrite-validated canonical answer / solve-path
-  acceptAnyRoot?,    // optional; solve-only — any single root of sourceExpression (PAA "una solución")
-  sourceExpression?, // required when acceptAnyRoot
 
-  // mcq seeds (U5): options[], correctOption (prompt/answer shape as authored)
+  // step seeds (U1–U4):
+  prompt,            // problem statement
+  answer,            // Algebrite-validated canonical answer / solve-path
+
+  // mcq seeds (U5):
+  // prompt, options[], correctOption
 
   // DEFERRED (regeneration engine, Section 3): paramSlots, validParameterSpace, difficultyConstraints
 }
 ```
 
-**Routing contract:** `op` selects the validator in `validateAgainstSeed` (`math-validation.js`). An indeterminate or unknown `op` returns an ask-Ronel fail-safe (`{ valid: null }`), **never** a false accept. In `app.html`, seeds with `op` skip Claude form-check and complete when the validator accepts.
-
 ```
-ejemplos[levelId] = {            // authored aid, per level (Section 2)
-  representations: {             // only authored tracks present; UI renders tabs accordingly
-    simbolico,                   // always present (default)
-    visual?, formula?, voz?      // optional, per content
-  }
+conceptos[levelId] = {           // teaching + worked solution(s) — the level's only gate (Section 2)
+  teoria,                        // the rule / concept statement (short)
+  worked: [                      // 1..n fully worked problems, step-by-step, chosen to cover the Práctica set
+    { prompt, pasos: [ ... ],    // simbólico step-by-step
+      voz? }                     // optional audio narration; may render via the three-column walkthrough board
+  ]
+}
+
+ejemplos[levelId] = {            // complementary aid ONLY — never the primary worked solution, NON-gating (Section 2)
+  visual?, formula?, casos?      // optional representations; UI shows only authored tabs; absent ⇒ no Ejemplos entry
 }
 ```
+
+> **Implementation note (current runtime):** these named `conceptos[levelId]` / `ejemplos[levelId]` objects are the **canonical target**, not the live shape — they have zero readers today. Live, each level is a single **lesson JSON blob** in KV (`lesson:{curriculum}:{unit}:level{n}`), authored in the worker seed scripts (fields: `rules[]`, `formulas`, `conceptVisual`, `conceptVoice`, `example.steps[]`, `subtopics[].walkthrough[]`). The decisions above are enforced **on that blob**: the **worked stepped example renders in the Conceptos phase** (the three-column walkthrough board, or a stepped renderer), **Ejemplos holds aid tabs only** (visual / fórmula / casos, authored-only), and **Conceptos completion sets `concepts_done` and gates Práctica**. Migration to the named objects is deferred; the behavioral rules hold on the blob now.
 
 ```
 subTopicEnum[unitId][levelId] = [tag, ...]   // closed per-level vocabulary (Section 6)
@@ -366,7 +368,7 @@ curriculum.config  = { finalQuestionsPerLevel: 2, finalUnitFloorRatio: 0.78,
 student.progress[unitId][levelId] = {
   status,            // not_started | in_progress | content_complete | passed | borderline | failed
   placedOut,         // bool — set by placement; status → passed
-  conceptosDone,     // bool — soft-gate for Práctica (Section 2)
+  conceptosDone,     // bool — set when Conceptos (teaching + worked examples) completed; soft-gate for Práctica (Section 2)
   practiceCleared,   // int — count cleared toward the N−1 bar
   ejemplosViews,     // int — logged aid-consultation signal; never gates
   unitTest: {

@@ -93,39 +93,50 @@
     return key;
   }
 
+  function defaultPhaseList(includeExample) {
+    var list = [1, 2];
+    if (includeExample !== false) list.push(3);
+    list.push(4);
+    return list;
+  }
+
   function buildHtml(current, opts) {
     var esc = opts.escHtml || function (s) {
       return String(s)
         .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;');
     };
+    var phases = opts.phaseList || defaultPhaseList(true);
+    var currentIdx = phases.indexOf(current);
     var steps = [];
-    var i;
-    for (i = 1; i <= PHASE_COUNT; i++) {
-      var isCurrent = i === current;
-      var isDone = i < current;
+    var idx;
+    for (idx = 0; idx < phases.length; idx++) {
+      var phaseId = phases[idx];
+      var isCurrent = phaseId === current;
+      var isDone = currentIdx >= 0 && idx < currentIdx;
       var cls = 'lesson-phase-step';
       if (isCurrent) cls += ' is-current';
       if (isDone) cls += ' is-done';
-      var stepLabel = label(LABEL_KEYS[i]);
+      var stepLabel = label(LABEL_KEYS[phaseId]);
       var inner =
-        '<span class="lesson-phase-num">' + i + '</span>' +
+        '<span class="lesson-phase-num">' + (idx + 1) + '</span>' +
         '<span class="lesson-phase-label">' + esc(stepLabel) + '</span>';
-      var href = opts.href ? opts.href(i) : null;
+      var href = opts.href ? opts.href(phaseId) : null;
       var aria = ' aria-label="' + esc(stepLabel) + '"';
       if (href && !isCurrent) {
         steps.push(
-          '<a class="' + cls + '" href="' + href + '" data-lesson-phase="' + i + '"' + aria + '>' + inner + '</a>'
+          '<a class="' + cls + '" href="' + href + '" data-lesson-phase="' + phaseId + '"' + aria + '>' + inner + '</a>'
         );
       } else {
         steps.push(
-          '<button type="button" class="' + cls + '" data-lesson-phase="' + i + '"' +
+          '<button type="button" class="' + cls + '" data-lesson-phase="' + phaseId + '"' +
           (isCurrent ? ' aria-current="step"' : '') + aria + '>' + inner + '</button>'
         );
       }
     }
+    var cols = phases.length;
     return (
-      '<nav class="lesson-phase-nav" aria-label="' +
+      '<nav class="lesson-phase-nav" style="grid-template-columns:repeat(' + cols + ',minmax(0,1fr))" aria-label="' +
       esc(label('lesson_phase_nav_aria')) +
       '">' +
       steps.join('') +

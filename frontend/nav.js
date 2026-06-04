@@ -241,7 +241,7 @@
     var nuvoStudent = localStorage.getItem('nuvo_student');
     var isStudent  = !isTeacher && !!nuvoStudent;
 
-    var logoHref = isStudent ? 'home.html' : (isTeacher ? 'index.html' : 'index.html');
+    var logoHref = 'index.html';
     var isGuest = !isTeacher && !isStudent;
 
     root.innerHTML =

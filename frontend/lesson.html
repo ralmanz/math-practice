@@ -1188,6 +1188,13 @@
     margin-bottom: 16px;
   }
   body.has-walkthrough { --wt-stage-bp: 840px; }
+  .concepts-wt-lead {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin: 16px 0 8px;
+    text-align: center;
+  }
   .wt-topbar {
     display: flex;
     align-items: center;
@@ -1712,6 +1719,7 @@
 
 <script src="lang.js?v=20260514-concept-nav"></script>
 <script src="lesson-phase-nav.js?v=20260518-grammar"></script>
+<script src="lesson-example-walkthrough.js?v=20260603-p4"></script>
 <script src="calculator.js?v=20260518-calc-hover"></script>
 <script src="https://cdn.jsdelivr.net/npm/algebrite@1.4.0/dist/algebrite.bundle-for-browser.js"></script>
 <script>
@@ -1743,6 +1751,8 @@
   let subtopicIndex    = 0;
   let lessonMaxPhase   = 1;
   let lessonCurrentPhase = 1;
+  let conceptsDoneMarked = false;
+  let _studentRecordCache = null;
 
   // ── Helpers ──────────────────────────────────────────────────
   function curriculumLabel(c) {
@@ -1806,6 +1816,33 @@
   function formulaPanelHtml(formulas) {
     const items = (formulas || []).map(f => `<div class="formula-pill">${escHtml(f)}</div>`).join('');
     return `<div class="formula-list">${items || `<span>${Lang.t('formula_no_items')}</span>`}</div>`;
+  }
+
+  function normalizeAidList(v) {
+    if (v == null || v === '') return [];
+    if (Array.isArray(v)) return v.map(String).map((s) => s.trim()).filter(Boolean);
+    const s = String(v).trim();
+    return s ? [s] : [];
+  }
+
+  /** Aid-only Ejemplos tracks (lesson.ejemplos); not legacy lesson.example worked steps. */
+  function lessonEjemplosAid() {
+    const aid = lesson?.ejemplos || {};
+    const visual = aid.visual != null ? String(aid.visual).trim() : '';
+    return {
+      visual,
+      formula: normalizeAidList(aid.formula),
+      casos: normalizeAidList(aid.casos),
+    };
+  }
+
+  function casosPanelHtml(casos) {
+    return (casos || []).map((c) => {
+      const s = String(c).trim();
+      if (!s) return '';
+      if (s.includes('<')) return `<div class="concept-written">${s}</div>`;
+      return `<div class="casos-item">${escHtml(s)}</div>`;
+    }).join('');
   }
 
   function conceptVisualHtml() {
@@ -1949,6 +1986,8 @@
     lesson = await lessonRes.json();
     lessonMaxPhase = 1;
     lessonCurrentPhase = 1;
+    conceptsDoneMarked = false;
+    _studentRecordCache = null;
 
     if (window.refreshNavMenu) window.refreshNavMenu();
 
@@ -1981,12 +2020,24 @@
     return n;
   }
 
+  function lessonHasEjemplosAid() {
+    const a = lessonEjemplosAid();
+    return !!(a.visual || a.formula.length || a.casos.length);
+  }
+
+  function lessonPhaseList() {
+    const list = [1, 2];
+    if (lessonHasEjemplosAid()) list.push(3);
+    list.push(4);
+    return list;
+  }
+
   function lessonPhaseNavOpts(current) {
     return {
       current: current,
       escHtml: escHtml,
-      href: function (n) {
-        if (n === 4 && lesson) return curriculumAppUrl('practice', 'complete');
+      phaseList: lessonPhaseList(),
+      href: function () {
         return null;
       },
       onNavigate: function (n) {
@@ -1997,28 +2048,26 @@
 
   function lessonPhaseNavFallbackHtml(current) {
     const labels = ['', 'phase_intro', 'phase_concepts', 'phase_example', 'phase_practice'];
+    const phases = lessonPhaseList();
+    const currentIdx = phases.indexOf(current);
     const steps = [];
-    for (let n = 1; n <= LESSON_PHASE_COUNT; n++) {
-      const isCurrent = n === current;
-      const isDone = n < current;
+    phases.forEach(function (phaseId, idx) {
+      const isCurrent = phaseId === current;
+      const isDone = currentIdx >= 0 && idx < currentIdx;
       let cls = 'lesson-phase-step';
       if (isCurrent) cls += ' is-current';
       if (isDone) cls += ' is-done';
-      const label = Lang.t(labels[n]);
+      const label = Lang.t(labels[phaseId]);
       const inner =
-        `<span class="lesson-phase-num">${n}</span>` +
+        `<span class="lesson-phase-num">${idx + 1}</span>` +
         `<span class="lesson-phase-label">${escHtml(label)}</span>`;
-      const practiceHref = n === 4 && lesson ? curriculumAppUrl('practice', 'complete') : null;
-      if (practiceHref && !isCurrent) {
-        steps.push(`<a class="${cls}" href="${practiceHref}" data-lesson-phase="${n}">${inner}</a>`);
-      } else {
-        steps.push(
-          `<button type="button" class="${cls}" data-lesson-phase="${n}"` +
-          `${isCurrent ? ' aria-current="step"' : ''}>${inner}</button>`
-        );
-      }
-    }
-    return `<nav class="lesson-phase-nav" aria-label="${escHtml(Lang.t('lesson_phase_nav_aria'))}">${steps.join('')}</nav>`;
+      steps.push(
+        `<button type="button" class="${cls}" data-lesson-phase="${phaseId}"` +
+        `${isCurrent ? ' aria-current="step"' : ''}>${inner}</button>`
+      );
+    });
+    const cols = phases.length;
+    return `<nav class="lesson-phase-nav" style="grid-template-columns:repeat(${cols},minmax(0,1fr))" aria-label="${escHtml(Lang.t('lesson_phase_nav_aria'))}">${steps.join('')}</nav>`;
   }
 
   function updateLessonPhaseNav(phaseNum) {
@@ -2055,6 +2104,38 @@
     ));
   }
 
+  function lessonLevelWorkedExample() {
+    const ex = lesson && lesson.example;
+    if (ex && Array.isArray(ex.steps) && ex.steps.length > 0) return ex;
+    return null;
+  }
+
+  function subtopicWorkedExample(sub) {
+    const ex = sub && sub.example;
+    if (ex && Array.isArray(ex.steps) && ex.steps.length > 0) return ex;
+    return null;
+  }
+
+  function lessonNeedsWorkedExampleInConceptos() {
+    if (lessonUsesWalkthroughConcepts()) return false;
+    return !!lessonLevelWorkedExample();
+  }
+
+  function exampleToWalkthroughSteps(ex) {
+    if (!ex || !window.exampleStepsToWalkthrough) return [];
+    return window.exampleStepsToWalkthrough(ex);
+  }
+
+  function renderConceptosWithWorkedExample(ex, beforeBoardHtml, wtOpts) {
+    const wtSteps = exampleToWalkthroughSteps(ex);
+    if (!wtSteps.length) {
+      renderWithPhase(2, beforeBoardHtml);
+      return;
+    }
+    teardownActiveWalkthrough();
+    renderWalkthrough(wtSteps, Object.assign({ beforeBoardHtml: beforeBoardHtml }, wtOpts || {}));
+  }
+
   function teardownActiveWalkthrough() {
     if (typeof window._lessonWtTeardown === 'function') {
       window._lessonWtTeardown();
@@ -2081,8 +2162,10 @@
     document.body.classList.remove('has-walkthrough');
     if (phase === 1) showCover();
     else if (phase === 2) goToConceptsPhase();
-    else if (phase === 3) showExample();
-    else if (phase === 4) showPractice();
+    else if (phase === 3) {
+      if (lessonHasEjemplosAid()) showExample();
+      else showPractice();
+    } else if (phase === 4) showPractice();
   };
 
   function badgeHtml() {
@@ -2179,17 +2262,8 @@
     `);
   }
 
-  // ── Phase 2: Concepts ─────────────────────────────────────────
-  function showConcepts() {
-    subtopicIndex    = 0;
-    activeConceptTab = 'written';
-
-    if (lesson.subtopics && lesson.subtopics.length > 0) {
-      renderSubtopic();
-      return;
-    }
-
-    // Flat mode — Nivel 1 and 2 (unchanged behavior)
+  function buildFlatConceptsCardHtml(opts) {
+    const includeNav = opts && opts.includeNav !== false;
     const rulesHtml = (lesson.rules || []).map((rule, i) =>
       `<li>
         <span class="rule-num">${i + 1}</span>
@@ -2198,8 +2272,13 @@
     ).join('');
     const conceptVoiceText = (lesson.conceptVoice || lesson.subtitle || (lesson.rules || []).join(' ')).trim();
     const formulas = formulasFromLesson();
-
-    renderWithPhase(2, `
+    const navHtml = includeNav
+      ? `<div class="example-nav-row">
+          <button type="button" class="main-btn secondary" onclick="retreatConcepts()">${Lang.t('concept_back_intro')}</button>
+          <button type="button" class="main-btn" onclick="${lessonHasEjemplosAid() ? 'showExample()' : 'showPractice()'}">${escHtml(lessonHasEjemplosAid() ? Lang.t('concepts_next_btn') : Lang.t('example_btn_goto_practice'))}</button>
+        </div>`
+      : '';
+    return `
       ${badgeHtml()}
       <h1>${escHtml(lesson.title || 'Lesson')}</h1>
       <div class="card">
@@ -2221,28 +2300,40 @@
           <button class="main-btn secondary voice-btn" onclick="stopVoice()">${Lang.t('voice_stop_btn')}</button>
         </div>
       </div>
-      <div class="example-nav-row">
-        <button type="button" class="main-btn secondary" onclick="retreatConcepts()">${Lang.t('concept_back_intro')}</button>
-        <button type="button" class="main-btn" onclick="showExample()">${Lang.t('concepts_next_btn')}</button>
-      </div>
-    `);
+      ${navHtml}`;
   }
 
-  function renderSubtopic() {
-    const sub    = lesson.subtopics[subtopicIndex];
-    const total  = lesson.subtopics.length;
-    const isLast = subtopicIndex === total - 1;
+  // ── Phase 2: Concepts ─────────────────────────────────────────
+  function showConcepts() {
+    subtopicIndex    = 0;
+    activeConceptTab = 'written';
 
+    if (lesson.subtopics && lesson.subtopics.length > 0) {
+      renderSubtopic();
+      return;
+    }
+
+    const levelEx = lessonLevelWorkedExample();
+    if (levelEx) {
+      const prefix =
+        buildFlatConceptsCardHtml({ includeNav: false }) +
+        '<p class="concepts-wt-lead">Ejemplo resuelto paso a paso ↓</p>';
+      renderConceptosWithWorkedExample(levelEx, prefix, { completeMode: 'practice' });
+      return;
+    }
+
+    renderWithPhase(2, buildFlatConceptsCardHtml({ includeNav: true }));
+  }
+
+  function buildSubtopicConceptsCardHtml(sub, subtopicIndex, total, isLast, includeNav) {
     const rulesHtml = (sub.rules || []).map((rule, i) =>
       `<li>
         <span class="rule-num">${i + 1}</span>
         <span>${escHtml(rule)}</span>
       </li>`
     ).join('');
-
     const conceptVoiceText = (sub.conceptVoice || (sub.rules || []).join(' ')).trim();
-    const formulas         = sub.formulas || [];
-
+    const formulas = sub.formulas || [];
     const visualHtml = sub.conceptVisual
       ? sub.conceptVisual
       : `<div class="concept-visual-grid">${
@@ -2250,19 +2341,26 @@
             `<div class="concept-visual-card"><strong>${Lang.t('concept_visual_step')} ${i + 1}</strong><br>${escHtml(rule)}</div>`
           ).join('')
         }</div>`;
-
     const dotsHtml = lesson.subtopics.map((_, i) => {
       let cls = 'subtopic-dot';
       if (i < subtopicIndex)        cls += ' done';
       else if (i === subtopicIndex) cls += ' active';
       return `<span class="${cls}"></span>`;
     }).join('');
-
-    const nextLabel  = isLast ? Lang.t('concepts_next_btn') : Lang.t('concepts_next_subtopic');
-    const nextAction = isLast ? 'showExample()' : 'advanceSubtopic()';
+    const nextLabel  = isLast
+      ? (lessonHasEjemplosAid() ? Lang.t('concepts_next_btn') : Lang.t('example_btn_goto_practice'))
+      : Lang.t('concepts_next_subtopic');
+    const nextAction = isLast
+      ? (lessonHasEjemplosAid() ? 'showExample()' : 'showPractice()')
+      : 'advanceSubtopic()';
     const backLabel  = subtopicIndex === 0 ? Lang.t('concept_back_intro') : Lang.t('concept_back_prev');
-
-    renderWithPhase(2, `
+    const navHtml = includeNav
+      ? `<div class="example-nav-row">
+          <button type="button" class="main-btn secondary" onclick="retreatConcepts()">${backLabel}</button>
+          <button type="button" class="main-btn" onclick="${nextAction}">${nextLabel}</button>
+        </div>`
+      : '';
+    return `
       ${badgeHtml()}
       <h1>${escHtml(lesson.title || 'Lesson')}</h1>
       <div class="subtopic-progress-row">
@@ -2289,11 +2387,26 @@
           <button class="main-btn secondary voice-btn" onclick="stopVoice()">${Lang.t('voice_stop_btn')}</button>
         </div>
       </div>
-      <div class="example-nav-row">
-        <button type="button" class="main-btn secondary" onclick="retreatConcepts()">${backLabel}</button>
-        <button type="button" class="main-btn" onclick="${nextAction}">${nextLabel}</button>
-      </div>
-    `);
+      ${navHtml}`;
+  }
+
+  function renderSubtopic() {
+    const sub    = lesson.subtopics[subtopicIndex];
+    const total  = lesson.subtopics.length;
+    const isLast = subtopicIndex === total - 1;
+
+    const subEx = subtopicWorkedExample(sub);
+    if (subEx && !lessonUsesWalkthroughConcepts()) {
+      const prefix =
+        buildSubtopicConceptsCardHtml(sub, subtopicIndex, total, isLast, false) +
+        '<p class="concepts-wt-lead">Ejemplo resuelto paso a paso ↓</p>';
+      renderConceptosWithWorkedExample(subEx, prefix, {
+        completeMode: isLast ? 'practice' : 'nextSubtopic',
+      });
+      return;
+    }
+
+    renderWithPhase(2, buildSubtopicConceptsCardHtml(sub, subtopicIndex, total, isLast, true));
   }
 
   function retreatConcepts() {
@@ -2324,59 +2437,65 @@
     });
   }
 
-  // ── Phase 3: Worked example ───────────────────────────────────
+  // ── Phase 3: Ejemplos (aid-only: visual / fórmula / casos) ─────
   function showExample() {
-    // For lessons with subtopics, use the MCM subtopic (index 2) as the
-    // representative worked example — it contains the full MCD+MCM brain-doc example.
-    if (lesson.subtopics && !lesson.example) {
-      lesson.example = lesson.subtopics[2].example;
+    if (!lessonHasEjemplosAid()) {
+      showPractice();
+      return;
     }
-    exampleStep = 0;
-    activeExampleTab = 'symbolic';
+    if (lessonCurrentPhase === 2) markConceptsDone();
+    activeExampleTab = null;
     renderExamplePhase();
   }
 
   function renderExamplePhase() {
-    const ex        = lesson.example || {};
-    const steps     = ex.steps       || [];
-    const formulas  = formulasFromLesson();
+    const aid = lessonEjemplosAid();
+    const tracks = [];
+    if (aid.visual) {
+      tracks.push({
+        id: 'visual',
+        label: Lang.t('concept_tab_visual'),
+        panelHtml: aid.visual.includes('<') ? aid.visual : `<div class="concept-written">${escHtml(aid.visual)}</div>`,
+      });
+    }
+    if (aid.formula.length) {
+      tracks.push({
+        id: 'formula',
+        label: Lang.t('concept_tab_formula'),
+        panelHtml: formulaPanelHtml(aid.formula),
+      });
+    }
+    if (aid.casos.length) {
+      tracks.push({
+        id: 'casos',
+        label: Lang.t('example_tab_casos'),
+        panelHtml: casosPanelHtml(aid.casos),
+      });
+    }
+    if (!tracks.length) {
+      showPractice();
+      return;
+    }
 
-    const dotsHtml = steps.map((_, i) =>
-      `<div class="step-dot" id="dot-${i}"></div>`
+    activeExampleTab = tracks[0].id;
+    const tabsHtml = tracks.map((t, i) =>
+      `<button class="tab-btn${i === 0 ? ' active' : ''}" id="tab-${t.id}" onclick="switchExTab('${t.id}')">${escHtml(t.label)}</button>`
     ).join('');
-
-    const tabsHtml = `
-      <div class="tab-row">
-        <button class="tab-btn active" id="tab-symbolic" onclick="switchExTab('symbolic')">${Lang.t('example_tab_symbolic')}</button>
-        <button class="tab-btn"        id="tab-visual"   onclick="switchExTab('visual')">${Lang.t('example_tab_visual')}</button>
-        <button class="tab-btn"        id="tab-formula"  onclick="switchExTab('formula')">${Lang.t('concept_tab_formula')}</button>
-        <button class="tab-btn"        id="tab-voice"    onclick="switchExTab('voice')">${Lang.t('concept_tab_voice')}</button>
-      </div>`;
-
-    const initBtnLabel = steps.length === 0 ? Lang.t('example_btn_goto_practice') : Lang.t('example_btn_show_step_n').replace('{n}', 1);
+    const panelsHtml = tracks.map((t, i) =>
+      `<div id="${t.id}-panel" class="${t.id === 'visual' ? 'visual-panel' : 'teaching-panel'}"` +
+      `${i === 0 ? '' : ' style="display:none;"'}>${t.panelHtml}</div>`
+    ).join('');
 
     renderWithPhase(3, `
       ${badgeHtml()}
       <h1>${escHtml(lesson.title || 'Lesson')}</h1>
       <div class="card">
         <div class="card-title">${Lang.t('example_card_title')}</div>
-        ${tabsHtml}
-        <div id="symbolic-panel">
-          <div class="equation-display" id="equation-display">${escHtml(ex.start || '')}</div>
-          <div class="annotation-box"   id="annotation-box"></div>
-        </div>
-        <div id="visual-panel" class="visual-panel" style="display:none;">${exampleVisualHtml(null)}</div>
-        <div id="formula-panel" class="teaching-panel" style="display:none;">${formulaPanelHtml(formulas)}</div>
-        <div id="voice-panel" class="teaching-panel" style="display:none;">
-          <div id="example-voice-text">${escHtml(currentExampleVoiceText(null) || Lang.t('voice_no_text'))}</div>
-          <button class="main-btn voice-btn" onclick="speakText(document.getElementById('example-voice-text').textContent)">${Lang.t('voice_listen_btn')}</button>
-          <button class="main-btn secondary voice-btn" onclick="stopVoice()">${Lang.t('voice_stop_btn')}</button>
-        </div>
-        <div class="narration-box" id="narration-box">${Lang.t('example_narration_init')}</div>
-        ${steps.length > 0 ? `<div class="step-dots" id="step-dots">${dotsHtml}</div>` : ''}
+        <div class="tab-row">${tabsHtml}</div>
+        ${panelsHtml}
         <div class="example-nav-row">
-          <button class="main-btn secondary" id="prev-example-btn" onclick="handleExampleBack()" disabled>${Lang.t('example_btn_previous')}</button>
-          <button class="main-btn" id="main-btn" onclick="handleExampleBtn()">${initBtnLabel}</button>
+          <button type="button" class="main-btn secondary" onclick="goToConceptsPhase()">${Lang.t('concept_back_intro')}</button>
+          <button type="button" class="main-btn" onclick="showPractice()">${Lang.t('example_btn_goto_practice')}</button>
         </div>
       </div>
     `);
@@ -2384,64 +2503,60 @@
 
   function switchExTab(tab) {
     activeExampleTab = tab;
-    ['symbolic', 'visual', 'formula', 'voice'].forEach(function (name) {
+    const aid = lessonEjemplosAid();
+    const ids = [];
+    if (aid.visual) ids.push('visual');
+    if (aid.formula.length) ids.push('formula');
+    if (aid.casos.length) ids.push('casos');
+    ids.forEach(function (name) {
       setPanelVisible(name + '-panel', name === tab);
       setTabActive('tab-' + name, name === tab);
     });
   }
 
-  function handleExampleBtn() {
-    const steps = (lesson.example || {}).steps || [];
-
-    if (exampleStep >= steps.length) {
-      lessonMaxPhase = LESSON_PHASE_COUNT;
-      showPractice();
-      return;
-    }
-
-    exampleStep++;
-    renderCurrentExampleStep();
+  function lessonProgressKeys() {
+    return {
+      unit: String(unit || lesson?.unit || 'aritmetica'),
+      stage: String(stage || lesson?.stage || lesson?.level || '3'),
+    };
   }
 
-  function handleExampleBack() {
-    if (exampleStep <= 0) return;
-    exampleStep--;
-    renderCurrentExampleStep();
+  function statusAllowsPractice(status) {
+    return status === 'concepts_done' || status === 'complete';
   }
 
-  function renderCurrentExampleStep() {
-    const ex = lesson.example || {};
-    const steps = ex.steps || [];
-    const currentStepIndex = exampleStep - 1;
-    const showingStart = exampleStep === 0;
-    const step = showingStart ? null : steps[currentStepIndex];
+  async function loadStudentRecord() {
+    if (_studentRecordCache) return _studentRecordCache;
+    if (!studentId || guestMode) return null;
+    try {
+      const r = await fetch(`${WORKER}/student/${encodeURIComponent(studentId)}`);
+      if (r.ok) _studentRecordCache = await r.json();
+    } catch (e) {}
+    return _studentRecordCache;
+  }
 
-    document.getElementById('equation-display').textContent = step ? (step.equation || '') : (ex.start || '');
-    document.getElementById('annotation-box').textContent   = step ? (step.annotation || '') : '';
-    document.getElementById('narration-box').textContent    = step ? (step.narration || '') : Lang.t('example_narration_init');
-    const visualPanel = document.getElementById('visual-panel');
-    if (visualPanel) visualPanel.innerHTML = exampleVisualHtml(step);
-    const voiceText = document.getElementById('example-voice-text');
-    if (voiceText) voiceText.textContent = currentExampleVoiceText(step) || Lang.t('voice_no_text');
-    for (let i = 0; i < steps.length; i++) {
-      const dot = document.getElementById(`dot-${i}`);
-      if (!dot) continue;
-      if (i < currentStepIndex)       dot.className = 'step-dot done';
-      else if (i === currentStepIndex) dot.className = 'step-dot active';
-      else                             dot.className = 'step-dot';
+  async function levelHasConceptsDone() {
+    if (guestMode || !studentId || !lesson) return true;
+    if (conceptsDoneMarked) return true;
+    const rec = await loadStudentRecord();
+    if (!rec || !rec.progress) return false;
+    const { unit, stage } = lessonProgressKeys();
+    return statusAllowsPractice((rec.progress[unit] || {})[stage]);
+  }
+
+  async function enterPracticeOrRedirectToConceptos() {
+    if (!(await levelHasConceptsDone())) {
+      goToConceptsPhase();
+      return false;
     }
-
-    const btn = document.getElementById('main-btn');
-    btn.textContent = exampleStep >= steps.length
-      ? Lang.t('example_btn_try_yourself')
-      : Lang.t('example_btn_show_step_n').replace('{n}', exampleStep + 1);
-
-    const prevBtn = document.getElementById('prev-example-btn');
-    if (prevBtn) prevBtn.disabled = exampleStep <= 0;
+    return true;
   }
 
   // ── Phase 4: Practice (always app.html — same engine as guests) ──
   async function showPractice() {
+    if (lessonCurrentPhase === 2) markConceptsDone();
+    if (!(await enterPracticeOrRedirectToConceptos())) return;
+
     lessonMaxPhase = LESSON_PHASE_COUNT;
     lessonCurrentPhase = LESSON_PHASE_COUNT;
     try {
@@ -2506,7 +2621,7 @@
           <div class="score-display">${score} / ${total}</div>
           <h2>${Lang.t('result_fail_h2')}</h2>
           <p>${escHtml(failScoreText)} ${Lang.t('result_fail_review')}</p>
-          <button class="result-btn secondary" onclick="showExample()">${Lang.t('result_fail_btn')}</button>
+          <button class="result-btn secondary" onclick="${lessonHasEjemplosAid() ? 'showExample()' : 'goToConceptsPhase()'}">${Lang.t('result_fail_btn')}</button>
         </div>
       `);
     }
@@ -2515,6 +2630,26 @@
 
   // ── Subtopic vertical flow ─────────────────────────────────────
   const PROXY_URL_ST = 'https://math-practice-proxy.ronelalmanza20.workers.dev';
+
+  function markConceptsDone() {
+    if (conceptsDoneMarked) return;
+    if (!lesson || !studentId) return;
+    conceptsDoneMarked = true;
+    const { unit, stage } = lessonProgressKeys();
+    if (_studentRecordCache) {
+      if (!_studentRecordCache.progress) _studentRecordCache.progress = {};
+      if (!_studentRecordCache.progress[unit]) _studentRecordCache.progress[unit] = {};
+      _studentRecordCache.progress[unit][stage] = 'concepts_done';
+    }
+    try {
+      fetch(`${PROXY_URL_ST}/student/${studentId}/progress`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ unit, stage, status: 'concepts_done' }),
+      }).catch(() => {});
+    } catch (e) {}
+  }
+
   let _allPracticeProblems = [];
   let _stProgress = {};  // idx → { problems, probIdx, correct, wrongTotal, wrongOnCurrent, hintLevel, exStep, exOpen }
 
@@ -2902,17 +3037,7 @@
     syncLessonPhaseNav(2);
     setTimeout(() => card.scrollIntoView({ behavior:'smooth', block:'center' }), 50);
 
-    // mark lesson progress
-    try {
-      const studentId = localStorage.getItem('studentId');
-      if (studentId && lesson) {
-        fetch(`${PROXY_URL_ST}/student/${studentId}/progress`, {
-          method:'PUT',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ unit: lesson.unit||'aritmetica', stage: lesson.stage||lesson.level||'3', status:'concepts_done' })
-        }).catch(()=>{});
-      }
-    } catch(e) {}
+    markConceptsDone();
   }
 
   function updateStProgress() {
@@ -2925,15 +3050,20 @@
   }
 
   // ── Walkthrough engine ────────────────────────────────────────
-  function renderWalkthrough(steps) {
+  function renderWalkthrough(steps, opts) {
+    opts = opts || {};
+    const prefixHtml = opts.beforeBoardHtml || '';
+    const headerHtml = prefixHtml
+      ? prefixHtml
+      : `${badgeHtml()}<h1>${escHtml(lesson.title || '')}</h1>`;
+
     function gridSvg(colId) {
       return `<svg class="wt-grid-svg" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="gp-${colId}" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M 28 0 L 0 0 0 28" fill="none" stroke="#E8E6E0" stroke-width="0.5"/></pattern></defs><rect width="100%" height="100%" fill="url(#gp-${colId})"/></svg>`;
     }
 
     document.body.classList.add("has-walkthrough");
     renderWithPhase(2, `
-      ${badgeHtml()}
-      <h1>${escHtml(lesson.title || '')}</h1>
+      ${headerHtml}
       <div class="walkthrough-board" id="wt-board">
         <div class="wt-topbar" id="wt-topbar">
           <div style="display:flex;gap:8px">
@@ -3472,8 +3602,16 @@
         const btn = document.createElement('button');
         btn.className = 'main-btn';
         btn.style.marginTop = '16px';
-        btn.textContent = 'Practicar \u2192';
-        btn.onclick = function() { showPractice(); };
+        const mode = opts.completeMode || 'practice';
+        btn.textContent = mode === 'nextSubtopic' ? 'Siguiente tema \u2192' : 'Practicar \u2192';
+        btn.onclick = function() {
+          if (mode === 'nextSubtopic') {
+            advanceSubtopic();
+            return;
+          }
+          markConceptsDone();
+          showPractice();
+        };
         board.insertAdjacentElement('afterend', btn);
       }
     }
