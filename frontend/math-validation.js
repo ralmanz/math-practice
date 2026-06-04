@@ -424,6 +424,65 @@
       try { return String(Algebrite.run(`simplify((${fcMulFix(a)})-(${fcMulFix(b)}))`)) === '0'; }
       catch (e) { return null; }
     }
+    /**
+     * Parse a × 10^n style input (mantissa a, integer exponent n).
+     * @returns {{ a: number, n: number } | null}
+     */
+    function parseScientificStudent(raw) {
+      let s = String(raw).trim();
+      if (!s) return null;
+      s = s.replace(/×/g, '*').replace(/−/g, '-');
+      s = s.replace(/\s+/g, '');
+      const mant = '([+-]?(?:\\d+\\.\\d*|\\d*\\.\\d+|\\d+))';
+      let m = s.match(new RegExp('^' + mant + '[eE]([+-]?\\d+)$'));
+      if (m) {
+        const a = parseFloat(m[1]);
+        const n = parseInt(m[2], 10);
+        return Number.isFinite(a) && Number.isFinite(n) ? { a, n } : null;
+      }
+      m = s.match(new RegExp('^' + mant + '(?:\\*|x)10\\^([+-]?\\d+)$', 'i'));
+      if (m) {
+        const a = parseFloat(m[1]);
+        const n = parseInt(m[2], 10);
+        return Number.isFinite(a) && Number.isFinite(n) ? { a, n } : null;
+      }
+      return null;
+    }
+
+    function scientificTargetValue(canonicalRaw) {
+      const parsed = parseScientificStudent(canonicalRaw);
+      if (parsed && Number.isInteger(parsed.n)) {
+        const v = parsed.a * Math.pow(10, parsed.n);
+        return Number.isFinite(v) ? v : null;
+      }
+      return algebriteFloat(String(canonicalRaw).trim());
+    }
+
+    function isNormalizedMantissa(a) {
+      const absA = Math.abs(a);
+      if (absA < NUM_EPS) return false;
+      return absA >= 1 - NUM_EPS && absA < 10 - NUM_EPS;
+    }
+
+    function checkScientific(studentAnswer, canonicalRaw) {
+      const target = scientificTargetValue(canonicalRaw);
+      if (target == null) return { valid: null, reason: 'scientific-canonical-parse' };
+
+      const parsed = parseScientificStudent(studentAnswer);
+      if (!parsed) return { valid: null, reason: 'scientific-unparseable' };
+      if (!Number.isFinite(parsed.a) || !Number.isFinite(parsed.n) || !Number.isInteger(parsed.n)) {
+        return { valid: null, reason: 'scientific-exponent' };
+      }
+      if (!isNormalizedMantissa(parsed.a)) {
+        return { valid: false, reason: 'scientific-not-normalized' };
+      }
+
+      const value = parsed.a * Math.pow(10, parsed.n);
+      if (!Number.isFinite(value)) return { valid: null, reason: 'scientific-overflow' };
+      if (numsClose(value, target)) return { valid: true };
+      return { valid: false, reason: 'scientific-value-mismatch' };
+    }
+
     function formCheck(op, studentRaw, canonicalRaw) {
       Algebrite.run('clearall');
       const student = fcNorm(studentRaw), canonical = fcNorm(canonicalRaw);
@@ -708,6 +767,8 @@
           return checkEvaluateFinal(studentInput, seed);
         case 'translate':
           return checkEquivalence(studentInput, seed.answer, seed.type || seed.problemType);
+        case 'scientific':
+          return checkScientific(studentInput, seed.answer);
         default:
           return { valid: null, indeterminate: true, reason: 'unknown-op:' + String(op) };
       }
@@ -722,6 +783,7 @@
       containsEquals,
       canonicalLinearInequality,
       checkInequality,
+      checkScientific,
       formCheck,
       validateAgainstSeed,
       parseEvaluateSubst,

@@ -2355,7 +2355,8 @@
       const ansNorm = String(p.answer || '').replace(/\s+/g, '').replace(/≥/g, '>=').replace(/≤/g, '<=');
       const absGeUnion = p.op === 'inequality' && /^abs\([^)]+\)(>=|>)/i.test(ansNorm);
       let formMode = 'default';
-      if (p.acceptAnyRoot) formMode = 'any-root';
+      if (p.op === 'scientific') formMode = 'scientific';
+      else if (p.acceptAnyRoot) formMode = 'any-root';
       else if (absGeUnion) formMode = 'union';
       else if (solveLike) formMode = 'multi-root';
       studentCalc.setAnswerFormMode(formMode);

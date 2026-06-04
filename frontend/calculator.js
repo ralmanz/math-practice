@@ -269,6 +269,7 @@
     <button class="calc-btn op" data-insert=", " data-ans-comma style="flex:1 1 auto;">,</button>
     <button class="calc-btn op" data-insert="x <= , x >= " data-ans-union style="flex:1 1 100%; display:none;">x ≤ N, x ≥ N</button>
     <button class="calc-btn op" data-insert="x = , x = " data-ans-dual style="flex:1 1 100%;">x = N, x = N</button>
+    <button class="calc-btn op" data-insert=" × 10^" data-ans-scientific style="flex:1 1 100%; display:none;">× 10^n</button>
   </div>
 </div>
 `;
@@ -389,16 +390,20 @@
       var single = panel.querySelectorAll('[data-ans-single]');
       var unionTpl = panel.querySelector('[data-ans-union]');
       var unionOps = panel.querySelectorAll('[data-ans-union-op]');
+      var sciTpl = panel.querySelector('[data-ans-scientific]');
       var isUnion = mode === 'union';
       var isAnyRoot = mode === 'any-root';
-      if (dual) dual.style.display = (isAnyRoot || isUnion) ? 'none' : '';
-      if (comma) comma.style.display = isAnyRoot ? 'none' : '';
+      var isScientific = mode === 'scientific';
+      var hideStandard = isAnyRoot || isUnion || isScientific;
+      if (dual) dual.style.display = hideStandard ? 'none' : '';
+      if (comma) comma.style.display = (isAnyRoot || isScientific) ? 'none' : '';
       if (unionTpl) unionTpl.style.display = isUnion ? '' : 'none';
+      if (sciTpl) sciTpl.style.display = isScientific ? '' : 'none';
       unionOps.forEach(function (btn) {
         btn.style.display = isUnion ? '' : 'none';
       });
       single.forEach(function (btn) {
-        btn.style.display = (isAnyRoot || isUnion) ? 'none' : '';
+        btn.style.display = hideStandard ? 'none' : '';
       });
     }
 
