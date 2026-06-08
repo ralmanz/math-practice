@@ -135,6 +135,9 @@
       box-shadow: 0 4px 24px rgba(37, 99, 235, 0.1);
     }
 
+    /* Temporarily hide secondary curriculum card — remove class to show again */
+    .filter-card--hidden { display: none; }
+
     .card-icon {
       font-size: 2.4rem;
       line-height: 1;
@@ -266,8 +269,8 @@
       <a href="home.html?curriculum=PAA&guest=true" class="card-btn" data-i18n="filter_card1_btn">Empezar →</a>
     </div>
 
-    <!-- Card 2: Secondary Math -->
-    <div class="filter-card">
+    <!-- Card 2: Secondary Math (hidden for now — remove filter-card--hidden to re-enable) -->
+    <div class="filter-card filter-card--hidden" data-curriculum="secondary" aria-hidden="true">
       <div class="card-icon">&#x1F4DA;</div>
       <h2 class="card-title" data-i18n="filter_card2_title">Matemáticas de Secundaria</h2>
       <p class="card-desc" data-i18n="filter_card2_desc">Refuerza álgebra y matemáticas de grados 6 a 9 con el currículo Cambridge, Common Core o IB.</p>
