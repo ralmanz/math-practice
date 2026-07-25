@@ -519,15 +519,27 @@
       max-width: 100%;
       padding: 10px 12px;
       box-sizing: border-box;
-      border: 1.5px solid var(--border);
+      border: 2px solid var(--blue);
       border-radius: 10px;
       font-size: 0.95rem;
       font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+      animation: hero-try-input-pulse 2.2s ease-in-out infinite;
     }
     .hero-try-input:focus {
       outline: none;
-      border-color: var(--blue);
+      border-color: var(--blue-dark);
       box-shadow: 0 0 0 3px var(--blue-light);
+      animation: none;
+    }
+    @keyframes hero-try-input-pulse {
+      0%, 100% {
+        border-color: var(--blue);
+        box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.45);
+      }
+      50% {
+        border-color: var(--blue-mid);
+        box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.12);
+      }
     }
     .hero-try-btn {
       padding: 10px 14px;
@@ -928,6 +940,7 @@
     @media (prefers-reduced-motion: reduce) {
       .hero-tutor-live-pill { animation: none; }
       .hero-preview .hero-tutor-tile { animation: none; }
+      .hero-try-input { animation: none; }
       #hero-preview-engine[data-phase="full"] .hero-engine-caret {
         animation: none;
         opacity: 1;
