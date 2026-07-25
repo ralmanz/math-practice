@@ -283,11 +283,14 @@
 
     #product-previews .hero-previews-row {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 20px;
       align-items: stretch;
       min-height: var(--preview-card-height);
       width: 100%;
+      max-width: 720px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     #product-previews .hero-preview {
@@ -611,30 +614,6 @@
         transform 0.45s ease,
         margin-top 0.45s ease,
         margin-bottom 0.45s ease;
-    }
-
-    #product-previews #hero-preview-guided:is([data-phase="1"], [data-phase="2"], [data-phase="3"], [data-phase="full"])
-      [data-demo-part="step"] {
-      max-height: 120px;
-      opacity: 1;
-      transform: none;
-      margin-top: 4px;
-    }
-
-    #product-previews #hero-preview-guided:is([data-phase="2"], [data-phase="3"], [data-phase="full"])
-      [data-demo-part="hint"] {
-      max-height: 100px;
-      opacity: 1;
-      transform: none;
-      margin-top: 10px;
-    }
-
-    #product-previews #hero-preview-guided:is([data-phase="3"], [data-phase="full"])
-      [data-demo-part="feedback"] {
-      max-height: 88px;
-      opacity: 1;
-      transform: none;
-      margin-top: 10px;
     }
 
     #product-previews #hero-preview-engine:is([data-phase="1"], [data-phase="2"], [data-phase="3"], [data-phase="4"], [data-phase="full"])
@@ -1639,7 +1618,7 @@
         max-width: 440px;
         margin: 0 auto;
         /* stacked: fixed per card; section height is stable while each animates */
-        min-height: calc(var(--preview-card-height) * 3 + 32px);
+        min-height: calc(var(--preview-card-height) * 2 + 32px);
       }
     }
 
@@ -1744,33 +1723,10 @@
 <section id="product-previews" aria-hidden="true">
   <div class="container">
     <div class="hero-previews-row">
-      <p class="sr-only" data-i18n="hero_demo_aria">Vista previa: práctica guiada con pista y revisión instantánea</p>
       <p class="sr-only" data-i18n="hero_engine_aria">Vista previa: cada línea se revisa antes de continuar</p>
       <p class="sr-only" data-i18n="hero_tutor_aria">Vista previa: clases en vivo por Google Meet</p>
 
-      <div class="hero-preview" id="hero-preview-guided" data-phase="0">
-            <div class="hero-demo-chrome">
-              <div class="hero-demo-dots" aria-hidden="true"><span></span><span></span><span></span></div>
-              <span class="hero-demo-chrome-title" data-i18n="hero_demo_title">Guided practice</span>
-            </div>
-            <div class="hero-demo-body">
-              <p class="hero-demo-prompt" data-i18n="hero_demo_prompt">Solve for x: 2x + 3 = 11</p>
-              <div class="hero-demo-block" data-demo-part="step">
-                <span class="hero-demo-badge" data-i18n="hero_demo_step_label">Step 1 of 3</span>
-                <p class="hero-demo-step-q" data-i18n="hero_demo_step_q">What should you do first to isolate the term with x?</p>
-              </div>
-              <div class="hero-demo-block hero-demo-hint" data-demo-part="hint">
-                <span class="hero-demo-hint-tag" data-i18n="hero_demo_hint_tag">Hint</span>
-                <p data-i18n="hero_demo_hint_text">Subtract 3 from both sides.</p>
-              </div>
-              <div class="hero-demo-block hero-demo-feedback" data-demo-part="feedback">
-                <span class="hero-demo-check" aria-hidden="true">&#10003;</span>
-                <p data-i18n="hero_demo_feedback">Nice &mdash; that keeps the equation balanced.</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="hero-preview" id="hero-preview-engine" data-phase="0">
+      <div class="hero-preview" id="hero-preview-engine" data-phase="0">
             <div class="hero-demo-chrome">
               <div class="hero-demo-dots" aria-hidden="true"><span></span><span></span><span></span></div>
               <span class="hero-demo-chrome-title" data-i18n="hero_engine_meta">Problem 1 of 1 · Simplify</span>
@@ -2059,7 +2015,7 @@
 </script>
 
 <script src="landing-try.js?v=20260603-landing-try"></script>
-<script src="landing-previews.js?v=20260603-landing-previews"></script>
+<script src="landing-previews.js?v=20260725-two-previews"></script>
 <script src="nav.js?v=20260515-teacher-filter"></script>
 </body>
 </html>

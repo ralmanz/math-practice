@@ -1,5 +1,5 @@
 /**
- * landing-previews.js — three independent hero preview animations (guided, engine, tutor).
+ * landing-previews.js — two hero preview animations (engine, tutor).
  */
 (function () {
   'use strict';
@@ -28,14 +28,6 @@
       }
     })();
   }
-
-  startLoop(document.getElementById('hero-preview-guided'), [
-    { phase: 0, ms: 1000 },
-    { phase: 1, ms: 1200 },
-    { phase: 2, ms: 1300 },
-    { phase: 3, ms: 2200 },
-    { phase: 'reset', ms: 500 },
-  ]);
 
   startLoop(document.getElementById('hero-preview-engine'), [
     { phase: 0, ms: 750 },
