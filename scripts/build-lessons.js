@@ -55,6 +55,61 @@ for (const f of fs.readdirSync(path.join(ROOT, 'frontend/content')).filter(f => 
 const lang = (frame.language && frame.language.default) || 'es';
 const pick = (o) => (o && typeof o === 'object' ? (o[lang] || o.en || o.es) : o);
 
+
+/**
+ * Derive the Intro machine hook from the level's OWN material.
+ *
+ * Earlier this keyed off `example.start`, which only exists on equation levels —
+ * so like-terms and expand levels emitted no hook and the Intro rendered nearly
+ * empty. Parse any seed into ax + b instead: an ANSWER like "11y + 7" or "7x",
+ * or a solve seed's left-hand side ("3x + 5 = 14").
+ */
+function deriveHook(seeds) {
+  const parse = (txt) => {
+    const m = String(txt || '').replace(/[−–]/g, '-').replace(/\s+/g, '')
+      .match(/^(\d*)([a-z])(?:([+-])(\d+))?$/i);
+    if (!m) return null;
+    const a = m[1] === '' ? 1 : parseInt(m[1], 10);
+    const b = m[3] ? (m[3] === '-' ? -1 : 1) * parseInt(m[4], 10) : 0;
+    return { a, b, v: m[2] };
+  };
+
+  // Collect every parseable rule, then prefer a two-part one (b != 0) — "3x + 5"
+  // is a far better puzzle than "2x", which the student cracks in one tap.
+  const found = [];
+  for (const s of seeds) {
+    const fromAnswer = parse(s.answer);
+    if (fromAnswer) found.push(fromAnswer);
+    if (s.expression && String(s.expression).includes('=')) {
+      const fromLhs = parse(String(s.expression).split('=')[0]);
+      if (fromLhs) found.push(fromLhs);
+    }
+  }
+  found.sort((x, y) => (y.b !== 0) - (x.b !== 0) || Math.abs(y.a) - Math.abs(x.a));
+  const r = found[0];
+  if (!r || !r.a) return undefined;
+
+  const { a, b, v } = r;
+  const sign = b < 0 ? '\u2212' : '+';
+  const term = (k) => `${k === 1 ? '' : k}${v}`;
+  const answer = b === 0 ? term(a) : `${term(a)} ${sign} ${Math.abs(b)}`;
+
+  const candidates = b === 0
+    ? [`${v} + ${a}`, term(a + 1), `${term(a)} + 1`]
+    : [`${term(1)} ${sign} ${Math.abs(a + b)}`, `${term(Math.abs(b))} ${sign} ${a}`, `${term(a + 1)} ${sign} ${Math.abs(b)}`];
+
+  const options = [answer];
+  for (const c of candidates) {
+    if (options.length >= 3) break;
+    if (options.indexOf(c) < 0) options.push(c);
+  }
+  // Deterministic shuffle so the answer is not always first.
+  const shift = (a * 31 + b * 17 + options.length) % options.length;
+  for (let i = 0; i < shift; i++) options.push(options.shift());
+
+  return { type: 'machine', a, b, v, inputs: [1, 2, 5, 10], answer, options };
+}
+
 const built = [];
 for (const unit of band.units || []) {
   for (const level of unit.levels || []) {
@@ -84,8 +139,13 @@ for (const unit of band.units || []) {
         subtitle: gradable.map(s => G.label(s, lang)).join(' · '),
         skills: level.skills,
         intro: {
+          // `rule` is REQUIRED — coverIntroHtml() gates the whole rule card on it.
+          rule: `${pick(unit.label)} — ${gradable.map(s => G.label(s, lang)).join('; ')}.`,
           ruleTitle: `${pick(frame.name)} — ${pick(band.label)}`,
           ruleChips: gradable.map(s => G.label(s, lang)),
+          goals: gradable.map(s => G.label(s, lang)),
+          problems: [...new Set(seeds.map(s => G.label((s.skills || [])[0] || '', lang)))].filter(Boolean),
+          hook: deriveHook(seeds),
         },
         example: first ? { start: first.expression } : undefined,
         practiceProblems: seeds.map(s => s.id),

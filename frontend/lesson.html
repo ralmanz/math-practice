@@ -1822,6 +1822,9 @@
 </div>
 
 <script src="content/coordinates.js?v=20260727-dstruct3d"></script>
+<script src="content/frames/meduca.js?v=20260727-dstruct3d"></script>
+<script src="content/frames/camb.js?v=20260727-dstruct3d"></script>
+<script src="content/frames/index.js?v=20260727-dstruct3d"></script>
 <script src="lang.js?v=20260727-dstruct3d"></script>
 <script src="lesson-phase-nav.js?v=20260518-grammar"></script>
 <script src="lesson-example-walkthrough.js?v=20260603-p4"></script>
@@ -2296,6 +2299,21 @@
   };
 
   function badgeHtml() {
+    // Canonical lessons carry their own labels. `unit` holds the progress key
+    // ('CAMB:s7:expr'), which must never be shown to a student.
+    if (_coord && _coord.form === 'canonical') {
+      const c = _coord.canonical;
+      const band = (window.FrameRegistry && FrameRegistry.getBand(c.frame, c.band)) || null;
+      const frameDef = (window.FrameRegistry && FrameRegistry.getFrame(c.frame)) || null;
+      const lang = (lesson && lesson.language) || Lang.detect();
+      const pick = (o, fb) => (o && typeof o === 'object' ? (o[lang] || o.en || o.es) : o) || fb;
+      const parts = [
+        pick(frameDef && frameDef.name, c.frame),
+        pick(band && band.label, c.band),
+        `${Lang.t('level_label')} ${String(c.level).replace(/^N/, '')}`,
+      ];
+      return `<div class="lesson-badge">${parts.map(escHtml).join(' &middot; ')}</div>`;
+    }
     const lvl = (lesson && lesson.level) ? lesson.level : (String(stage).match(/\d+/) || [''])[0] || stage;
     return `<div class="lesson-badge">${escHtml(curriculumLabel(curriculum))} &middot; ${escHtml(unitDisplayName(unit))} &middot; ${escHtml(Lang.t('level_label'))} ${escHtml(String(lvl))}</div>`;
   }
