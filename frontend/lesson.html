@@ -187,6 +187,110 @@
     line-height: 1.4;
     margin: 0;
   }
+  /* ── Intro hook: "descubre la regla" machine ─────────────────────────── */
+  .hook-card {
+    background: linear-gradient(160deg, #F5F3FF 0%, #EEF2FF 100%);
+    border: 1px solid #DDD6FE;
+    border-radius: 16px;
+    padding: 18px 16px 16px;
+    margin: 0 0 18px;
+  }
+  .hook-eyebrow {
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #7C3AED;
+    margin: 0 0 4px;
+  }
+  .hook-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #1F2937;
+    line-height: 1.3;
+    margin: 0 0 12px;
+  }
+  .hook-machine {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .hook-slot {
+    min-width: 58px;
+    height: 52px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+  }
+  .hook-slot--in  { background: #FFFFFF; border: 2px solid #C4B5FD; color: #4C1D95; }
+  .hook-slot--out { background: #4F46E5; border: 2px solid #4338CA; color: #FFFFFF; }
+  .hook-slot--empty { background: #FFFFFF; border: 2px dashed #C4B5FD; color: #A78BFA; }
+  .hook-box {
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: #312E81;
+    color: #FFFFFF;
+    font-weight: 800;
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+    box-shadow: 0 4px 12px rgba(49,46,129,0.25);
+  }
+  .hook-arrow { color: #8B5CF6; font-size: 1.2rem; font-weight: 800; }
+  .hook-prompt {
+    font-size: 0.85rem;
+    color: #4C1D95;
+    text-align: center;
+    margin: 0 0 10px;
+    line-height: 1.45;
+  }
+  .hook-chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+  .hook-chip {
+    border: 2px solid #C4B5FD;
+    background: #FFFFFF;
+    color: #4C1D95;
+    border-radius: 999px;
+    padding: 8px 16px;
+    font-size: 0.92rem;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: transform 0.12s ease, background 0.12s ease;
+  }
+  .hook-chip:hover { background: #EDE9FE; transform: translateY(-1px); }
+  .hook-chip:disabled { opacity: 0.45; cursor: default; transform: none; }
+  .hook-chip--used { background: #DDD6FE; border-color: #A78BFA; }
+  .hook-chip--right { background: #059669; border-color: #047857; color: #FFFFFF; }
+  .hook-chip--wrong { background: #FEE2E2; border-color: #FCA5A5; color: #991B1B; }
+  .hook-table {
+    display: flex; flex-direction: column; gap: 4px;
+    max-width: 220px; margin: 0 auto 12px;
+  }
+  .hook-row {
+    display: grid; grid-template-columns: 1fr auto 1fr;
+    align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.7);
+    border-radius: 8px; padding: 5px 10px;
+    font-size: 0.92rem; font-weight: 700; color: #312E81;
+    font-variant-numeric: tabular-nums;
+  }
+  .hook-row span:last-child { text-align: right; }
+  .hook-reveal {
+    margin-top: 12px; padding: 12px 14px;
+    background: #FFFFFF; border: 2px solid #A7F3D0; border-radius: 12px;
+    text-align: center;
+  }
+  .hook-reveal-eq {
+    font-size: 1.35rem; font-weight: 800; color: #065F46; margin: 0 0 4px;
+    font-variant-numeric: tabular-nums;
+  }
+  .hook-reveal-note { font-size: 0.82rem; color: #047857; margin: 0; line-height: 1.45; }
   /* Lo que vas a lograr */
   .cover-goals-list {
     list-style: none;
@@ -1717,6 +1821,7 @@
   </div>
 </div>
 
+<script src="content/coordinates.js?v=20260727-dstruct3"></script>
 <script src="lang.js?v=20260514-concept-nav"></script>
 <script src="lesson-phase-nav.js?v=20260518-grammar"></script>
 <script src="lesson-example-walkthrough.js?v=20260603-p4"></script>
@@ -1735,9 +1840,14 @@
   Lang.apply();
 
   const _params    = new URLSearchParams(window.location.search);
-  const curriculum = _params.get('curriculum') || '';
-  const unit       = _params.get('unit')       || '';
-  const stage      = _params.get('stage') || _params.get('level') || '';
+  // D-STRUCT v3.0 §3 — one resolver for both address forms. See coordinates.js.
+  // `unit`/`stage` stay populated in the legacy shape because student progress
+  // records are keyed on them; a routing change must not rewrite student data.
+  const _coord = (window.Coordinates && window.Coordinates.resolve(_params)) || null;
+
+  const curriculum = _params.get('curriculum') || (_coord && _coord.canonical ? _coord.canonical.frame : '');
+  const unit       = _coord ? _coord.progress.unit  : (_params.get('unit') || '');
+  const stage      = _coord ? _coord.progress.stage : (_params.get('stage') || _params.get('level') || '');
   const guestMode  = _params.get('guest') === 'true';
   const phaseParam = _params.get('phase') || '';
   const studentId  = localStorage.getItem('studentId') || _params.get('student') || '';
@@ -1962,7 +2072,10 @@
       return;
     }
 
-    const lessonRes = await fetch(`${WORKER}/lesson/${encodeURIComponent(curriculum)}/${encodeURIComponent(unit)}/${encodeURIComponent(stage)}`);
+    const _lessonPath = _coord
+      ? _coord.lessonPath
+      : `/lesson/${encodeURIComponent(curriculum)}/${encodeURIComponent(unit)}/${encodeURIComponent(stage)}`;
+    const lessonRes = await fetch(`${WORKER}${_lessonPath}`);
 
     if (!lessonRes.ok) {
       if (lessonRes.status === 404) {
@@ -1996,7 +2109,8 @@
 
   function routeInitialLessonPhase() {
     if (phaseParam === 'concepts') {
-      goToConceptsPhase();
+      // Conceptos removed — old links land on the lesson rather than 404.
+      showCover();
       return;
     }
     if (phaseParam === 'example') {
@@ -2025,8 +2139,12 @@
     return !!(a.visual || a.formula.length || a.casos.length);
   }
 
+  // Phase 2 (Conceptos) was removed — the Intro now carries the teaching hook and
+  // the student goes straight from Intro to Práctica. Phase IDs are unchanged so
+  // existing progress records and ?phase= links keep resolving; 2 simply never
+  // appears in the nav, and goToLessonPhase(2) forwards onward.
   function lessonPhaseList() {
-    const list = [1, 2];
+    const list = [1];
     if (lessonHasEjemplosAid()) list.push(3);
     list.push(4);
     return list;
@@ -2161,7 +2279,10 @@
     teardownActiveWalkthrough();
     document.body.classList.remove('has-walkthrough');
     if (phase === 1) showCover();
-    else if (phase === 2) goToConceptsPhase();
+    else if (phase === 2) {
+      // Conceptos removed — forward rather than dead-end.
+      if (lessonHasEjemplosAid()) showExample(); else showPractice();
+    }
     else if (phase === 3) {
       if (lessonHasEjemplosAid()) showExample();
       else showPractice();
@@ -2173,7 +2294,160 @@
     return `<div class="lesson-badge">${escHtml(curriculumLabel(curriculum))} &middot; ${escHtml(unitDisplayName(unit))} &middot; ${escHtml(Lang.t('level_label'))} ${escHtml(String(lvl))}</div>`;
   }
 
-  // ── Phase 1: Cover ────────────────────────────────────────────
+  // ── Phase 1: Cover — interactive hook ─────────────────────────
+  //
+  // The Intro used to be a static rule card. It now opens with a "descubre la
+  // regla" machine: the student feeds numbers in, watches numbers come out, and
+  // works out the rule themselves — then we reveal that the rule they just found
+  // IS the algebra this level teaches.
+  //
+  // Driven by lesson.intro.hook when present:
+  //   { type:'machine', a, b, inputs:[…], options:[…], answer:'2x + 5', note:'…' }
+  // With no hook data we fall back to hookFromLesson(), which derives a machine
+  // from the lesson's own worked example so the numbers are never arbitrary.
+  //
+  // NOTE: this markup is injected with innerHTML, which silently drops <script>.
+  // All behaviour therefore hangs off onclick attributes calling the global
+  // nuvoHook* functions defined below. Do not move logic into inline scripts.
+
+  let hookState = null;
+
+  function hookFromLesson() {
+    const h = lesson && lesson.intro && lesson.intro.hook;
+    if (h && h.type === 'machine' && typeof h.a === 'number') return h;
+
+    // Derive from the level's worked example: "3x + 5 = 14" → rule 3x + 5.
+    const start = (lesson && lesson.example && lesson.example.start) || '';
+    const m = String(start).replace(/\s+/g, '').match(/^(\d*)([a-z])([+\-])(\d+)=/i);
+    if (m) {
+      const a = m[1] === '' ? 1 : parseInt(m[1], 10);
+      const b = (m[3] === '-' ? -1 : 1) * parseInt(m[4], 10);
+      const v = m[2];
+      const sign = b < 0 ? '−' : '+';
+      const term = (k) => `${k === 1 ? '' : k}${v}`;
+      const answer = `${term(a)} ${sign} ${Math.abs(b)}`;
+
+      // Distractors: "added everything together" and "swapped the two numbers" —
+      // both real student errors. Dedupe, because a === b makes the swap identical
+      // to the answer, and drop anything that happens to fit the same rule.
+      const candidates = [
+        `${term(1)} ${sign} ${Math.abs(a + b)}`,
+        `${term(Math.abs(b))} ${sign} ${a}`,
+        `${term(a + 1)} ${sign} ${Math.abs(b)}`,
+      ];
+      const options = [answer];
+      for (const c of candidates) {
+        if (options.length >= 3) break;
+        if (options.indexOf(c) < 0) options.push(c);
+      }
+
+      // Deterministic shuffle keyed on the rule, so the answer is not always first
+      // but the order is stable across repaints (the card re-renders on every tap).
+      const seed = (a * 31 + b * 17 + options.length) % options.length;
+      for (let i = 0; i < seed; i++) options.push(options.shift());
+
+      return { type: 'machine', a, b, v, inputs: [1, 2, 5, 10], answer, options };
+    }
+    return null;
+  }
+
+  function hookApply(x) {
+    return hookState.a * x + hookState.b;
+  }
+
+  function hookRowsHtml() {
+    if (!hookState.fed.length) {
+      return `<div class="hook-table"><div class="hook-row" style="opacity:.5">
+        <span>?</span><span class="hook-arrow">→</span><span>?</span></div></div>`;
+    }
+    return `<div class="hook-table">${hookState.fed.map(function (x) {
+      return `<div class="hook-row"><span>${x}</span><span class="hook-arrow">→</span><span>${hookApply(x)}</span></div>`;
+    }).join('')}</div>`;
+  }
+
+  function hookBodyHtml() {
+    const s = hookState;
+    const machine = `<div class="hook-machine">
+        <div class="hook-slot ${s.last === null ? 'hook-slot--empty' : 'hook-slot--in'}">${s.last === null ? '?' : s.last}</div>
+        <span class="hook-arrow">→</span>
+        <div class="hook-box">${escHtml(Lang.t('hook_machine_label'))}</div>
+        <span class="hook-arrow">→</span>
+        <div class="hook-slot ${s.last === null ? 'hook-slot--empty' : 'hook-slot--out'}">${s.last === null ? '?' : hookApply(s.last)}</div>
+      </div>`;
+
+    if (s.solved) {
+      return machine + hookRowsHtml() + `<div class="hook-reveal">
+        <p class="hook-reveal-eq">${escHtml(s.answer)}</p>
+        <p class="hook-reveal-note">${escHtml(s.note || Lang.t('hook_reveal_note'))}</p>
+      </div>`;
+    }
+
+    if (s.fed.length >= 2) {
+      const opts = s.options.map(function (o, i) {
+        const cls = s.wrong.indexOf(i) >= 0 ? 'hook-chip hook-chip--wrong' : 'hook-chip';
+        return `<button type="button" class="${cls}" onclick="nuvoHookGuess(${i})">${escHtml(o)}</button>`;
+      }).join('');
+      return machine + hookRowsHtml() +
+        `<p class="hook-prompt">${escHtml(Lang.t('hook_guess_prompt'))}</p>
+         <div class="hook-chips">${opts}</div>`;
+    }
+
+    const chips = s.inputs.map(function (x, i) {
+      const used = s.fed.indexOf(x) >= 0;
+      return `<button type="button" class="hook-chip${used ? ' hook-chip--used' : ''}"${used ? ' disabled' : ''} onclick="nuvoHookFeed(${i})">${x}</button>`;
+    }).join('');
+    return machine + hookRowsHtml() +
+      `<p class="hook-prompt">${escHtml(Lang.t('hook_feed_prompt'))}</p>
+       <div class="hook-chips">${chips}</div>`;
+  }
+
+  function hookCardHtml() {
+    const h = hookFromLesson();
+    if (!h) return '';
+    if (!hookState || hookState.src !== h) {
+      hookState = {
+        src: h, a: h.a, b: h.b, v: h.v || 'x',
+        inputs: h.inputs && h.inputs.length ? h.inputs : [1, 2, 5, 10],
+        options: h.options && h.options.length ? h.options : [h.answer],
+        answer: h.answer, note: h.note,
+        fed: [], last: null, wrong: [], solved: false,
+      };
+    }
+    return `<div class="hook-card" id="nuvo-hook">
+      <p class="hook-eyebrow">${escHtml(Lang.t('hook_eyebrow'))}</p>
+      <p class="hook-title">${escHtml(Lang.t('hook_title'))}</p>
+      <div id="nuvo-hook-body">${hookBodyHtml()}</div>
+    </div>`;
+  }
+
+  function hookRepaint() {
+    const el = document.getElementById('nuvo-hook-body');
+    if (el) el.innerHTML = hookBodyHtml();
+  }
+
+  window.nuvoHookFeed = function (i) {
+    if (!hookState) return;
+    const x = hookState.inputs[i];
+    if (x === undefined || hookState.fed.indexOf(x) >= 0) return;
+    hookState.fed.push(x);
+    hookState.last = x;
+    hookRepaint();
+  };
+
+  window.nuvoHookGuess = function (i) {
+    if (!hookState) return;
+    if (hookState.options[i] === hookState.answer) hookState.solved = true;
+    else if (hookState.wrong.indexOf(i) < 0) hookState.wrong.push(i);
+    hookRepaint();
+  };
+
+  // Single entry point for the Intro CTA. Conceptos is gone, so this goes to the
+  // worked example when the level has one, otherwise straight to practice.
+  window.beginLesson = function () {
+    if (lessonHasEjemplosAid()) showExample();
+    else showPractice();
+  };
+
   function coverIntroHtml() {
     const intro = lesson.intro;
     if (!intro) {
@@ -2255,8 +2529,9 @@
     renderWithPhase(1, `
       <div class="cover-badge-wrap">${badgeHtml()}</div>
       <h1 class="cover-heading">${escHtml(lesson.title || 'Lesson')}</h1>
+      ${hookCardHtml()}
       <div class="cover-begin-wrap">
-        <button class="main-btn main-btn--cta" onclick="(lesson.subtopics&&lesson.subtopics.length)?startSubtopicFlow():showConcepts()">${Lang.t('cover_begin_btn')}</button>
+        <button class="main-btn main-btn--cta" onclick="beginLesson()">${Lang.t('cover_begin_btn')}</button>
       </div>
       ${coverIntroHtml()}
     `);
@@ -2494,7 +2769,7 @@
         <div class="tab-row">${tabsHtml}</div>
         ${panelsHtml}
         <div class="example-nav-row">
-          <button type="button" class="main-btn secondary" onclick="goToConceptsPhase()">${Lang.t('concept_back_intro')}</button>
+          <button type="button" class="main-btn secondary" onclick="showCover()">${Lang.t('concept_back_intro')}</button>
           <button type="button" class="main-btn" onclick="showPractice()">${Lang.t('example_btn_goto_practice')}</button>
         </div>
       </div>
@@ -2544,17 +2819,17 @@
     return statusAllowsPractice((rec.progress[unit] || {})[stage]);
   }
 
+  // Conceptos was a soft gate in front of Práctica. With the phase removed there is
+  // nothing to gate on, so practice is always allowed. markConceptsDone() is still
+  // called by showPractice() so student progress records keep advancing through the
+  // same 'concepts_done' state the backend and teacher view already expect.
   async function enterPracticeOrRedirectToConceptos() {
-    if (!(await levelHasConceptsDone())) {
-      goToConceptsPhase();
-      return false;
-    }
     return true;
   }
 
   // ── Phase 4: Practice (always app.html — same engine as guests) ──
   async function showPractice() {
-    if (lessonCurrentPhase === 2) markConceptsDone();
+    markConceptsDone();
     if (!(await enterPracticeOrRedirectToConceptos())) return;
 
     lessonMaxPhase = LESSON_PHASE_COUNT;
@@ -2621,7 +2896,7 @@
           <div class="score-display">${score} / ${total}</div>
           <h2>${Lang.t('result_fail_h2')}</h2>
           <p>${escHtml(failScoreText)} ${Lang.t('result_fail_review')}</p>
-          <button class="result-btn secondary" onclick="${lessonHasEjemplosAid() ? 'showExample()' : 'goToConceptsPhase()'}">${Lang.t('result_fail_btn')}</button>
+          <button class="result-btn secondary" onclick="${lessonHasEjemplosAid() ? 'showExample()' : 'showCover()'}">${Lang.t('result_fail_btn')}</button>
         </div>
       `);
     }

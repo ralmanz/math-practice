@@ -378,6 +378,33 @@ Rules:
       return jsonResponse({ ok: true, id: newProblem.id });
     }
 
+    // ── Canonical lesson route (D-STRUCT v3.0 §3) ────────────────────────────
+    // GET  /lesson/:frame/:band/:unit/:level  → KV key lesson:FRAME:band:unit:level
+    // POST /lesson/:frame/:band/:unit/:level  → teacher auth, save
+    // Additive: the 3-part legacy route below is unchanged and still serves every
+    // live student link. Nothing is cut over here.
+    const lessonMatch4 = path.match(/^\/lesson\/([^/]+)\/([^/]+)\/([^/]+)\/([^/]+)$/);
+    if (lessonMatch4) {
+      const [, cFrame, cBand, cUnit, cLevel] = lessonMatch4;
+      const key4 = `lesson:${cFrame}:${cBand}:${cUnit}:${cLevel}`;
+      if (request.method === 'GET') {
+        const raw = await env.STUDENTS.get(key4);
+        if (!raw) return jsonResponse({ error: 'Lesson not found', key: key4 }, 404);
+        return jsonResponse(JSON.parse(raw));
+      }
+      if (request.method === 'POST') {
+        const auth = request.headers.get('Authorization') || '';
+        const secret = auth.startsWith('Bearer ') ? auth.slice(7) : '';
+        if (!env.TEACHER_SECRET || secret !== env.TEACHER_SECRET) {
+          return jsonResponse({ error: 'Unauthorized' }, 401);
+        }
+        let body4;
+        try { body4 = await request.json(); } catch { return jsonResponse({ error: 'Invalid JSON' }, 400); }
+        await env.STUDENTS.put(key4, JSON.stringify(body4));
+        return jsonResponse({ ok: true, key: key4 });
+      }
+    }
+
     // GET /lesson/:curriculum/:unit/:level — return lesson JSON from KV
     // POST /lesson/:curriculum/:unit/:level — teacher auth, save lesson JSON to KV
     const lessonMatch = path.match(/^\/lesson\/([^/]+)\/([^/]+)\/([^/]+)$/);

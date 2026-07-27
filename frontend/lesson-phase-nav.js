@@ -93,8 +93,9 @@
     return key;
   }
 
+  // Phase 2 (Conceptos) removed — see lesson.html lessonPhaseList().
   function defaultPhaseList(includeExample) {
-    var list = [1, 2];
+    var list = [1];
     if (includeExample !== false) list.push(3);
     list.push(4);
     return list;
