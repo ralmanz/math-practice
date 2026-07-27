@@ -1,3 +1,4 @@
+(function () {
 'use strict';
 
 /**
@@ -139,3 +140,4 @@ const frame = {
 
 if (typeof module !== 'undefined') module.exports = frame;
 if (typeof window !== 'undefined') { window.Frames = window.Frames || {}; window.Frames.MEDUCA = frame; }
+})();

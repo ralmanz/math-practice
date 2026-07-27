@@ -1,3 +1,4 @@
+(function () {
 'use strict';
 
 /**
@@ -123,3 +124,4 @@ const _exports = {
 };
 if (typeof module !== 'undefined') module.exports = _exports;
 if (typeof window !== 'undefined') window.Coordinates = _exports;
+})();

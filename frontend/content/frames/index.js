@@ -1,3 +1,4 @@
+(function () {
 'use strict';
 
 /**
@@ -107,3 +108,4 @@ function bandLevels(frameId, bandDef, progress, manifest) {
 const _exports = { REGISTRY, LEGACY_CURRICULUM_TO_FRAME, getFrame, getBand, resolveStudentFrame, bandLevels };
 if (typeof module !== 'undefined') module.exports = _exports;
 if (typeof window !== 'undefined') window.FrameRegistry = _exports;
+})();
