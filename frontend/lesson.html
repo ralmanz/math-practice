@@ -1821,8 +1821,8 @@
   </div>
 </div>
 
-<script src="content/coordinates.js?v=20260727-dstruct3b"></script>
-<script src="lang.js?v=20260727-dstruct3"></script>
+<script src="content/coordinates.js?v=20260727-dstruct3c"></script>
+<script src="lang.js?v=20260727-dstruct3c"></script>
 <script src="lesson-phase-nav.js?v=20260518-grammar"></script>
 <script src="lesson-example-walkthrough.js?v=20260603-p4"></script>
 <script src="calculator.js?v=20260518-calc-hover"></script>
@@ -1991,12 +1991,20 @@
     return step?.narration || ex.narration_intro || lesson.subtitle || '';
   }
 
+  // Emit the SAME address form we arrived on. A canonical lesson must hand
+  // canonical params to app.html — `unit` here holds the progress key
+  // ('CAMB:s7:expr'), which is neither a valid canonical nor legacy unit, so
+  // passing it on leaves the practice engine with nothing to resolve.
+  function coordParams() {
+    if (_coord && _coord.form === 'canonical') {
+      const c = _coord.canonical;
+      return { frame: c.frame, band: c.band, unit: c.unit, level: c.level };
+    }
+    return { curriculum: curriculum, unit: unit, stage: stage };
+  }
+
   function buildLessonUrl(extra) {
-    const q = new URLSearchParams({
-      curriculum: curriculum,
-      unit: unit,
-      stage: stage
-    });
+    const q = new URLSearchParams(coordParams());
     if (guestMode) q.set('guest', 'true');
     if (studentId && !guestMode) q.set('student', studentId);
     Object.keys(extra || {}).forEach(function (k) {
@@ -2010,13 +2018,10 @@
   /** Practice and test run in app.html (same engine for guests and logged-in students). */
   function curriculumAppUrl(mode, nextPhase) {
     const returnUrl = buildLessonUrl({ phase: nextPhase });
-    const q = new URLSearchParams({
-      curriculum: curriculum,
-      unit: unit,
-      stage: stage,
+    const q = new URLSearchParams(Object.assign(coordParams(), {
       mode: mode,
       returnTo: returnUrl
-    });
+    }));
     if (guestMode) q.set('guest', 'true');
     if (studentId && !guestMode) q.set('student', studentId);
     return 'app.html?' + q.toString();

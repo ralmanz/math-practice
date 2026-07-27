@@ -1,4 +1,6 @@
+(function () {
 'use strict';
+
 
 const subTopicEnum = {
   U1: {
@@ -268,6 +270,9 @@ const draws = {
   'U4-N3': { test: ['u4-n3-02', 'u4-n3-04', 'u4-n3-06'], final: ['u4-n3-03', 'u4-n3-05'] },
 };
 
-const _seedExports = { subTopicEnum, seeds, draws };
+const lang = 'es';
+
+const _seedExports = { lang, subTopicEnum, seeds, draws };
 if (typeof module !== 'undefined') module.exports = _seedExports;
 if (typeof window !== 'undefined') window.SeedPAA = _seedExports;
+})();

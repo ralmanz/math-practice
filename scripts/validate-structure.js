@@ -42,7 +42,7 @@ for (const v of Object.keys(G.legacyToSkill)) if (!enumVals.has(v)) errors.push(
 // ── Layer B ──────────────────────────────────────────────────────────────────
 const frameDir = path.join(ROOT, 'frontend/content/frames');
 const frames = fs.existsSync(frameDir)
-  ? fs.readdirSync(frameDir).filter(f => f.endsWith('.js')).map(f => require(path.join(frameDir, f)))
+  ? fs.readdirSync(frameDir).filter(f => f.endsWith('.js') && f !== 'index.js').map(f => require(path.join(frameDir, f)))
   : [];
 
 let referenced = new Set(), refCount = 0, referenceFrames = 0;

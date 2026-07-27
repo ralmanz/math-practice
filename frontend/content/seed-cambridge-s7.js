@@ -1,4 +1,6 @@
+(function () {
 'use strict';
+
 
 /**
  * Cambridge Lower Secondary — Stage 7 — Algebra
@@ -240,3 +242,4 @@ const lang = 'en';
 const _seedExports = { lang, skillsUsed, seeds, draws };
 if (typeof module !== 'undefined') module.exports = _seedExports;
 if (typeof window !== 'undefined') window.SeedCambridgeS7 = _seedExports;
+})();

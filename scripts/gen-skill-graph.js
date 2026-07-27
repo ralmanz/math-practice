@@ -49,7 +49,8 @@ const body = skills.map(s =>
 
 const counts = skills.reduce((a, s) => (a[s.track] = (a[s.track] || 0) + 1, a), {});
 
-const out = `'use strict';
+const out = `(function () {
+'use strict';
 
 /**
  * LAYER A — the curriculum-agnostic skill graph.
@@ -123,6 +124,7 @@ const _exports = {
 };
 if (typeof module !== 'undefined') module.exports = _exports;
 if (typeof window !== 'undefined') window.SkillGraph = _exports;
+})();
 `;
 
 fs.writeFileSync(path.join(ROOT, 'frontend/content/skill-graph.js'), out);

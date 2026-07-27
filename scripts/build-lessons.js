@@ -94,6 +94,16 @@ for (const unit of band.units || []) {
   }
 }
 
+// Publish manifest: which coordinates actually have a lesson record. home.html
+// renders only these, so a level with no seeds never shows a clickable pill that
+// would 404. Merged across bands so one file covers every frame.
+const manifestPath = path.join(ROOT, 'frontend/content/lesson-manifest.json');
+let manifest = {};
+try { manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8')); } catch {}
+manifest[`${frame.id}/${band.id}`] = built.map(b => `${b.coord.unit}/${b.coord.level}`);
+fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
+console.log(`\nmanifest updated: ${manifestPath.replace(ROOT + '/', '')}`);
+
 console.log(`\n${frameId}/${bandId} — ${built.length} lesson records`);
 for (const b of built) console.log(`  ${b.key}  (${b.data.practiceProblems.length} problems)`);
 

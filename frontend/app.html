@@ -920,11 +920,14 @@
   }
 
 </style>
-<script src="lang.js?v=20260514-practicar"></script>
+<script src="lang.js?v=20260727-dstruct3c"></script>
 <script src="lesson-phase-nav.js?v=20260518-grammar"></script>
 <script src="calculator.js?v=20260518-calc-hover"></script>
 <script src="https://cdn.jsdelivr.net/npm/algebrite@1.4.0/dist/algebrite.bundle-for-browser.js"></script>
-<script src="content/seed-paa-algebra.js"></script>
+<script src="content/coordinates.js?v=20260727-dstruct3c"></script>
+<script src="content/seed-paa-algebra.js?v=20260727-dstruct3c"></script>
+<script src="content/seed-cambridge-s7.js?v=20260727-dstruct3c"></script>
+<script src="content/seed-registry.js?v=20260727-dstruct3c"></script>
 <script src="math-validation.js?v=20260602-formcheck"></script>
 </head>
 <body>
@@ -2214,10 +2217,35 @@
     const problemType = PARAM_MODE === 'test' ? 'test' : 'practice';
 
     problems = [];
-    const _seedCoords = (CURRICULUM_SEED_MAP[PARAM_CURRICULUM] || {})[unitVal]?.[levelVal];
-    if (_seedCoords) {
-      const _local = getLocalSeedProblems(_seedCoords.unitId, _seedCoords.levelId, problemType);
-      if (_local.length > 0) { problems = _local; }
+
+    // ── Canonical coordinate (D-STRUCT v3.0) ────────────────────────────────
+    // Resolve straight from the seed registry, which spans every bank. Tried
+    // first because a canonical URL can never be served by the PAA-only path
+    // below — that mismatch is why Cambridge practice came up empty.
+    const _coord = window.Coordinates && Coordinates.resolve(_urlParams);
+    if (_coord && _coord.form === 'canonical' && window.SeedRegistry) {
+      problems = SeedRegistry.forCoord(_coord.canonical);
+
+      // Prefer the lesson record's own ordering when it lists problems.
+      try {
+        const lr = await fetch(`${PROXY_URL}${_coord.lessonPath}`);
+        if (lr.ok) {
+          const lesson = await lr.json();
+          if (Array.isArray(lesson.practiceProblems) && lesson.practiceProblems.length) {
+            const ordered = SeedRegistry.byIds(lesson.practiceProblems);
+            if (ordered.length) problems = ordered;
+          }
+        }
+      } catch (e) { /* registry result already stands */ }
+    }
+
+    // ── Legacy PAA path — unchanged ─────────────────────────────────────────
+    if (problems.length === 0) {
+      const _seedCoords = (CURRICULUM_SEED_MAP[PARAM_CURRICULUM] || {})[unitVal]?.[levelVal];
+      if (_seedCoords) {
+        const _local = getLocalSeedProblems(_seedCoords.unitId, _seedCoords.levelId, problemType);
+        if (_local.length > 0) { problems = _local; }
+      }
     }
     if (problems.length === 0) {
       problems = await fetchBankProblemsForLesson(PARAM_CURRICULUM, unitVal, levelVal, problemType);
