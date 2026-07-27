@@ -44,6 +44,19 @@ if (band.status === 'PROVISIONAL') {
   process.exit(1);
 }
 
+const LEGACY_CURRICULUM_FOR_FRAME = {
+  CAMB: 'cambridge',
+  MEDUCA: 'meduca',
+  IB: 'ib-myp',
+  CCSS: 'ccss',
+};
+
+/** s7 → 7, g9 → 9, myp3 → 3 — legacy grade field for fallback renderers. */
+function legacyGradeForBand(bandId) {
+  const m = String(bandId || '').match(/(\d+)/);
+  return m ? m[1] : '';
+}
+
 (async () => {
   let student = null;
   try {
@@ -60,7 +73,7 @@ if (band.status === 'PROVISIONAL') {
   console.log(`\n${studentId} — ${student.name || '(no name)'}`);
   console.log(`  before: frame=${student.frame || '—'} band=${student.band || '—'} ` +
               `curriculum=${student.curriculum || '—'} grade=${student.grade || '—'}`);
-  console.log(`  after:  frame=${frame.id} band=${band.id}`);
+  console.log(`  after:  frame=${frame.id} band=${band.id} curriculum=${LEGACY_CURRICULUM_FOR_FRAME[frame.id] || '—'}`);
 
   const units = (band.units || []).map(u => `${u.id}(${(u.levels || []).length})`).join(' ');
   console.log(`  band units: ${units}`);
@@ -74,7 +87,13 @@ if (band.status === 'PROVISIONAL') {
     method: 'PUT',
     headers: { 'Authorization': 'Bearer ' + secret, 'Content-Type': 'application/json' },
     // `name` is required by the endpoint; preserve whatever is already there.
-    body: JSON.stringify({ name: student.name || studentId, frame: frame.id, band: band.id }),
+    body: JSON.stringify({
+      name: student.name || studentId,
+      frame: frame.id,
+      band: band.id,
+      curriculum: LEGACY_CURRICULUM_FOR_FRAME[frame.id] || '',
+      grade: legacyGradeForBand(band.id),
+    }),
   });
   console.log(put.ok ? '\nOK — assigned.' : `\nFAILED ${put.status} ${await put.text()}`);
   if (!put.ok) process.exitCode = 1;

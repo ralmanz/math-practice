@@ -430,12 +430,12 @@
 </main>
 
 
-<script src="content/skill-graph.js?v=20260727-dstruct3c"></script>
-<script src="content/coordinates.js?v=20260727-dstruct3c"></script>
-<script src="content/frames/meduca.js?v=20260727-dstruct3c"></script>
-<script src="content/frames/camb.js?v=20260727-dstruct3c"></script>
-<script src="content/frames/index.js?v=20260727-dstruct3c"></script>
-<script src="lang.js?v=20260727-dstruct3c"></script>
+<script src="content/skill-graph.js?v=20260727-dstruct3d"></script>
+<script src="content/coordinates.js?v=20260727-dstruct3d"></script>
+<script src="content/frames/meduca.js?v=20260727-dstruct3d"></script>
+<script src="content/frames/camb.js?v=20260727-dstruct3d"></script>
+<script src="content/frames/index.js?v=20260727-dstruct3d"></script>
+<script src="lang.js?v=20260727-dstruct3d"></script>
 <script>
   const WORKER = 'https://math-practice-proxy.ronelalmanza20.workers.dev';
   const URL_PARAMS = new URLSearchParams(window.location.search);
@@ -701,7 +701,8 @@
       return;
     }
 
-    if (student.curriculum === 'PAA') {
+    // Legacy PAA — only when the account has no canonical frame/band.
+    if (student.curriculum === 'PAA' && !student.frame) {
       renderPAACurriculum(student, studentId);
       return;
     }

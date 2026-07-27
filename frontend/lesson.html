@@ -1821,8 +1821,8 @@
   </div>
 </div>
 
-<script src="content/coordinates.js?v=20260727-dstruct3c"></script>
-<script src="lang.js?v=20260727-dstruct3c"></script>
+<script src="content/coordinates.js?v=20260727-dstruct3d"></script>
+<script src="lang.js?v=20260727-dstruct3d"></script>
 <script src="lesson-phase-nav.js?v=20260518-grammar"></script>
 <script src="lesson-example-walkthrough.js?v=20260603-p4"></script>
 <script src="calculator.js?v=20260518-calc-hover"></script>
@@ -2028,7 +2028,8 @@
   }
 
   function showGuestCompletionCard() {
-    const isPAA = curriculum === 'PAA';
+    const isCanonical = _coord && _coord.form === 'canonical';
+    const isPAA = !isCanonical && curriculum === 'PAA';
     const loginCurriculum = isPAA ? 'PAA' : 'cambridge';
     const titleKey = isPAA ? 'guest_lesson_complete_title' : 'guest_lesson_complete_title_secondary';
     const subtitleKey = isPAA ? 'guest_lesson_complete_subtitle' : 'guest_lesson_complete_subtitle_secondary';
@@ -2839,6 +2840,14 @@
 
     lessonMaxPhase = LESSON_PHASE_COUNT;
     lessonCurrentPhase = LESSON_PHASE_COUNT;
+
+    // Canonical coords resolve in app.html via SeedRegistry. Probing the worker
+    // bank with the progress key (CAMB:s7:lineq) returns [] and never reaches app.
+    if (_coord && _coord.form === 'canonical') {
+      window.location.href = curriculumAppUrl('practice', 'complete');
+      return;
+    }
+
     try {
       const r = await fetch(`${WORKER}/problems/curriculum/${encodeURIComponent(curriculum)}/${encodeURIComponent(unit)}/${encodeURIComponent(stage)}/practice`);
       const arr = r.ok ? await r.json() : [];
