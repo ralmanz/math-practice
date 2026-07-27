@@ -920,14 +920,14 @@
   }
 
 </style>
-<script src="lang.js?v=20260727-dstruct3e"></script>
+<script src="lang.js?v=20260727-dstruct3f"></script>
 <script src="lesson-phase-nav.js?v=20260518-grammar"></script>
 <script src="calculator.js?v=20260518-calc-hover"></script>
 <script src="https://cdn.jsdelivr.net/npm/algebrite@1.4.0/dist/algebrite.bundle-for-browser.js"></script>
-<script src="content/coordinates.js?v=20260727-dstruct3d"></script>
-<script src="content/seed-paa-algebra.js?v=20260727-dstruct3d"></script>
-<script src="content/seed-cambridge-s7.js?v=20260727-dstruct3d"></script>
-<script src="content/seed-registry.js?v=20260727-dstruct3d"></script>
+<script src="content/coordinates.js?v=20260727-dstruct3f"></script>
+<script src="content/seed-paa-algebra.js?v=20260727-dstruct3f"></script>
+<script src="content/seed-cambridge-s7.js?v=20260727-dstruct3f"></script>
+<script src="content/seed-registry.js?v=20260727-dstruct3f"></script>
 <script src="math-validation.js?v=20260602-formcheck"></script>
 </head>
 <body>
@@ -1235,6 +1235,15 @@
   const UNIT_LABELS = { aritmetica: 'Aritmética', algebra: 'Álgebra' };
 
   function buildLessonPhaseUrl(phaseSlug) {
+    const bootCoord = resolveBootCoord();
+    if (bootCoord && bootCoord.form === 'canonical') {
+      const q = new URLSearchParams(Coordinates.toQuery(bootCoord.canonical, {
+        phase: phaseSlug,
+        student: STUDENT_ID || '',
+      }));
+      if (PARAM_GUEST) q.set('guest', 'true');
+      return 'lesson.html?' + q.toString();
+    }
     const defaultUnit = PARAM_CURRICULUM === 'PAA' ? 'algebra' : '1';
     const q = new URLSearchParams({
       curriculum: PARAM_CURRICULUM,
@@ -1245,6 +1254,24 @@
     if (PARAM_GUEST) q.set('guest', 'true');
     if (STUDENT_ID) q.set('student', STUDENT_ID);
     return 'lesson.html?' + q.toString();
+  }
+
+  function resolveBootCoord() {
+    if (window.Coordinates) {
+      const c = Coordinates.resolve(_urlParams);
+      if (c) return c;
+    }
+    const frame = _urlParams.get('frame');
+    const band  = _urlParams.get('band');
+    const unit  = _urlParams.get('unit');
+    const level = _urlParams.get('level');
+    if (frame && band && unit && level) {
+      return {
+        form: 'canonical',
+        canonical: { frame: frame.toUpperCase(), band, unit, level },
+      };
+    }
+    return null;
   }
 
   function mountCurriculumLessonChrome() {
@@ -2153,7 +2180,7 @@
     }
 
     // Guest mode: curriculum practice without login
-    const _bootCoord = window.Coordinates && Coordinates.resolve(_urlParams);
+    const _bootCoord = resolveBootCoord();
     if (PARAM_GUEST && (_bootCoord || PARAM_CURRICULUM)) {
       loadGuestProblems();
       return;
@@ -2175,7 +2202,12 @@
       }
     }
     // Curriculum/lesson flow: resolve from canonical or legacy URL params
-    if (_bootCoord || (PARAM_CURRICULUM && PARAM_UNIT && (PARAM_STAGE || PARAM_LEVEL))) {
+    const _hasLegacyLesson =
+      PARAM_CURRICULUM && PARAM_UNIT && (PARAM_STAGE || PARAM_LEVEL);
+    const _hasCanonicalParams =
+      _urlParams.get('frame') && _urlParams.get('band') &&
+      _urlParams.get('unit') && _urlParams.get('level');
+    if (_bootCoord || _hasLegacyLesson || _hasCanonicalParams) {
       loadCurriculumProblemsFromBank(false);
       return;
     }
@@ -2216,7 +2248,7 @@
     // Resolve straight from the seed registry, which spans every bank. Tried
     // first because a canonical URL can never be served by the PAA-only path
     // below — that mismatch is why Cambridge practice came up empty.
-    const _coord = window.Coordinates && Coordinates.resolve(_urlParams);
+    const _coord = resolveBootCoord();
     if (_coord && _coord.form === 'canonical' && window.SeedRegistry) {
       problems = SeedRegistry.forCoord(_coord.canonical);
 
@@ -2717,7 +2749,10 @@
       }
       return;
     }
-    if (PARAM_CURRICULUM && PARAM_UNIT && PARAM_STAGE) {
+    const _doneCoord = resolveBootCoord();
+    const _hasLegacyLesson =
+      PARAM_CURRICULUM && PARAM_UNIT && (PARAM_STAGE || PARAM_LEVEL);
+    if (_doneCoord || _hasLegacyLesson) {
       // Curriculum flow (no lesson return URL): show done screen with back-to-curriculum button
       document.getElementById('practice-screen').style.display = 'none';
       document.getElementById('done-screen').style.display = 'block';
