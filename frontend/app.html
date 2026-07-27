@@ -920,7 +920,7 @@
   }
 
 </style>
-<script src="lang.js?v=20260727-dstruct3d"></script>
+<script src="lang.js?v=20260727-dstruct3e"></script>
 <script src="lesson-phase-nav.js?v=20260518-grammar"></script>
 <script src="calculator.js?v=20260518-calc-hover"></script>
 <script src="https://cdn.jsdelivr.net/npm/algebrite@1.4.0/dist/algebrite.bundle-for-browser.js"></script>
@@ -1217,7 +1217,6 @@
   }
   let askRonelProblems = [];
   let generatedLink = '';
-  let guestProblemAttempted = false;
 
   // ── Dashboard tracking (optional — set from URL params ?student=X&pid=Y) ──
   const _urlParams = new URLSearchParams(window.location.search);
@@ -1495,12 +1494,6 @@
   async function submitTranslate(input, problem) {
     const t0 = performance.now();
     console.log('[submitTranslate] entry', { input });
-
-    if (PARAM_GUEST && PARAM_MODE !== 'test' && !guestProblemAttempted) {
-      guestProblemAttempted = true;
-      const c = parseInt(localStorage.getItem('nuvo_guest_count') || '0', 10);
-      localStorage.setItem('nuvo_guest_count', String(c + 1));
-    }
 
     let isCorrect = false;
 
@@ -2160,7 +2153,8 @@
     }
 
     // Guest mode: curriculum practice without login
-    if (PARAM_GUEST && PARAM_CURRICULUM) {
+    const _bootCoord = window.Coordinates && Coordinates.resolve(_urlParams);
+    if (PARAM_GUEST && (_bootCoord || PARAM_CURRICULUM)) {
       loadGuestProblems();
       return;
     }
@@ -2180,8 +2174,8 @@
         console.error('Failed to parse problem data from URL:', e);
       }
     }
-    // Curriculum/lesson flow: fetch+filter problems from the problem bank
-    if (PARAM_CURRICULUM && PARAM_UNIT && PARAM_STAGE) {
+    // Curriculum/lesson flow: resolve from canonical or legacy URL params
+    if (_bootCoord || (PARAM_CURRICULUM && PARAM_UNIT && (PARAM_STAGE || PARAM_LEVEL))) {
       loadCurriculumProblemsFromBank(false);
       return;
     }
@@ -2265,21 +2259,8 @@
     loadProblem(0);
   }
 
-  // ── Guest mode: load PAA practice problems without login ──
+  // ── Guest mode: load practice problems without login ──
   async function loadGuestProblems() {
-    // Initialise counter only on first ever visit
-    if (localStorage.getItem('nuvo_guest_count') === null) {
-      localStorage.setItem('nuvo_guest_count', '0');
-    }
-
-    const guestCount = parseInt(localStorage.getItem('nuvo_guest_count') || '0', 10);
-
-    // Guest used free practice quota — send to enrollment form
-    if (PARAM_MODE !== 'test' && guestCount >= 5) {
-      redirectGuestToEnrollment();
-      return;
-    }
-
     await loadCurriculumProblemsFromBank(true);
   }
 
@@ -2331,7 +2312,6 @@
     stepHistory = [];
     wrongCount = 0;
     formCheckAttempts = 0;
-    guestProblemAttempted = false;
     if (IS_UNIT_TEST) {
       unitTestStepRejections = [];
       unitTestQuestionRecorded = false;
@@ -2417,12 +2397,6 @@
     if (gateRequired && !stepEqGateOn) {
       rejectGateNotOpen();
       return;
-    }
-
-    if (PARAM_GUEST && PARAM_MODE !== 'test' && !guestProblemAttempted) {
-      guestProblemAttempted = true;
-      const c = parseInt(localStorage.getItem('nuvo_guest_count') || '0', 10);
-      localStorage.setItem('nuvo_guest_count', String(c + 1));
     }
 
     document.getElementById('calc-grid').classList.add('disabled');
@@ -2726,13 +2700,6 @@
     if (IS_UNIT_TEST) {
       advanceUnitTestQuestion();
       return;
-    }
-    if (PARAM_GUEST && PARAM_MODE !== 'test') {
-      const count = parseInt(localStorage.getItem('nuvo_guest_count') || '0', 10);
-      if (count >= 5) {
-        redirectGuestToEnrollment();
-        return;
-      }
     }
     if (currentIndex < problems.length - 1) {
       loadProblem(currentIndex + 1);
